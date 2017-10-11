@@ -5,11 +5,11 @@ package org.firstinspires.ftc.teamcode.MainBot.teleop;
  */
 
 public class CrossCommunicator {
-    public static class Drive {
-        public static String UP = "up";
-        public static String DOWN = "down";
-        public static String LEFT = "left";
-        public static String RIGHT = "right";
+    public static class Drive {                      // FL––––FR
+        public static String UP = "front left";      // |U   R|
+        public static String DOWN = "back right";    // |     |
+        public static String LEFT = "back left";     // |L   D|
+        public static String RIGHT = "front right";  // BL––––BR
     }
 
     public static class Jewel {
