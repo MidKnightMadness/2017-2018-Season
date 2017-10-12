@@ -1,8 +1,6 @@
 # Assemblies
 This experiment copied the TeleOp behavior of the 2016-2017 Main Bot and MiniBot. It uses a new format where each subassembly is split into seperate directories and each subassembly is divided into a controller and TeleOp. Subassemblies are combined to make each robot. When a subassembly needs informaition about the robot configuration or other assemblies, it goes to a common CrossCommunicator. This allows each subassembly to not reference other subassembies so each subassembly can be developed independently.
 
-Trying.
-
 Simple autonomous examples are also included, but they do not use this format.
 
 ## How to Git It All Working on Your Computer
