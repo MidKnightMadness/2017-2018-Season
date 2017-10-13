@@ -43,7 +43,7 @@ public class VuMarkView extends LinearOpMode {
         waitForStart();
         vuMarks.activate();
 
-        while (time < 30) {
+        while (opModeIsActive()) {
             RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(vuMarkTemplate);
             telemetry.addLine("VUMARK: " + vuMark);
             telemetry.update();
