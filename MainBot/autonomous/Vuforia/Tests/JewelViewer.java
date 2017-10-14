@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.MainBot.autonomous.Vuforia.Tests;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.os.Environment;
 
@@ -17,6 +18,7 @@ import com.vuforia.Vuforia;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CloseableFrame;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
@@ -38,7 +40,7 @@ public class JewelViewer extends LinearOpMode {
     private final boolean SHOW_TEXT_IMAGE = false;
 
     //How many times to run through? Suggested: 7
-    private final int NUM_OF_TAKES = 7;
+    private final int NUM_OF_TAKES = 1;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -86,7 +88,7 @@ public class JewelViewer extends LinearOpMode {
         telemetry.update();
 
         //Prepares tracking asset group -- takes 1s
-        VuforiaTrackables pictographTrackables = vuforia.loadTrackablesFromAsset("Pictographs");
+        VuforiaTrackables pictographTrackables = vuforia.loadTrackablesFromAsset("RelicVuMark");
 
         //Log time
         times[3] = time - times[2];
@@ -145,10 +147,19 @@ public class JewelViewer extends LinearOpMode {
 
                         //Get points of corners of jewels based on pictograph in the 2d image Units: Inch
                         float[][] srcPoints = new float[4][2];
-                        srcPoints[0] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(14f, -1f, 2.5f)).getData();
+                        srcPoints[0] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(375f, -100f, 0f)).getData();
+                        srcPoints[1] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(150f, -100f, 0f)).getData();
+                        srcPoints[2] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(150f, -250f, 0f)).getData();
+                        srcPoints[3] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(375f, -250f, 0f)).getData();
+
+
+
+
+
+                        /*srcPoints[0] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(14f, -1f, 2.5f)).getData();
                         srcPoints[1] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(3.5f, -1f, 2.5f)).getData();
                         srcPoints[2] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(3.5f, -4.25f, 2.5f)).getData();
-                        srcPoints[3] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(14f, -4.25f, 2.5f)).getData();
+                        srcPoints[3] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(14f, -4.25f, 2.5f)).getData();*/
 
 
 
@@ -183,9 +194,106 @@ public class JewelViewer extends LinearOpMode {
                                 float height = Math.min(srcBmp.getHeight() - y, Math.max(0,
                                         Math.max(Math.max(srcPoints[0][1], srcPoints[1][1]), Math.max(srcPoints[2][1], srcPoints[3][1])) - y
                                 ));
+                                telemetry.addLine(x + ", " + y + ", " + width + ", " + height);
+                                telemetry.update();
 
                                 Bitmap medBmp = Bitmap.createBitmap(srcBmp, (int) x, (int) y, (int) width, (int) height);
+
+                                //If SAVE_CROPPED, save outBmp as png
+                                if (SAVE_CROPPED) {
+
+                                    try {
+
+                                        File file = new File("/storage/self/primary/Pictures/images/", "Outpu_" + time + ".png");
+                                        FileOutputStream outStream = new FileOutputStream(file);
+                                        medBmp.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+                                        outStream.close();
+                                    } catch (Exception e) {
+                                        telemetry.addLine(e.toString());
+                                        telemetry.update();
+                                    }
+                                }
+
+
+                                telemetry.addLine("MedBMP!");
+                                telemetry.update();
                                 Bitmap outBmp = Bitmap.createScaledBitmap(medBmp, 2, 4, false);
+
+
+                                //Check color
+                                int blueCount = 0, redCount = 0;
+                                double[][] getColor = new double[4][2];
+                                for (i = 0; i < 4; i++) {
+                                    for (int j = 0; j < 1; j++) {
+                                        int blueVal, redVal, difference;
+                                        blueVal = Color.blue(outBmp.getPixel(j, i));
+                                        redVal = Color.red(outBmp.getPixel(j, i));
+                                        difference = redVal - blueVal;
+                                        if (Math.abs(difference) < 40) {
+                                            break;
+                                        }
+                                        else if (difference < 0) {
+                                            blueCount++;
+
+                                        }
+                                        else {
+                                            redCount++;
+                                        }
+                                        /*telemetry.addLine("Ratio: " + i + " " + j + " ");
+                                        telemetry.addLine(redVal + ":" + blueVal);*/
+                                    }
+                                }
+                                String left;
+                                String right;
+                                telemetry.addLine("Column 0: " + redCount + " " + blueCount);
+                                if (redCount > blueCount) {
+                                    telemetry.addLine("Red left");
+                                    left = "Red";
+                                }
+                                else {
+                                    telemetry.addLine("Blue left");
+                                    left = "Blue";
+                                }
+                                redCount = 0;
+                                blueCount = 0;
+                                for (i = 0; i < 4; i++) {
+                                    for (int j = 1; j < 2; j++) {
+                                        int blueVal, redVal, difference;
+                                        blueVal = Color.blue(outBmp.getPixel(j, i));
+                                        redVal = Color.red(outBmp.getPixel(j, i));
+                                        difference = redVal - blueVal;
+                                        if (Math.abs(difference) < 40) {
+                                            break;
+                                        }
+                                        else if (difference < 0) {
+                                            blueCount++;
+
+                                        }
+                                        else {
+                                            redCount++;
+                                        }
+                                        /*telemetry.addLine("Ratio: " + i + " " + j + " ");
+                                        telemetry.addLine(redVal + ":" + blueVal);*/
+                                    }
+                                }
+                                telemetry.addLine("Column 1: " + redCount + " " + blueCount);
+                                if (redCount > blueCount) {
+                                    telemetry.addLine("Red right");
+                                    right = "Red";
+                                }
+                                else {
+                                    telemetry.addLine("Blue right");
+                                    right = "Blue";
+                                }
+                                if (left != right) {
+                                    telemetry.addLine("Yay");
+                                } else {
+                                    continue;
+                                }
+                                telemetry.addLine("Pictograph: " + RelicRecoveryVuMark.from(pictographTrackables.get(0)));
+                                telemetry.update();
+
+
 
 
 
@@ -194,7 +302,7 @@ public class JewelViewer extends LinearOpMode {
 
                                     try {
 
-                                        File file = new File("/storage/self/primary/Pictures/images/", "Output_" + time + ".png");
+                                        File file = new File("/storage/self/primary/Pictures/images/", "Outpu_" + time + ".png");
                                         FileOutputStream outStream = new FileOutputStream(file);
                                         outBmp.compress(Bitmap.CompressFormat.PNG, 100, outStream);
                                         outStream.close();
