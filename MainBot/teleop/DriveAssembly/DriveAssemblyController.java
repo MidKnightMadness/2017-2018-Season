@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop.DriveAssembly;
 
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -10,12 +16,13 @@ import java.lang.Math;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
-public class DriveAssemblyController {
+public class DriveAssemblyController implements SensorEventListener{
     
-    private static double RATIO_WHEEL = 6300; //in encoder counts
-    private static double RATIO_BOT = 1120;
-    private static boolean MOTORS = true;
+    private static double RATIO_WHEEL = 17.5; //in encoder counts
+    private static double RATIO_BOT = 1;
+    private static boolean MOTORS = false;
     private static double TURN_SPEED_RATIO = 1;
+    private static boolean THETA_BY_PHONE = true;
 
     private Telemetry telemetry;
     private DcMotor motorUp;
@@ -32,6 +39,17 @@ public class DriveAssemblyController {
     private double translationDirection = 0;
     private double addedRotation = 0;
 
+    private SensorManager sensorManager;
+    private Sensor accelSensor;
+    private Sensor magnetSensor;
+    private boolean mSRead = false;
+    private boolean aSRead = false;
+    private float[] mSensorReadings = new float[3];
+    private float[] aSensorReadings = new float[3];
+    private float[] orientation = new float[3];
+    private float[] rotationMatrix = new float[9];
+    private double startPos = 0;
+
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
 
@@ -46,7 +64,23 @@ public class DriveAssemblyController {
             motorDown.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            motorUp.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motorDown.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             oldMotorPos = new int[]{motorUp.getCurrentPosition(), motorDown.getCurrentPosition(), motorLeft.getCurrentPosition(), motorRight.getCurrentPosition()};
+        }
+        if (THETA_BY_PHONE) {
+            sensorManager = (SensorManager) hardwareMap.appContext.getSystemService(Context.SENSOR_SERVICE);
+            accelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            magnetSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+
+            sensorManager.registerListener(this, accelSensor,
+                    SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
+            sensorManager.registerListener(this, magnetSensor,
+                    SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
         }
         telemetry.addLine("Status: Initialized and Ready!");
         telemetry.update();
@@ -80,6 +114,7 @@ public class DriveAssemblyController {
 
     public void start() {
         timeElapsed = runtime.time();
+        startPos = theta;
     }
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
@@ -130,11 +165,13 @@ public class DriveAssemblyController {
 
 
         /* ************SET THETA************ */
+        if (!THETA_BY_PHONE) {
             // dw/s * s = dw -> dw * db/dw = db
             timeThisRun = runtime.time() - timeElapsed;
             timeElapsed = runtime.time();
 
-            theta += ((motorUp.getCurrentPosition() + motorDown.getCurrentPosition() + motorLeft.getCurrentPosition() + motorRight.getCurrentPosition() - oldMotorPos[0] - oldMotorPos[1] - oldMotorPos[2] - oldMotorPos[3])/4) * (RATIO_BOT / RATIO_WHEEL);
+            //encoder ticks of motor * (encoder ticks of bot / encoder ticks of wheel) * (degrees of bot / encoder ticks of bot)
+            theta += ((motorUp.getCurrentPosition() + motorDown.getCurrentPosition() + motorLeft.getCurrentPosition() + motorRight.getCurrentPosition() - oldMotorPos[0] - oldMotorPos[1] - oldMotorPos[2] - oldMotorPos[3]) / 4d) * (RATIO_BOT / RATIO_WHEEL);
 
             telemetry.addLine("Up Motor: " + (motorUp.getCurrentPosition() - oldMotorPos[0]));
             telemetry.addLine("Down Motor: " + (motorDown.getCurrentPosition() - oldMotorPos[1]));
@@ -149,12 +186,37 @@ public class DriveAssemblyController {
             telemetry.addData("Ratio: ", RATIO_BOT / RATIO_WHEEL);
             telemetry.addData("All Together: ", addedRotation * scale * timeThisRun * (RATIO_BOT / RATIO_WHEEL));
             telemetry.addData("Theta: ", theta);*/
-
+        } else {
+            telemetry.addLine("Orient: " + orientation[0] + ", " + orientation[1] + ", " + orientation[2]);
+        }
 
             telemetry.update();
     }
 
     public void stop() {
-
+        sensorManager.unregisterListener(this);
     }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        if (sensorEvent.sensor == accelSensor) {
+            aSensorReadings = sensorEvent.values;
+            aSRead = true;
+        } else if (sensorEvent.sensor == magnetSensor) {
+            mSensorReadings = sensorEvent.values;
+            mSRead = true;
+        }
+
+        if (aSRead && mSRead) {
+            SensorManager.getRotationMatrix(rotationMatrix, null, aSensorReadings, mSensorReadings);
+            SensorManager.getOrientation(rotationMatrix, orientation);
+            orientation[0] *= 180d/Math.PI;
+            orientation[1] *= 180d/Math.PI;
+            orientation[2] *= 180d/Math.PI;
+            theta = orientation[0] - startPos;
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int value) {}
 }

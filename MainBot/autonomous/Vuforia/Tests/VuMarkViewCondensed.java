@@ -18,7 +18,7 @@ public class VuMarkViewCondensed extends LinearOpMode {
         VuforiaTrackable vuMarkTemplate = vuMarks.get(0);
         waitForStart();
         vuMarks.activate();
-        while (time < 30) {
+        while (opModeIsActive()) {
             RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(vuMarkTemplate);
             telemetry.addLine("VUMARK: " + vuMark);
             telemetry.update();
