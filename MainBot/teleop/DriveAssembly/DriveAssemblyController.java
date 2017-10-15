@@ -16,13 +16,15 @@ import java.lang.Math;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
-public class DriveAssemblyController implements SensorEventListener{
-    
-    private static double RATIO_WHEEL = 17.5; //in encoder counts
-    private static double RATIO_BOT = 1;
-    private static boolean MOTORS = false;
+public class DriveAssemblyController implements SensorEventListener {
+
+    private static double RATIO_WHEEL = 6300; //in encoder counts
+    private static double RATIO_BOT = 1120;
+    private static boolean MOTORS = true;
     private static double TURN_SPEED_RATIO = 1;
     private static boolean THETA_BY_PHONE = true;
+    private boolean isUsingTheta = true;
+    private boolean bPressed = false;
 
     private Telemetry telemetry;
     private DcMotor motorUp;
@@ -118,6 +120,23 @@ public class DriveAssemblyController implements SensorEventListener{
     }
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
+        if (gamepad1.a) {
+            startPos = orientation[0];
+            theta = 0;
+        }
+        if (gamepad1.b && !bPressed) {
+            isUsingTheta = !isUsingTheta;
+            if (isUsingTheta) {
+                startPos = orientation[0];
+                theta = startPos;
+            }
+            bPressed = true;
+        } else if (!gamepad1.b){
+            bPressed = false;
+        }
+
+
+
         translationDirection = aTan(gamepad1.left_stick_x, -gamepad1.left_stick_y);
 
         //degrees per second to add to each motor speed
@@ -149,7 +168,7 @@ public class DriveAssemblyController implements SensorEventListener{
         //telemetry.addLine("Added Rotation: " + addedRotation);
         //telemetry.addLine("Time Elapsed: " + timeElapsed);
         //telemetry.addLine("Scale: " + scale);
-        telemetry.addLine("Up Motor: " + tempMotors[3]);
+        telemetry.addLine("Up Motor: " + tempMotors[0]);
         telemetry.addLine("Down Motor: " + tempMotors[1]);
         telemetry.addLine("Left Motor: " + tempMotors[2]);
         telemetry.addLine("Right Motor: " + tempMotors[3]);
@@ -165,7 +184,7 @@ public class DriveAssemblyController implements SensorEventListener{
 
 
         /* ************SET THETA************ */
-        if (!THETA_BY_PHONE) {
+        if (!THETA_BY_PHONE && isUsingTheta) {
             // dw/s * s = dw -> dw * db/dw = db
             timeThisRun = runtime.time() - timeElapsed;
             timeElapsed = runtime.time();
@@ -213,7 +232,10 @@ public class DriveAssemblyController implements SensorEventListener{
             orientation[0] *= 180d/Math.PI;
             orientation[1] *= 180d/Math.PI;
             orientation[2] *= 180d/Math.PI;
-            theta = orientation[0] - startPos;
+            if (isUsingTheta) {
+                theta = orientation[0] - startPos;
+            }
+
         }
     }
 
