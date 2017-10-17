@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous.Vuforia;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous.Vuforia.Tests;
 
 import android.graphics.Bitmap;
 import android.os.Environment;

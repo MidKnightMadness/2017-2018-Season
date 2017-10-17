@@ -37,10 +37,10 @@ public class FindDWController {
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
 
-        motorUp.setPower(gamepad1.right_stick_x);
-        motorDown.setPower(gamepad1.right_stick_x);
-        motorLeft.setPower(gamepad1.right_stick_x);
-        motorRight.setPower(gamepad1.right_stick_x);
+        motorUp.setPower(gamepad1.right_stick_x * 0.5);
+        motorDown.setPower(gamepad1.right_stick_x * 0.5);
+        motorLeft.setPower(gamepad1.right_stick_x * 0.5);
+        motorRight.setPower(gamepad1.right_stick_x * 0.5);
 
         telemetry.addData("Motor Up: ", motorUp.getCurrentPosition());
         telemetry.addData("Motor Down: ", motorDown.getCurrentPosition());
