@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.MainBot.teleop.JewelAssembly.JewelAssembly
 
 @Autonomous(name = "MainBot", group = "Main Bot")
 public class MainBot extends LinearOpMode {
-
+    private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.BLUE;
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -32,20 +32,32 @@ public class MainBot extends LinearOpMode {
 
         visualC.look(false);
         jewelC.down();
-        driveC.setTarget(0.1, 0, 0, (visualC.leftJewel == VisualController.JewelColor.BLUE ? 10 : -10), (visualC.leftJewel == VisualController.JewelColor.BLUE ? 1 : -1), false);
-        while (!driveC.reachedTargetRotation || jewelC.isBusy()) {
-            driveC.update();
+        while (jewelC.isBusy()) {
             jewelC.update();
             idle();
         }
 
-        jewelC.up();
-        driveC.setTarget(0.1, 0, 0, (visualC.leftJewel == VisualController.JewelColor.BLUE ? -10 : 10), (visualC.leftJewel == VisualController.JewelColor.BLUE ? -1 : 1), false);
-        while (!driveC.reachedTargetRotation || jewelC.isBusy()) {
+        driveC.setTarget(0.1, 0, 0, (visualC.leftJewel == TEAM_COLOR ? 10 : -10), (visualC.leftJewel == TEAM_COLOR ? 1 : -1), false);
+        while (!driveC.reachedTargetRotation) {
             driveC.update();
+            telemetry.update();
+            idle();
+        }
+
+        jewelC.up();
+        while (jewelC.isBusy()) {
             jewelC.update();
             idle();
         }
+
+        driveC.setTarget(0.5, 3828.5, 65, (visualC.leftJewel == TEAM_COLOR ? -10 : 10), (visualC.leftJewel == TEAM_COLOR ? -1 : 1), false);
+        while (!driveC.reachedTargetRotation) {
+            driveC.update();
+            telemetry.update();
+            idle();
+        }
+
+
 
         // Do something useful
     }

@@ -24,8 +24,10 @@ import java.util.Vector;
 public class DriveAssemblyController {
     private static boolean MOTORS_ENABLED = true;
     private static double TURN_SPEED_RATIO = 1;
+    private double motorDriverSpeed = 0.8;
     private boolean isUsingTheta = true;
     private boolean bPressed = false;
+    private boolean yPressed = false;
 
     private Telemetry telemetry;
     private DcMotor motorUp;
@@ -33,9 +35,10 @@ public class DriveAssemblyController {
     private DcMotor motorLeft;
     private DcMotor motorRight;
     private double motorSpeeds[] = new double[4];
-    private double theta = 0;
+    private double theta = 135;
     private BNO055IMU imu;
     private double startPos = 0;
+    private int[] oldMotorPos = new int[4];
 
     private double targetSpeed = 0;
     private double targetDistance = 0;
@@ -118,7 +121,8 @@ public class DriveAssemblyController {
     //on start, set startPos to theta
     public void start() {
         imu.startAccelerationIntegration(new Position(), new Velocity(), 50);
-        startPos = theta;
+        startPos = AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle) + theta;
+        oldMotorPos = new int[]{motorUp.getCurrentPosition(), motorDown.getCurrentPosition(), motorLeft.getCurrentPosition(), motorRight.getCurrentPosition()};
     }
 
     /**
@@ -126,7 +130,7 @@ public class DriveAssemblyController {
      * @param reset  the angle to reset to
      */
     public void resetTheta(double reset) {
-        startPos = AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle);
+        startPos = AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle) + reset;
         theta = reset;
     }
 
@@ -165,7 +169,7 @@ public class DriveAssemblyController {
     public void setRotationMode(boolean isNowUsingTheta) {
         isUsingTheta = isNowUsingTheta;
         if (isUsingTheta) {
-            startPos = AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle);
+            startPos = theta - AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle);
             theta = startPos;
         }
     }
@@ -184,6 +188,9 @@ public class DriveAssemblyController {
      * @param driverControlled  whether or not the robot is currently driver-controlled
      */
     public void setTarget(double speed, double distance, double direction, double rotation, double rotationSpeed, boolean driverControlled) {
+        reachedTargetRotation = false;
+        reachedTargetTranslation = false;
+
         targetSpeed = speed;
         targetDistance = distance;
         targetDirection = direction;
@@ -197,7 +204,7 @@ public class DriveAssemblyController {
      */
     public void update() {
         if (!isDriverControlled) {
-            if (Math.abs(theta - targetRotation) < 1) {
+            if (Math.abs(theta - startPos - targetRotation) < 3) {
                 reachedTargetRotation = true;
                 targetRotationSpeed = 0;
             }
@@ -208,7 +215,8 @@ public class DriveAssemblyController {
             }
         }
 
-        netTranslationVector.add(new VectorF(((motorLeft.getCurrentPosition() - motorRight.getCurrentPosition()) / 2), ((motorUp.getCurrentPosition() - motorDown.getCurrentPosition()) / 2)));
+        netTranslationVector.add(new VectorF(((motorLeft.getCurrentPosition() - oldMotorPos[2]) - (motorRight.getCurrentPosition() - oldMotorPos[3]) / 2), ((motorUp.getCurrentPosition() - oldMotorPos[0]) - (motorDown.getCurrentPosition() - oldMotorPos[1]) / 2)));
+        oldMotorPos = new int[]{motorUp.getCurrentPosition(), motorDown.getCurrentPosition(), motorLeft.getCurrentPosition(), motorRight.getCurrentPosition()};
 
         if (isUsingTheta){
             theta = AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle) - startPos;
@@ -250,7 +258,7 @@ public class DriveAssemblyController {
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
         if (gamepad1.a) {
-            resetTheta(45);
+            resetTheta(135);
         }
         if (gamepad1.b && !bPressed) {
             setRotationMode(isUsingTheta);
@@ -262,8 +270,14 @@ public class DriveAssemblyController {
             resetNetTransVect();
             resetNetRotation();
         }
+        if (gamepad1.y && !bPressed) {
+            motorDriverSpeed = (motorDriverSpeed == 0.8 ? 0.4 : 0.8);
+            yPressed = true;
+        } else if (!gamepad1.y){
+            yPressed = false;
+        }
 
-        setTarget(0.8, ((gamepad1.left_stick_x == 0 && -gamepad1.left_stick_y == 0) ? 0 : 1), aTan(gamepad1.left_stick_x, -gamepad1.left_stick_y), 1, gamepad1.right_stick_x, true);
+        setTarget(motorDriverSpeed, ((gamepad1.left_stick_x == 0 && -gamepad1.left_stick_y == 0) ? 0 : 1), aTan(gamepad1.left_stick_x, -gamepad1.left_stick_y), 1, gamepad1.right_stick_x, true);
         update();
         telemetry.addData("Current Translation Vector: ", getNetTransVect());
         telemetry.addData("Net Translation Direction: ", aTan(getNetTransVect().get(0), getNetTransVect().get(1)));
