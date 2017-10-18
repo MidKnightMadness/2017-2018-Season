@@ -18,7 +18,6 @@ public class MainBot extends LinearOpMode {
         JewelAssemblyController jewelC = new JewelAssemblyController();
         GlyphAssemblyController glyphC = new GlyphAssemblyController();
         VisualController visualC = new VisualController();
-
         driveC.init(telemetry, hardwareMap);
         jewelC.init(telemetry, hardwareMap);
         glyphC.init(telemetry, hardwareMap);
@@ -28,12 +27,22 @@ public class MainBot extends LinearOpMode {
         telemetry.update();
 
         waitForStart();
+        driveC.start();
 
         visualC.look(false);
+        driveC.setTarget(0.1, 0, 0, 10, 1, false);
+        while (!driveC.reachedTargetRotation) {
+            driveC.update();
+            idle();
+        }
 
-        /*glyphC.grab();
+
+
+
+
+/*
         jewelC.down();
-        driveC.move(0.2, 0, 0, 10);
+        driveC.setTarget(0.2, 0, 0, 10, 1, false);
 
         while (!(driveC.rotated && jewelC.reachedTarget && glyphC.reachedTarget)) {
             driveC.update();
@@ -45,6 +54,5 @@ public class MainBot extends LinearOpMode {
         */
 
         // Do something useful
-
     }
 }
