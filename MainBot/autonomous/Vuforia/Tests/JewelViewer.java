@@ -234,7 +234,6 @@ public class JewelViewer extends LinearOpMode {
                                         }
                                         else if (difference < 0) {
                                             blueCount++;
-
                                         }
                                         else {
                                             redCount++;
