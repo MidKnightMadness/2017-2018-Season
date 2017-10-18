@@ -13,7 +13,7 @@ public class CrossCommunicator {
     }
 
     public static class Jewel {
-        public static String SERVO = "servo";
+        public static String MOTOR = "jewel arm";
     }
 
 }

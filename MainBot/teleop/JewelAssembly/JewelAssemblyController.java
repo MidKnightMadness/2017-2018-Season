@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop.JewelAssembly;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
@@ -12,9 +14,13 @@ import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
  */
 
 public class JewelAssemblyController {
-    private Servo servo;
-    private Servo servo2;
+    private DcMotor motor;
     private Telemetry telemetry;
+    private ElapsedTime runtime;
+    private double waitUntil = 0;
+    boolean pressed = false;
+    double power = .3;
+    int distance = 529;
 
     private void log(String data) {
         telemetry.addLine(data);
@@ -22,27 +28,39 @@ public class JewelAssemblyController {
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
-        servo = hardwareMap.servo.get(CrossCommunicator.Jewel.SERVO);
-        servo.setPosition(0);
-        servo2 = hardwareMap.servo.get("servo2");
-        servo2.setPosition(0);
+        motor = hardwareMap.dcMotor.get(CrossCommunicator.Jewel.MOTOR);
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        runtime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
     }
 
     public void start() {
-
+        runtime.reset();
     }
 
-    private double pos = 0;
-    private double dir = 0.1;
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
-        if (pos < 1) {
-            pos += dir;
-            servo2.setPosition(pos);
-            log("" + pos);
-        } else if (pos < 2){
-            pos += dir;
-            servo.setPosition(pos - 1);
-            log("" + pos);
+
+        if (gamepad1.x && !pressed && (runtime.time() > waitUntil)) {
+            pressed = true;
+            motor.setTargetPosition(motor.getCurrentPosition() - distance);
+            motor.setPower(power);
+
+            waitUntil = runtime.time() + 2;
+        }
+        if (pressed && (runtime.time() > waitUntil)) {
+            motor.setTargetPosition(motor.getCurrentPosition() + distance);
+            motor.setPower(-power);
+            waitUntil = runtime.time() + 2;
+            pressed = false;
+        }
+        if (gamepad1.dpad_down) {
+            motor.setTargetPosition(motor.getCurrentPosition() - 10);
+            motor.setPower(power);
+        }
+
+        if (gamepad1.dpad_up) {
+            motor.setTargetPosition(motor.getCurrentPosition() + 10);
+            motor.setPower(-power);
         }
     }
 
