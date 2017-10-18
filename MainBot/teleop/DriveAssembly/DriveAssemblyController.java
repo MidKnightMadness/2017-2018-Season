@@ -197,7 +197,7 @@ public class DriveAssemblyController {
      */
     public void update() {
         if (!isDriverControlled) {
-            if (Math.abs(theta - targetRotation) < 4) {
+            if (Math.abs(theta - targetRotation) < 1) {
                 reachedTargetRotation = true;
                 targetRotationSpeed = 0;
             }

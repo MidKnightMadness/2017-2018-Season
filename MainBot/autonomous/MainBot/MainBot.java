@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.MainBot.autonomous.Vuforia.VisualControlle
 import org.firstinspires.ftc.teamcode.MainBot.teleop.DriveAssembly.DriveAssemblyController;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.GlyphAssembly.GlyphAssemblyController;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.JewelAssembly.JewelAssemblyController;
+import org.firstinspires.ftc.teamcode.MainBot.teleop.JewelAssembly.JewelAssemblyNewController;
 
 @Autonomous(name = "MainBot", group = "Main Bot")
 public class MainBot extends LinearOpMode {
@@ -15,7 +16,7 @@ public class MainBot extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         DriveAssemblyController driveC = new DriveAssemblyController();
-        JewelAssemblyController jewelC = new JewelAssemblyController();
+        JewelAssemblyNewController jewelC = new JewelAssemblyNewController();
         GlyphAssemblyController glyphC = new GlyphAssemblyController();
         VisualController visualC = new VisualController();
         driveC.init(telemetry, hardwareMap);
@@ -30,28 +31,21 @@ public class MainBot extends LinearOpMode {
         driveC.start();
 
         visualC.look(false);
-        driveC.setTarget(0.1, 0, 0, 10, 1, false);
-        while (!driveC.reachedTargetRotation) {
+        jewelC.down();
+        driveC.setTarget(0.1, 0, 0, (visualC.leftJewel == VisualController.JewelColor.BLUE ? 10 : -10), (visualC.leftJewel == VisualController.JewelColor.BLUE ? 1 : -1), false);
+        while (!driveC.reachedTargetRotation || jewelC.isBusy()) {
             driveC.update();
+            jewelC.update();
             idle();
         }
 
-
-
-
-
-/*
-        jewelC.down();
-        driveC.setTarget(0.2, 0, 0, 10, 1, false);
-
-        while (!(driveC.rotated && jewelC.reachedTarget && glyphC.reachedTarget)) {
+        jewelC.up();
+        driveC.setTarget(0.1, 0, 0, (visualC.leftJewel == VisualController.JewelColor.BLUE ? -10 : 10), (visualC.leftJewel == VisualController.JewelColor.BLUE ? -1 : 1), false);
+        while (!driveC.reachedTargetRotation || jewelC.isBusy()) {
             driveC.update();
             jewelC.update();
-            glyphC.update();
+            idle();
         }
-
-        jewelC.up();
-        */
 
         // Do something useful
     }

@@ -33,7 +33,7 @@ public class VisualController {
     // whether or not to save the cropped image
     private boolean SAVE_CROPPED = false;
 
-    enum JewelColor {
+    public enum JewelColor {
         RED,
         BLUE
     }
