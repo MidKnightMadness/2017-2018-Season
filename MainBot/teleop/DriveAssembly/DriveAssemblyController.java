@@ -1,11 +1,6 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop.DriveAssembly;
 
-import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -14,15 +9,18 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.lang.Math;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
-public class DriveAssemblyController implements SensorEventListener {
+public class DriveAssemblyController {
 
     private static double RATIO_WHEEL = 6300; //in encoder counts
     private static double RATIO_BOT = 1120;
     private static boolean MOTORS = true;
     private static double TURN_SPEED_RATIO = 1;
-    private static boolean THETA_BY_PHONE = true;
+    private static boolean THETA_BY_GYRO = true;
     private boolean isUsingTheta = true;
     private boolean bPressed = false;
 
@@ -32,7 +30,6 @@ public class DriveAssemblyController implements SensorEventListener {
     private DcMotor motorLeft;
     private DcMotor motorRight;
     private double timeElapsed;
-    private double timeThisRun;
     private ElapsedTime runtime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
     private double tempMotors[] = new double[4];
     private int oldMotorPos[] = new int[4];
@@ -40,20 +37,17 @@ public class DriveAssemblyController implements SensorEventListener {
     private double theta = 0;
     private double translationDirection = 0;
     private double addedRotation = 0;
-
-    private SensorManager sensorManager;
-    private Sensor accelSensor;
-    private Sensor magnetSensor;
-    private boolean mSRead = false;
-    private boolean aSRead = false;
-    private float[] mSensorReadings = new float[3];
-    private float[] aSensorReadings = new float[3];
-    private float[] orientation = new float[3];
-    private float[] rotationMatrix = new float[9];
+    private BNO055IMU imu;
     private double startPos = 0;
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
 
 
         if (MOTORS) {
@@ -72,17 +66,6 @@ public class DriveAssemblyController implements SensorEventListener {
             motorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             oldMotorPos = new int[]{motorUp.getCurrentPosition(), motorDown.getCurrentPosition(), motorLeft.getCurrentPosition(), motorRight.getCurrentPosition()};
-        }
-        if (THETA_BY_PHONE) {
-            sensorManager = (SensorManager) hardwareMap.appContext.getSystemService(Context.SENSOR_SERVICE);
-            accelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            magnetSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-
-
-            sensorManager.registerListener(this, accelSensor,
-                    SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
-            sensorManager.registerListener(this, magnetSensor,
-                    SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
         }
         telemetry.addLine("Status: Initialized and Ready!");
         telemetry.update();
@@ -121,13 +104,13 @@ public class DriveAssemblyController implements SensorEventListener {
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
         if (gamepad1.a) {
-            startPos = orientation[0];
+            startPos = AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle);
             theta = 0;
         }
         if (gamepad1.b && !bPressed) {
             isUsingTheta = !isUsingTheta;
             if (isUsingTheta) {
-                startPos = orientation[0];
+                startPos = AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle);
                 theta = startPos;
             }
             bPressed = true;
@@ -144,10 +127,11 @@ public class DriveAssemblyController implements SensorEventListener {
 
         stopped = (gamepad1.left_stick_x == 0 && -gamepad1.left_stick_y == 0) ? 0 : 1;
 
-        tempMotors[0] = stopped*Math.sin((theta + translationDirection)*(Math.PI/180d)) + addedRotation;
-        tempMotors[1] = -stopped*Math.sin((theta + translationDirection)*(Math.PI/180d)) + addedRotation;
-        tempMotors[2] = stopped*Math.cos((theta + translationDirection)*(Math.PI/180d)) + addedRotation;
-        tempMotors[3] = -stopped*Math.cos((theta + translationDirection)*(Math.PI/180d)) + addedRotation;
+        tempMotors[0] = stopped*Math.cos((theta + translationDirection)*(Math.PI/180d)) + addedRotation;
+        tempMotors[1] = -stopped*Math.cos((theta + translationDirection)*(Math.PI/180d)) + addedRotation;
+        tempMotors[2] = stopped*Math.sin((theta + translationDirection)*(Math.PI/180d)) + addedRotation;
+        tempMotors[3] = -stopped*Math.sin((theta + translationDirection)*(Math.PI/180d)) + addedRotation;
+
 
         double scale = Math.max(Math.max(Math.abs(tempMotors[0]), Math.abs(tempMotors[1])), Math.max(Math.abs(tempMotors[2]), Math.abs(tempMotors[3])));
         if (scale == 0) {
@@ -184,10 +168,8 @@ public class DriveAssemblyController implements SensorEventListener {
 
 
         /* ************SET THETA************ */
-        if (!THETA_BY_PHONE && isUsingTheta) {
+        if (!THETA_BY_GYRO && isUsingTheta) {
             // dw/s * s = dw -> dw * db/dw = db
-            timeThisRun = runtime.time() - timeElapsed;
-            timeElapsed = runtime.time();
 
             //encoder ticks of motor * (encoder ticks of bot / encoder ticks of wheel) * (degrees of bot / encoder ticks of bot)
             theta += ((motorUp.getCurrentPosition() + motorDown.getCurrentPosition() + motorLeft.getCurrentPosition() + motorRight.getCurrentPosition() - oldMotorPos[0] - oldMotorPos[1] - oldMotorPos[2] - oldMotorPos[3]) / 4d) * (RATIO_BOT / RATIO_WHEEL);
@@ -205,40 +187,12 @@ public class DriveAssemblyController implements SensorEventListener {
             telemetry.addData("Ratio: ", RATIO_BOT / RATIO_WHEEL);
             telemetry.addData("All Together: ", addedRotation * scale * timeThisRun * (RATIO_BOT / RATIO_WHEEL));
             telemetry.addData("Theta: ", theta);*/
-        } else {
-            telemetry.addLine("Orient: " + orientation[0] + ", " + orientation[1] + ", " + orientation[2]);
+        } else if (isUsingTheta){
+            theta = AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle) - startPos;
         }
-
             telemetry.update();
     }
 
     public void stop() {
-        sensorManager.unregisterListener(this);
     }
-
-    @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-        if (sensorEvent.sensor == accelSensor) {
-            aSensorReadings = sensorEvent.values;
-            aSRead = true;
-        } else if (sensorEvent.sensor == magnetSensor) {
-            mSensorReadings = sensorEvent.values;
-            mSRead = true;
-        }
-
-        if (aSRead && mSRead) {
-            SensorManager.getRotationMatrix(rotationMatrix, null, aSensorReadings, mSensorReadings);
-            SensorManager.getOrientation(rotationMatrix, orientation);
-            orientation[0] *= 180d/Math.PI;
-            orientation[1] *= 180d/Math.PI;
-            orientation[2] *= 180d/Math.PI;
-            if (isUsingTheta) {
-                theta = orientation[0] - startPos;
-            }
-
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int value) {}
 }
