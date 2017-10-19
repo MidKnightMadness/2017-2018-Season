@@ -16,4 +16,9 @@ public class CrossCommunicator {
         public static String MOTOR = "jewel arm";
     }
 
+    public static class Glyph {
+        public static String MOTOR = "glyph elevator";
+        public static String SERVO = "grabber";
+    }
+
 }
