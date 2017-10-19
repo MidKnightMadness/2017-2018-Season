@@ -9,7 +9,7 @@ public class CrossCommunicator {
         public static String UP = "front left";      // |U   R|
         public static String DOWN = "back right";    // |     |
         public static String LEFT = "back left";     // |L   D|
-        public static String RIGHT = "front right";  // BL––––BR
+        public static String RIGHT = "front right";  // BL–G––BR
     }
 
     public static class Jewel {

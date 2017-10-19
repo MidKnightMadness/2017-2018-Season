@@ -4,7 +4,6 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -51,6 +50,9 @@ public class DriveAssemblyController {
 
     private VectorF netTranslationVector = new VectorF(0, 0);
     private double netRotOffset = 0;
+
+    private double ly = 0;
+    private double ry = 0;
 
 
     /**
@@ -121,7 +123,7 @@ public class DriveAssemblyController {
     //on start, set startPos to theta
     public void start() {
         imu.startAccelerationIntegration(new Position(), new Velocity(), 50);
-        startPos = AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle) + theta;
+        resetTheta(135);
         oldMotorPos = new int[]{motorUp.getCurrentPosition(), motorDown.getCurrentPosition(), motorLeft.getCurrentPosition(), motorRight.getCurrentPosition()};
     }
 
@@ -169,8 +171,7 @@ public class DriveAssemblyController {
     public void setRotationMode(boolean isNowUsingTheta) {
         isUsingTheta = isNowUsingTheta;
         if (isUsingTheta) {
-            startPos = theta - AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle);
-            theta = startPos;
+            resetTheta(135);
         }
     }
 
@@ -204,7 +205,7 @@ public class DriveAssemblyController {
      */
     public void update() {
         if (!isDriverControlled) {
-            if (Math.abs(theta - startPos - targetRotation) < 3) {
+            if (Math.abs((theta - targetRotation + 3600)%360) < 3) {
                 reachedTargetRotation = true;
                 targetRotationSpeed = 0;
             }
@@ -218,31 +219,37 @@ public class DriveAssemblyController {
         netTranslationVector.add(new VectorF(((motorLeft.getCurrentPosition() - oldMotorPos[2]) - (motorRight.getCurrentPosition() - oldMotorPos[3]) / 2), ((motorUp.getCurrentPosition() - oldMotorPos[0]) - (motorDown.getCurrentPosition() - oldMotorPos[1]) / 2)));
         oldMotorPos = new int[]{motorUp.getCurrentPosition(), motorDown.getCurrentPosition(), motorLeft.getCurrentPosition(), motorRight.getCurrentPosition()};
 
-        if (isUsingTheta){
-            theta = AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle) - startPos;
-        }
+        if (isUsingTheta) {
+            theta = (AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle) - startPos + 360000) % 360;
 
 
-        int isTranslating = (targetDistance == 0 ? 0 : 1);
-        motorSpeeds[0] = isTranslating*Math.cos((theta + targetDirection)*(Math.PI/180d)) + (targetRotationSpeed * TURN_SPEED_RATIO);
-        motorSpeeds[1] = -isTranslating*Math.cos((theta + targetDirection)*(Math.PI/180d)) + (targetRotationSpeed * TURN_SPEED_RATIO);
-        motorSpeeds[2] = isTranslating*Math.sin((theta + targetDirection)*(Math.PI/180d)) + (targetRotationSpeed * TURN_SPEED_RATIO);
-        motorSpeeds[3] = -isTranslating*Math.sin((theta + targetDirection)*(Math.PI/180d)) + (targetRotationSpeed * TURN_SPEED_RATIO);
+            int isTranslating = (targetDistance == 0 ? 0 : 1);
+            motorSpeeds[0] = isTranslating * Math.cos((theta + targetDirection) * (Math.PI / 180d)) + (targetRotationSpeed * TURN_SPEED_RATIO);
+            motorSpeeds[1] = -isTranslating * Math.cos((theta + targetDirection) * (Math.PI / 180d)) + (targetRotationSpeed * TURN_SPEED_RATIO);
+            motorSpeeds[2] = isTranslating * Math.sin((theta + targetDirection) * (Math.PI / 180d)) + (targetRotationSpeed * TURN_SPEED_RATIO);
+            motorSpeeds[3] = -isTranslating * Math.sin((theta + targetDirection) * (Math.PI / 180d)) + (targetRotationSpeed * TURN_SPEED_RATIO);
 
 
-        double scale = Math.max(Math.max(Math.abs(motorSpeeds[0]), Math.abs(motorSpeeds[1])), Math.max(Math.abs(motorSpeeds[2]), Math.abs(motorSpeeds[3])));
-        if (scale == 0) {
-            scale = 0;
+            double scale = Math.max(Math.max(Math.abs(motorSpeeds[0]), Math.abs(motorSpeeds[1])), Math.max(Math.abs(motorSpeeds[2]), Math.abs(motorSpeeds[3])));
+            if (scale == 0) {
+                scale = 0;
+            } else {
+                scale = targetSpeed / scale;
+            }
+
+            motorSpeeds[0] *= scale;
+            motorSpeeds[1] *= scale;
+            motorSpeeds[2] *= scale;
+            motorSpeeds[3] *= scale;
         } else {
-            scale = targetSpeed/scale;
+            motorSpeeds[0] = ry;
+            motorSpeeds[1] = ly;
+            motorSpeeds[2] = ry;
+            motorSpeeds[3] = ly;
         }
 
-        motorSpeeds[0] *= scale;
-        motorSpeeds[1] *= scale;
-        motorSpeeds[2] *= scale;
-        motorSpeeds[3] *= scale;
-
-        telemetry.addLine("Theta: " + theta);
+        telemetry.addLine("Theta: " + (theta - startPos));
+        telemetry.addData("TargetTheta: ", Math.abs((theta - targetRotation + 36000)%360));
         telemetry.addLine("Up Motor Speed: " + motorSpeeds[0]);
         telemetry.addLine("Down Motor Speed: " + motorSpeeds[1]);
         telemetry.addLine("Left Motor Speed: " + motorSpeeds[2]);
@@ -270,13 +277,15 @@ public class DriveAssemblyController {
             resetNetTransVect();
             resetNetRotation();
         }
-        if (gamepad1.y && !bPressed) {
+        if (gamepad1.y && !yPressed) {
             motorDriverSpeed = (motorDriverSpeed == 0.8 ? 0.4 : 0.8);
             yPressed = true;
         } else if (!gamepad1.y){
             yPressed = false;
         }
 
+        ly = gamepad1.left_stick_y;
+        ry = gamepad1.right_stick_y;
         setTarget(motorDriverSpeed, ((gamepad1.left_stick_x == 0 && -gamepad1.left_stick_y == 0) ? 0 : 1), aTan(gamepad1.left_stick_x, -gamepad1.left_stick_y), 1, gamepad1.right_stick_x, true);
         update();
         telemetry.addData("Current Translation Vector: ", getNetTransVect());
