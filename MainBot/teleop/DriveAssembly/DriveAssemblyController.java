@@ -14,8 +14,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
-import java.util.Vector;
-
 /**
  * Created by gregory.ling on 10/17/17.
  */
