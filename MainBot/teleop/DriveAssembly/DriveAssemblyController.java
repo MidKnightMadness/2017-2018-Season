@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
 public class DriveAssemblyController {
     private static boolean MOTORS_ENABLED = true;
-    private static double TURN_SPEED_RATIO = 1;
+    private static double TURN_SPEED_RATIO = 2;
     private double motorDriverSpeed = 0.8;
     private boolean isUsingTheta = true;
     private boolean bPressed = false;
@@ -194,7 +194,7 @@ public class DriveAssemblyController {
         targetDistance = distance;
         targetDirection = direction;
         targetRotation = theta + rotation;
-        targetRotationSpeed = rotationSpeed;
+        targetRotationSpeed = rotationSpeed * (theta - targetRotation > 0 ? 1 : -1);
         isDriverControlled = driverControlled;
     }
 
@@ -203,11 +203,15 @@ public class DriveAssemblyController {
      */
     public void update() {
         if (!isDriverControlled) {
+            telemetry.addData("Diff: ", (theta - targetRotation));
             if (Math.abs((theta - targetRotation + 3600)%360) < 3) {
                 reachedTargetRotation = true;
                 targetRotationSpeed = 0;
             }
-            targetDistance -= Math.hypot(((motorUp.getCurrentPosition() - motorDown.getCurrentPosition()) / 2), ((motorLeft.getCurrentPosition() - motorRight.getCurrentPosition()) / 2));
+            if (Math.signum(theta - targetRotation) == Math.signum(targetRotationSpeed)) {
+                targetRotationSpeed = -0.5*targetRotationSpeed;
+            }
+            targetDistance -= Math.hypot(((motorLeft.getCurrentPosition() - oldMotorPos[2]) - (motorRight.getCurrentPosition() - oldMotorPos[3]) / 2), ((motorUp.getCurrentPosition() - oldMotorPos[0]) - (motorDown.getCurrentPosition() - oldMotorPos[1]) / 2));
             if (targetDistance <= 0) {
                 targetDistance = 0;
                 reachedTargetTranslation = true;

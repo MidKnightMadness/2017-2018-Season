@@ -34,7 +34,7 @@ import static com.vuforia.PIXEL_FORMAT.RGB565;
 public class JewelViewer extends LinearOpMode {
 
     // whether or not to save the cropped image
-    private final boolean SAVE_CROPPED = true;
+    private final boolean SAVE_CROPPED = false;
 
     // display textual representation of image and wait one second or not
     private final boolean SHOW_TEXT_IMAGE = false;

@@ -17,11 +17,11 @@ public class MainBot extends LinearOpMode {
 
         DriveAssemblyController driveC = new DriveAssemblyController();
         JewelAssemblyNewController jewelC = new JewelAssemblyNewController();
-        GlyphAssemblyController glyphC = new GlyphAssemblyController();
+        //GlyphAssemblyController glyphC = new GlyphAssemblyController();
         VisualController visualC = new VisualController();
         driveC.init(telemetry, hardwareMap);
         jewelC.init(telemetry, hardwareMap);
-        glyphC.init(telemetry, hardwareMap);
+        //glyphC.init(telemetry, hardwareMap);
         visualC.init(telemetry, hardwareMap);
 
         telemetry.addLine("Ready to go!");
@@ -37,7 +37,7 @@ public class MainBot extends LinearOpMode {
             idle();
         }
 
-        driveC.setTarget(0.1, 0, 0, (visualC.leftJewel == TEAM_COLOR ? 10 : -10), (visualC.leftJewel == TEAM_COLOR ? 1 : -1), false);
+        driveC.setTarget(0.1, 0, 0, (visualC.leftJewel == TEAM_COLOR ? 100 : 80), 1, false);
         while (!driveC.reachedTargetRotation) {
             driveC.update();
             telemetry.update();
@@ -50,7 +50,7 @@ public class MainBot extends LinearOpMode {
             idle();
         }
 
-        driveC.setTarget(0.5, 3828.5, 65, (visualC.leftJewel == TEAM_COLOR ? -10 : 10), (visualC.leftJewel == TEAM_COLOR ? -1 : 1), false);
+        driveC.setTarget(0.5, 10000, 180, (visualC.leftJewel == TEAM_COLOR ? -100 : -80), 1, false);
         while (!driveC.reachedTargetRotation) {
             driveC.update();
             telemetry.update();
