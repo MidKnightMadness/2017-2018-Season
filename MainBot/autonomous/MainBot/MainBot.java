@@ -50,7 +50,14 @@ public class MainBot extends LinearOpMode {
             idle();
         }
 
-        driveC.setTarget(0.5, 10000, 180, (visualC.leftJewel == TEAM_COLOR ? -100 : -80), 1, false);
+        driveC.setTarget(0.5, 20000, 180, 0, 0, false);
+        while (!driveC.reachedTargetTranslation) {
+            driveC.update();
+            telemetry.update();
+            idle();
+        }
+
+        driveC.setTarget(0.5, 0, 0, (visualC.leftJewel == TEAM_COLOR ? 100 : 80), 1, false);
         while (!driveC.reachedTargetRotation) {
             driveC.update();
             telemetry.update();
