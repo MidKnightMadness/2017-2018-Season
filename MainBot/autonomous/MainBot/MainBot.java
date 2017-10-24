@@ -5,9 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.MainBot.autonomous.Vuforia.VisualController;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.DriveAssembly.DriveAssemblyController;
-import org.firstinspires.ftc.teamcode.MainBot.teleop.GlyphAssembly.GlyphAssemblyController;
-import org.firstinspires.ftc.teamcode.MainBot.teleop.JewelAssembly.JewelAssemblyController;
-import org.firstinspires.ftc.teamcode.MainBot.teleop.JewelAssembly.JewelAssemblyNewController;
+import org.firstinspires.ftc.teamcode.MainBot.autonomous.JewelAssembly.JewelAssemblyAutonomousController;
 
 @Autonomous(name = "MainBot", group = "Main Bot")
 public class MainBot extends LinearOpMode {
@@ -16,7 +14,7 @@ public class MainBot extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         DriveAssemblyController driveC = new DriveAssemblyController();
-        JewelAssemblyNewController jewelC = new JewelAssemblyNewController();
+        JewelAssemblyAutonomousController jewelC = new JewelAssemblyAutonomousController();
         //GlyphAssemblyController glyphC = new GlyphAssemblyController();
         VisualController visualC = new VisualController();
         driveC.init(telemetry, hardwareMap);
@@ -33,7 +31,6 @@ public class MainBot extends LinearOpMode {
         visualC.look(false);
         jewelC.down();
         while (jewelC.isBusy()) {
-            jewelC.update();
             idle();
         }
 
@@ -46,11 +43,10 @@ public class MainBot extends LinearOpMode {
 
         jewelC.up();
         while (jewelC.isBusy()) {
-            jewelC.update();
             idle();
         }
 
-        driveC.setTarget(0.5, 20000, 180, 0, 0, false);
+        driveC.setTarget(0.5, 3828.5, 180, 0, 0, false);
         while (!driveC.reachedTargetTranslation) {
             driveC.update();
             telemetry.update();
@@ -63,9 +59,5 @@ public class MainBot extends LinearOpMode {
             telemetry.update();
             idle();
         }
-
-
-
-        // Do something useful
     }
 }
