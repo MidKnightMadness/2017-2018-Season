@@ -50,7 +50,7 @@ public class MainBot extends LinearOpMode {
             idle();
         }
 
-        driveC.setTarget(0.5, 20000, 180, 0, 0, false);
+        driveC.setTarget(0.5, 3800, 180, 0, 0, false);
         while (!driveC.reachedTargetTranslation) {
             driveC.update();
             telemetry.update();
@@ -64,7 +64,12 @@ public class MainBot extends LinearOpMode {
             idle();
         }
 
-
+        driveC.setTarget(0.5, 1000, 270, 0, 0, false);
+        while (!driveC.reachedTargetTranslation) {
+            driveC.update();
+            telemetry.update();
+            idle();
+        }
 
         // Do something useful
     }
