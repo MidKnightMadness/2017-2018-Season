@@ -87,6 +87,10 @@ public class DriveAssemblyController {
         }
     }
 
+    private double getIMURotation() {
+        return AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle);
+    }
+
     /**
      * An internal function to get the angle of the joystick; an expanded arctan
      * @param x  the joystick x
@@ -130,7 +134,7 @@ public class DriveAssemblyController {
      * @param reset  the angle to reset to
      */
     public void resetTheta(double reset) {
-        startPos = AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle) + reset;
+        startPos = getIMURotation() + reset;
         theta = reset;
     }
 
@@ -222,7 +226,7 @@ public class DriveAssemblyController {
         oldMotorPos = new int[]{motorUp.getCurrentPosition(), motorDown.getCurrentPosition(), motorLeft.getCurrentPosition(), motorRight.getCurrentPosition()};
 
         if (isUsingTheta) {
-            theta = (AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle) - startPos + 360000) % 360;
+            theta = (getIMURotation() - startPos + 360000) % 360;
 
 
             int isTranslating = (targetDistance == 0 ? 0 : 1);
@@ -245,9 +249,9 @@ public class DriveAssemblyController {
             motorSpeeds[3] *= scale;
         } else {
             motorSpeeds[0] = ry;
-            motorSpeeds[1] = ly;
+            motorSpeeds[1] = -ly;
             motorSpeeds[2] = ry;
-            motorSpeeds[3] = ly;
+            motorSpeeds[3] = -ly;
         }
 
         telemetry.addLine("Theta: " + (theta - startPos));
