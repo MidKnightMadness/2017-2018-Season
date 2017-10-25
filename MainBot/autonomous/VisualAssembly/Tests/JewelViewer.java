@@ -1,9 +1,7 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous.Vuforia.Tests;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualAssembly.Tests;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Matrix;
-import android.os.Environment;
 
 import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;

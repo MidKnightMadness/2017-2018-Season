@@ -3,13 +3,9 @@ package org.firstinspires.ftc.teamcode.MainBot.autonomous.SimpleBot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MainBot.autonomous.Vuforia.VisualController;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
-import org.firstinspires.ftc.teamcode.MainBot.teleop.DriveAssembly.DriveAssemblyController;
-import org.firstinspires.ftc.teamcode.MainBot.autonomous.JewelAssembly.JewelAssemblyAutonomousController;
 
 @Autonomous(name = "MainBot", group = "Main Bot")
 public class SimpleBot extends LinearOpMode {
