@@ -3,12 +3,12 @@ package org.firstinspires.ftc.teamcode.MainBot.autonomous.MainBot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.MainBot.autonomous.JewelAssembly.JewelAssemblyAutonomousController;
 import org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualAssembly.VisualController;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.DriveAssembly.Tests.DriveAssemblyNotSoOldController;
-import org.firstinspires.ftc.teamcode.MainBot.autonomous.JewelAssembly.JewelAssemblyAutonomousController;
 
-@Autonomous(name = "MainBot", group = "Main Bot")
-public class MainBot extends LinearOpMode {
+@Autonomous(name = "MainBotNew", group = "Main Bot")
+public class MainBotNew extends LinearOpMode {
     private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.BLUE;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -28,7 +28,7 @@ public class MainBot extends LinearOpMode {
         waitForStart();
         driveC.start();
 
-        visualC.look();
+        visualC.look(false);
         jewelC.down();
         while (jewelC.isBusy()) {
             idle();

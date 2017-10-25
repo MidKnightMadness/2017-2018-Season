@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous.Gyro;
+package org.firstinspires.ftc.teamcode.MainBot.teleop.DriveAssembly.Tests.Gyro;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -8,8 +8,6 @@ import android.hardware.SensorManager;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
-import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
 @Autonomous(name = "Main Bot: Gyro Display", group = "Mian Bot")
 public class GyroDisplay extends LinearOpMode implements SensorEventListener   {
