@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.MainBot.autonomous.Vuforia.VisualController;
+import org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualAssembly.VisualController;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
 @Autonomous(name = "MainBot", group = "Main Bot")
