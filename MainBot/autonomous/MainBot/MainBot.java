@@ -28,7 +28,7 @@ public class MainBot extends LinearOpMode {
         waitForStart();
         driveC.start();
 
-        visualC.look(false);
+        visualC.look();
         jewelC.down();
         while (jewelC.isBusy()) {
             idle();

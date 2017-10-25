@@ -82,8 +82,7 @@ public class VisualController {
 
     }
 
-    public void look(boolean doSaveCropped) throws InterruptedException {
-        SAVE_CROPPED = doSaveCropped;
+    public void look() throws InterruptedException {
 
         /* ************BEGIN!************* */
         //Begin tracking pictographs
