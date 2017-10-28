@@ -11,7 +11,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualAssembly.Tests.PictographViewer;
 
 @Autonomous(name = "REV Gyro Testing", group = "Main Bot")
 public class REVGyro extends LinearOpMode {

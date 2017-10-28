@@ -31,7 +31,7 @@ public class EncoderTesting extends LinearOpMode {
 
         waitForStart();
 
-        /*motorUp.setPower(1);
+        motorUp.setPower(1);
         while (time < 5) {
             idle();
         }
@@ -50,19 +50,19 @@ public class EncoderTesting extends LinearOpMode {
         while (time < 20 ) {
             idle();
         }
-        motorRight.setPower(0);*/
+        motorRight.setPower(0);
 
 
 
 
-        while (time < 20) {
+        /*while (time < 20) {
             telemetry.addData("Up Motor (0)", motorUp.getCurrentPosition());
             telemetry.addData("Left Motor (1)", motorDown.getCurrentPosition());
             telemetry.addData("Down Motor (2)", motorLeft.getCurrentPosition());
             telemetry.addData("Right Motor (3)", motorRight.getCurrentPosition());
             telemetry.update();
             idle();
-        }
+        }*/
         // Do something useful
 
     }

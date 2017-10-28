@@ -61,7 +61,7 @@ public class DriveAssemblyController {
 
 
     private double getIMURotation() {
-        return (AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle) + 3600)%360;
+        return (AngleUnit.normalizeDegrees(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle));
     }
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
@@ -90,11 +90,12 @@ public class DriveAssemblyController {
         motorDown.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        resetHeading();
     }
 
     public void start() {}
 
-    public void resetHeading() {
+    private void resetHeading() {
         startPos = getIMURotation() - BASE_ROTATION_ANGLE;
     }
 
@@ -117,19 +118,34 @@ public class DriveAssemblyController {
         if (!tankMode) {
             theta = getIMURotation() - startPos;
 
-            double translateScale = (gamepad1.left_stick_x + gamepad1.left_stick_y) / 4;
-            double targetDirection = aTan(gamepad1.left_stick_x, gamepad1.left_stick_y);
-            double targetRotationSpeed = gamepad1.right_stick_x / 2;
+            double translateScale = Math.min(Math.max(Math.abs((gamepad1.left_stick_x + gamepad1.left_stick_y)), -0.7), 0.7);
+            double targetDirection = aTan(gamepad1.left_stick_x, -gamepad1.left_stick_y);
+            double targetRotationSpeed = gamepad1.right_stick_x * (1 - Math.abs(translateScale));
+
             motorUp.setPower(translateScale * Math.cos((theta + targetDirection) * (Math.PI / 180d)) + (targetRotationSpeed));
             motorDown.setPower(-translateScale * Math.cos((theta + targetDirection) * (Math.PI / 180d)) + (targetRotationSpeed));
             motorLeft.setPower(translateScale * Math.sin((theta + targetDirection) * (Math.PI / 180d)) + (targetRotationSpeed));
             motorRight.setPower(-translateScale * Math.sin((theta + targetDirection) * (Math.PI / 180d)) + (targetRotationSpeed));
+
+
+            telemetry.addData("Theta", theta);
+            telemetry.addData("IMU Rotation", getIMURotation());
+            telemetry.addData("Start Position", startPos);
+            telemetry.addData("Target Direction", targetDirection);
+            telemetry.addData("Target Rotation Speed", targetRotationSpeed);
+            telemetry.addData("Translate Scale", translateScale);
+            telemetry.addData("Cosine", Math.cos((theta + targetDirection) * (Math.PI / 180d)));
+            telemetry.addData("Sine", Math.sin((theta + targetDirection) * (Math.PI / 180d)));
+
+            telemetry.update();
         } else {
-            motorUp.setPower(gamepad1.left_stick_x);
-            motorDown.setPower(-gamepad1.left_stick_y);
-            motorLeft.setPower(gamepad1.left_stick_x);
-            motorRight.setPower(-gamepad1.left_stick_y);
+            motorUp.setPower(gamepad1.left_stick_y);
+            motorDown.setPower(-gamepad1.right_stick_y);
+            motorLeft.setPower(gamepad1.left_stick_y);
+            motorRight.setPower(-gamepad1.right_stick_y);
         }
+
+
     }
 
     public void stop() {}

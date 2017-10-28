@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualAssembly.VisualController;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
-@Autonomous(name = "MainBot", group = "Main Bot")
+@Autonomous(name = "MainBotSimple", group = "Main Bot")
 public class SimpleBot extends LinearOpMode {
     private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.BLUE;
     private static double JEWEL_ARM_POWER = 0.3;
@@ -118,10 +118,20 @@ public class SimpleBot extends LinearOpMode {
         waitForStart();
 
         visualC.look();
+        telemetry.addLine("Lowering Arm...");
+        telemetry.update();
         lowerArm();
+        telemetry.addLine("Rotate Bot...");
+        telemetry.update();
         rotateBot(true);
+        telemetry.addLine("Raise Arm...");
+        telemetry.update();
         raiseArm();
+        telemetry.addLine("Rotate Bot Again...");
+        telemetry.update();
         rotateBot(false);
+        telemetry.addLine("Move Bot...");
+        telemetry.update();
         moveBot();
     }
 }
