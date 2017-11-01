@@ -41,7 +41,7 @@ public class GlyphAssemblyController {
 
 
         if (gamepad1.dpad_left) {
-            servo.setPosition(0);
+            servo.setPosition(-1);
         }
         else if (gamepad1.dpad_right){
                 servo.setPosition(1);
