@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop.DriveAssembly.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -30,24 +31,31 @@ public class EncoderTesting extends LinearOpMode {
         motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         waitForStart();
-
         motorUp.setPower(1);
         while (time < 5) {
+            telemetry.addData("Motor Up", motorUp.getCurrentPosition());
+            telemetry.update();
             idle();
         }
         motorUp.setPower(0);
         motorLeft.setPower(1);
         while (time < 10) {
+            telemetry.addData("Motor Left", motorLeft.getCurrentPosition());
+            telemetry.update();
             idle();
         }
         motorLeft.setPower(0);
         motorDown.setPower(1);
         while (time < 15) {
+            telemetry.addData("Motor Down", motorDown.getCurrentPosition());
+            telemetry.update();
             idle();
         }
         motorDown.setPower(0);
         motorRight.setPower(1);
         while (time < 20 ) {
+            telemetry.addData("Motor Right", motorRight.getCurrentPosition());
+            telemetry.update();
             idle();
         }
         motorRight.setPower(0);

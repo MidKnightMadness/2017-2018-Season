@@ -7,9 +7,11 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name = "Main Bot: Gyro Display", group = "Mian Bot")
+@Disabled
+@Autonomous(name = "Main Bot: Gyroo Display", group = "Mian Bot")
 public class GyroDisplay extends LinearOpMode implements SensorEventListener   {
 
     private SensorManager sensorManager;

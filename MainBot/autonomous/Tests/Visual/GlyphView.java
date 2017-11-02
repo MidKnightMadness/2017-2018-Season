@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualAssembly.Tests;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests.Visual;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -15,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
 @Disabled
-@Autonomous(name = "Glyph Director", group = "Vuforia")
+@Autonomous(name = "aGlyph Director", group = "Vuforia")
 public class GlyphView extends LinearOpMode {
 
     @Override

@@ -1,10 +1,11 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualAssembly.Tests;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests.Visual;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Environment;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.vuforia.HINT;
 import com.vuforia.PIXEL_FORMAT;
@@ -20,7 +21,8 @@ import java.io.FileOutputStream;
 
 import static com.vuforia.PIXEL_FORMAT.RGB565;
 
-@Autonomous(name = "Jewel Director", group = "Main Bot")
+@Disabled
+@Autonomous(name = "aJewel Director", group = "Main Bot")
 public class JewelView extends LinearOpMode {
 
     @Override

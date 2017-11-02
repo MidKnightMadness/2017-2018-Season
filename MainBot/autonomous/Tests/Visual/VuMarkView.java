@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualAssembly.Tests;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests.Visual;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -10,8 +10,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
-@Autonomous(name = "Vuforia: VuMark View", group = "Main Bot")
 @Disabled
+@Autonomous(name = "aVuforia: VuMark View", group = "Main Bot")
 public class VuMarkView extends LinearOpMode {
 
     @Override

@@ -1,12 +1,13 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous.MainBot;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualAssembly.VisualController;
+import org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualController;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.DriveAssembly.Tests.DriveAssemblyNotSoOldController;
-import org.firstinspires.ftc.teamcode.MainBot.autonomous.JewelAssembly.JewelAssemblyAutonomousController;
 
+@Disabled
 @Autonomous(name = "MainBot", group = "Main Bot")
 public class MainBot extends LinearOpMode {
     private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.BLUE;
@@ -14,7 +15,7 @@ public class MainBot extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         DriveAssemblyNotSoOldController driveC = new DriveAssemblyNotSoOldController();
-        JewelAssemblyAutonomousController jewelC = new JewelAssemblyAutonomousController();
+        JewelController jewelC = new JewelController();
         //GlyphAssemblyController glyphC = new GlyphAssemblyController();
         VisualController visualC = new VisualController();
         driveC.init(telemetry, hardwareMap);

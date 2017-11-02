@@ -1,15 +1,17 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualAssembly.Tests;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests.Visual;
 
 import android.graphics.Color;
 
 import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 /**
  * A simple test of a pair of color sensors
  */
-@Autonomous(name="Jewel View 2", group ="Main Bot")
+@Disabled
+@Autonomous(name="aJewel View 2", group ="Main Bot")
 
 public class JewelView2 extends LinearOpMode
 {

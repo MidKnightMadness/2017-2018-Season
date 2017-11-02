@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualAssembly.Tests;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests.Visual;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -6,13 +6,15 @@ import android.view.View;
 
 import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-@Autonomous(name = "Jewel View 3", group = "Main Bot")
+@Disabled
+@Autonomous(name = "aJewel View 3", group = "Main Bot")
 
 public class JewelView3 extends LinearOpMode {
 

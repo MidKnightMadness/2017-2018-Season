@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualAssembly;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;

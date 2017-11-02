@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop.DriveAssembly.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
+@Disabled
 @Autonomous(name = "Drive Test: Find Max Power", group = "Main Bot")
 public class FindMaxPower extends LinearOpMode {
 

@@ -1,14 +1,12 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous.JewelAssembly;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
-public class JewelAssemblyAutonomousController {
+public class JewelController {
     private DcMotor motor;
     double power = 0.3;
     int distance = 529;

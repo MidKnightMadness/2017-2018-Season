@@ -1,7 +1,6 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous.SimpleDriveAssembly;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 

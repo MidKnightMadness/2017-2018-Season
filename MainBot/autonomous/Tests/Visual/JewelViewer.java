@@ -1,10 +1,11 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualAssembly.Tests;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests.Visual;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
 import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.vuforia.Image;
 import com.vuforia.Matrix34F;
@@ -28,7 +29,8 @@ import java.util.Arrays;
 
 import static com.vuforia.PIXEL_FORMAT.RGB565;
 
-@Autonomous(name = "Main Bot Jewel Visual", group = "Main Bot")
+@Disabled
+@Autonomous(name = "aMain Bot Jewel Visual", group = "Main Bot")
 public class JewelViewer extends LinearOpMode {
 
     // whether or not to save the cropped image
