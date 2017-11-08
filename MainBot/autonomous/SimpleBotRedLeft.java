@@ -41,7 +41,6 @@ public class SimpleBotRedLeft extends LinearOpMode {
         rotateBot(true);
         raiseArm();
         rotateBot(false);
-        //moveBot();
         if (visualC.pictograph == RelicRecoveryVuMark.RIGHT) {
             DRIVE_MOVE_DISTANCE = 1850;
         }
