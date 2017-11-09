@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
-@Autonomous(name = "MainBotSimpleRedLeft", group = "Main Bot")
-public class SimpleBotRedLeft extends LinearOpMode {
+@Autonomous(name = "MainBotSimpleRedRelic", group = "Main Bot")
+public class SimpleBotRedRelic extends LinearOpMode {
     private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.BLUE;
     private static double JEWEL_ARM_POWER = 0.3;
     private static int JEWEL_ARM_DISTANCE = 600;
@@ -44,9 +44,6 @@ public class SimpleBotRedLeft extends LinearOpMode {
         //moveBot();
         if (visualC.pictograph == RelicRecoveryVuMark.RIGHT) {
             DRIVE_MOVE_DISTANCE = 1850;
-        }
-        else if (visualC.pictograph == RelicRecoveryVuMark.CENTER) {
-            DRIVE_MOVE_DISTANCE = 2500;
         }
         else if (visualC.pictograph == RelicRecoveryVuMark.LEFT){
             DRIVE_MOVE_DISTANCE = 3150;
