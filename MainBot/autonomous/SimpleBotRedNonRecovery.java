@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
-@Autonomous(name = "MainBotSimpleRedNonRecovery", group = "Main Bot")
+@Autonomous(name = "RedNonRecovery", group = "Main Bot")
 public class SimpleBotRedNonRecovery extends LinearOpMode {
     private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.RED;
     private static double JEWEL_ARM_POWER = 0.3;
