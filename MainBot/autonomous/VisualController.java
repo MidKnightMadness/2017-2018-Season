@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.vuforia.CameraDevice;
 import com.vuforia.Image;
 import com.vuforia.Matrix34F;
 import com.vuforia.PIXEL_FORMAT;
@@ -31,7 +32,7 @@ import java.util.Arrays;
 public class VisualController {
 
     // whether or not to save the cropped image
-    private boolean SAVE_CROPPED = false;
+    private boolean SAVE_CROPPED = true;
 
     public enum JewelColor {
         RED,
@@ -80,6 +81,8 @@ public class VisualController {
         //Prepares tracking asset group -- takes 1s
         pictographTrackables = vuforia.loadTrackablesFromAsset("RelicVuMark");
 
+        //Enable flash
+        CameraDevice.getInstance().setFlashTorchMode(true);
     }
 
     public void look() throws InterruptedException {
@@ -102,8 +105,8 @@ public class VisualController {
                     //Get points of corners of jewels based on pictograph in the 2d image Units: Inch
                     float[][] srcPoints = new float[4][2];
                     srcPoints[0] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(375f, -100f, 0f)).getData();
-                    srcPoints[1] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(150f, -100f, 0f)).getData();
-                    srcPoints[2] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(150f, -250f, 0f)).getData();
+                    srcPoints[1] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(100f, -100f, 0f)).getData();
+                    srcPoints[2] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(100f, -250f, 0f)).getData();
                     srcPoints[3] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(375f, -250f, 0f)).getData();
                     /* ************Get Image From Camera************* */
                     //get frame: 5 types: 1 rgb and 4 grayscale --> We want rgb
