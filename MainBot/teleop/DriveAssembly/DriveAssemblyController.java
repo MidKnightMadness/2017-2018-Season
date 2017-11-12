@@ -30,7 +30,9 @@ public class DriveAssemblyController {
     private double theta = 0;
     private boolean bPressed = false;
     private boolean tankMode = false;
-
+    private double motors[] = new double[4];
+    private double mainTranslateScale = 0;
+    private double mainRotateScale = 0;
 
     //Gets angle of vector <x,y>
     private double aTan(double x, double y) {
@@ -103,6 +105,14 @@ public class DriveAssemblyController {
         tankMode = !tankMode;
     }
 
+    private void targPow(DcMotor motor, int id, double speed) {
+        if ((speed - motors[id]) < 0.05)
+            motors[id] = speed;
+        else
+            motors[id] += Math.signum(speed - motors[id])*0.1;
+        motor.setPower(speed);
+    }
+
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
         if (gamepad1.a) {
             resetHeading();
@@ -118,31 +128,51 @@ public class DriveAssemblyController {
         if (!tankMode) {
             theta = getIMURotation() - startPos;
 
-            double translateScale = Math.min(Math.max(Math.abs((gamepad1.left_stick_x + gamepad1.left_stick_y)), -0.7), 0.7);
-            double targetDirection = aTan(gamepad1.left_stick_x, -gamepad1.left_stick_y);
-            double targetRotationSpeed = gamepad1.right_stick_x * (1 - Math.abs(translateScale));
+            double Tscale = 1 - gamepad1.left_trigger/1.5;
+            double Rscale = 1 - gamepad1.right_trigger/1.5;
 
-            motorUp.setPower(translateScale * Math.cos((theta + targetDirection) * (Math.PI / 180d)) + (targetRotationSpeed));
-            motorDown.setPower(-translateScale * Math.cos((theta + targetDirection) * (Math.PI / 180d)) + (targetRotationSpeed));
-            motorLeft.setPower(translateScale * Math.sin((theta + targetDirection) * (Math.PI / 180d)) + (targetRotationSpeed));
-            motorRight.setPower(-translateScale * Math.sin((theta + targetDirection) * (Math.PI / 180d)) + (targetRotationSpeed));
+            double translateScale = Math.pow(Math.min(Math.max(Math.abs(gamepad1.left_stick_x) + Math.abs(gamepad1.left_stick_y), 0), 1), 2) * 1 * Tscale * (1.5 - Math.pow(Math.abs(gamepad1.right_stick_x), 2));
+            if ((translateScale - mainTranslateScale) < 0.1)
+                mainTranslateScale = translateScale;
+            else
+                mainTranslateScale += Math.signum(translateScale - mainTranslateScale)*0.1;
+
+
+            double targetDirection = aTan(gamepad1.left_stick_x, -gamepad1.left_stick_y);
+            double rotateScale = Math.pow(Math.abs(gamepad1.right_stick_x), 2) * Math.signum(-gamepad1.right_stick_x) * (1 - Math.abs(translateScale)) * Rscale;
+            if ((rotateScale - mainRotateScale) < 0.1)
+                mainRotateScale = rotateScale;
+            else
+                mainRotateScale += Math.signum(rotateScale - mainRotateScale)*0.1;
+
+            targPow(motorUp, 0, mainTranslateScale * Math.cos((theta + targetDirection) * (Math.PI / 180d)) + (rotateScale));
+            targPow(motorDown, 1, -mainTranslateScale * Math.cos((theta + targetDirection) * (Math.PI / 180d)) + (rotateScale));
+            targPow(motorLeft, 2, mainTranslateScale * Math.sin((theta + targetDirection) * (Math.PI / 180d)) + (rotateScale));
+            targPow(motorRight, 3, -mainTranslateScale * Math.sin((theta + targetDirection) * (Math.PI / 180d)) + (rotateScale));
 
 
             telemetry.addData("Theta", theta);
             telemetry.addData("IMU Rotation", getIMURotation());
             telemetry.addData("Start Position", startPos);
             telemetry.addData("Target Direction", targetDirection);
-            telemetry.addData("Target Rotation Speed", targetRotationSpeed);
+            telemetry.addData("Target Rotation Speed", rotateScale);
             telemetry.addData("Translate Scale", translateScale);
             telemetry.addData("Cosine", Math.cos((theta + targetDirection) * (Math.PI / 180d)));
             telemetry.addData("Sine", Math.sin((theta + targetDirection) * (Math.PI / 180d)));
 
             telemetry.update();
         } else {
-            motorUp.setPower(gamepad1.left_stick_y);
-            motorDown.setPower(-gamepad1.right_stick_y);
-            motorLeft.setPower(gamepad1.left_stick_y);
-            motorRight.setPower(-gamepad1.right_stick_y);
+            if (Math.abs(gamepad1.left_stick_x + gamepad1.right_stick_x) > 1.5) {
+                targPow(motorUp, 0, -gamepad1.left_stick_x);
+                targPow(motorDown, 1, gamepad1.left_stick_x);
+                targPow(motorLeft, 2, gamepad1.left_stick_x);
+                targPow(motorRight, 3, -gamepad1.left_stick_x);
+            } else {
+                targPow(motorUp, 0, Math.pow(gamepad1.left_stick_y, 3));
+                targPow(motorDown, 1, -Math.pow(gamepad1.right_stick_y, 3));
+                targPow(motorLeft, 2, Math.pow(gamepad1.left_stick_y, 3));
+                targPow(motorRight, 3, -Math.pow(gamepad1.right_stick_y, 3));
+            }
         }
 
 
