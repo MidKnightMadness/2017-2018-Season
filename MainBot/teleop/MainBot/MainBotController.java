@@ -20,31 +20,31 @@ public class MainBotController {
     private GlyphAssemblyController glyphAssemblyController;
 
     public MainBotController() {
-        jewelAssemblyController = new JewelAssemblyController();
+        //jewelAssemblyController = new JewelAssemblyController();
         glyphAssemblyController = new GlyphAssemblyController();
         driveAssemblyController = new DriveAssemblyController();
     }
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
-        jewelAssemblyController.init(telemetry, hardwareMap);
+        //jewelAssemblyController.init(telemetry, hardwareMap);
         glyphAssemblyController.init(telemetry, hardwareMap);
         driveAssemblyController.init(telemetry, hardwareMap);
     }
 
     public void start() {
-        jewelAssemblyController.start();
+        //jewelAssemblyController.start();
         glyphAssemblyController.start();
         driveAssemblyController.start();
     }
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
-        jewelAssemblyController.loop(gamepad1, gamepad2);
+        //jewelAssemblyController.loop(gamepad1, gamepad2);
         glyphAssemblyController.loop(gamepad1, gamepad2);
         driveAssemblyController.loop(gamepad1, gamepad2);
     }
 
     public void stop() {
-        jewelAssemblyController.stop();
+        //jewelAssemblyController.stop();
         glyphAssemblyController.stop();
         driveAssemblyController.stop();
     }
