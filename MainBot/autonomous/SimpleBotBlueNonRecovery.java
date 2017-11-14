@@ -17,7 +17,7 @@ public class SimpleBotBlueNonRecovery extends LinearOpMode {
     private static int DRIVE_ROTATE_DISTANCE = 200;
     private static double DRIVE_MOVE_POWER = 0.4;
     private static int DRIVE_MOVE_DISTANCE = -1900;
-    private static int DRIVE_MOVE_SIDE_DISTANCE = 925;
+    private static int DRIVE_MOVE_SIDE_DISTANCE = 825;
 
     private DcMotor jewelMotor;
     private DcMotor driveUpMotor;
@@ -100,8 +100,6 @@ public class SimpleBotBlueNonRecovery extends LinearOpMode {
             idle();
         }
     }
-
-
 
     void rotateBot(Boolean reset) {
         telemetry.addLine("Rotate Bot " + (reset ? "First..." : "Second..."));
