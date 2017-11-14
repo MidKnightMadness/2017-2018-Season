@@ -42,13 +42,13 @@ public class SimpleBotBlueRecovery extends LinearOpMode {
         raiseArm();
         rotateBot(false);
         //moveBot();
-        if (visualC.pictograph == RelicRecoveryVuMark.RIGHT) {
+        if (visualC.pictograph == RelicRecoveryVuMark.LEFT) {
             DRIVE_MOVE_DISTANCE = -1850;
         }
         else if (visualC.pictograph == RelicRecoveryVuMark.CENTER) {
             DRIVE_MOVE_DISTANCE = -2500;
         }
-        else if (visualC.pictograph == RelicRecoveryVuMark.LEFT){
+        else if (visualC.pictograph == RelicRecoveryVuMark.RIGHT){
             DRIVE_MOVE_DISTANCE = -3150;
         }
         else {
