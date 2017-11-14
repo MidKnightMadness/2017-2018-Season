@@ -128,10 +128,7 @@ public class DriveAssemblyController {
         if (!tankMode) {
             theta = getIMURotation() - startPos;
 
-            double Tscale = 1 - gamepad1.left_trigger/1.5;
-            double Rscale = 1 - gamepad1.right_trigger/1.5;
-
-            double translateScale = Math.pow(Math.min(Math.max(Math.abs(gamepad1.left_stick_x) + Math.abs(gamepad1.left_stick_y), 0), 1), 2) * 1 * Tscale * (1.5 - Math.pow(Math.abs(gamepad1.right_stick_x), 2));
+            double translateScale = Math.pow(Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y), 2) * (1 - Math.min(Math.pow(Math.abs(gamepad1.right_stick_x), 2), 0.5));
             if ((translateScale - mainTranslateScale) < 0.1)
                 mainTranslateScale = translateScale;
             else
@@ -139,7 +136,7 @@ public class DriveAssemblyController {
 
 
             double targetDirection = aTan(gamepad1.left_stick_x, -gamepad1.left_stick_y);
-            double rotateScale = Math.pow(Math.abs(gamepad1.right_stick_x), 2) * Math.signum(-gamepad1.right_stick_x) * (1 - Math.abs(translateScale)) * Rscale;
+            double rotateScale = Math.pow(Math.abs(gamepad1.right_stick_x), 2) * Math.signum(-gamepad1.right_stick_x) * (1 - Math.abs(translateScale));
             if ((rotateScale - mainRotateScale) < 0.1)
                 mainRotateScale = rotateScale;
             else
