@@ -43,7 +43,7 @@ public class RedNonRecovery extends LinearOpMode {
         rotateBot(false);
         moveBot();
         speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE);
-        DRIVE_MOVE_DISTANCE = 925;
+        DRIVE_MOVE_DISTANCE = 875;
         if (visualC.pictograph == RelicRecoveryVuMark.RIGHT){
             DRIVE_MOVE_DISTANCE = DRIVE_MOVE_DISTANCE - 650;
         }
