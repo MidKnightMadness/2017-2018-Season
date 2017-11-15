@@ -24,18 +24,23 @@ public class RedRecovery extends LinearOpMode {
     private DcMotor driveLeftMotor;
     private DcMotor driveRightMotor;
     private VisualController visualC = new VisualController();
+    private GlyphController glyphC = new GlyphController();
+
 
     @Override
     public void runOpMode() throws InterruptedException {
         initialize(hardwareMap);
 
         visualC.init(telemetry, hardwareMap);
+        glyphC.init(telemetry, hardwareMap);
 
         telemetry.addLine("Ready to go!");
         telemetry.update();
 
         waitForStart();
 
+        glyphC.grab();
+        glyphC.lift();
         visualC.look();
         lowerArm();
         rotateBot(true);
@@ -60,6 +65,10 @@ public class RedRecovery extends LinearOpMode {
         moveBot();
         speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE);
         DRIVE_ROTATE90_DISTANCE = 1523;
+
+        glyphC.drop();
+
+
     }
 
 
