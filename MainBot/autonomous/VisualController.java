@@ -159,7 +159,9 @@ public class VisualController {
                             } else {
                                 outBmp = Bitmap.createScaledBitmap(Bitmap.createBitmap(srcBmp, (int) x, (int) y, (int) width, (int) height), 2, 4, false);
                             }
-                            //Check color
+
+
+                            /*//Check color
                             int blueCount = 0, redCount = 0, difference;
                             for (i = 0; i < 4; i++) {
                                 for (int j = 0; j < 1; j++) {
@@ -172,7 +174,16 @@ public class VisualController {
                                         redCount++;
                                     }
                                 }
+                            }*/
+                            // BEGIN EDIT:
+                            int redCount = 0;
+                            int blueCount = 0;
+                            for (int j = 0; j < 4; j++) {
+                                redCount += Color.red(outBmp.getPixel(0, j));
+                                blueCount += Color.blue(outBmp.getPixel(0, j));
                             }
+
+                            //END EDIT:
                             JewelColor left, right;
                             telemetry.addLine("Column 0: " + redCount + " " + blueCount);
                             if (redCount > blueCount) {
@@ -182,6 +193,7 @@ public class VisualController {
                                 telemetry.addLine("Blue left");
                                 left = JewelColor.BLUE;
                             }
+                            /*
                             redCount = 0;
                             blueCount = 0;
                             for (i = 0; i < 4; i++) {
@@ -195,7 +207,18 @@ public class VisualController {
                                         redCount++;
                                     }
                                 }
+                            }*/
+
+                            // BEGIN EDIT:
+                            redCount = 0;
+                            blueCount = 0;
+                            for (int j = 0; j < 4; j++) {
+                                redCount += Color.red(outBmp.getPixel(0, j));
+                                blueCount += Color.blue(outBmp.getPixel(0, j));
                             }
+
+                            //END EDIT:
+
                             telemetry.addLine("Column 1: " + redCount + " " + blueCount);
                             if (redCount > blueCount) {
                                 telemetry.addLine("Red right");
