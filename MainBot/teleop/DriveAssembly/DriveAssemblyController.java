@@ -24,7 +24,7 @@ public class DriveAssemblyController {
     private DcMotor motorLeft;
     private DcMotor motorRight;
 
-    private static int BASE_ROTATION_ANGLE = 135;
+    private static int BASE_ROTATION_ANGLE = -135;
 
     private double startPos = 0;
     private double theta = 0;
@@ -33,6 +33,10 @@ public class DriveAssemblyController {
     private double motors[] = new double[4];
     private double mainTranslateScale = 0;
     private double mainRotateScale = 0;
+    private double tempMotors[] = new double[4];
+    private double adjustedX = 0;
+    private double adjustedY = 0;
+    private double adjustedR = 0;
 
     //Gets angle of vector <x,y>
     private double aTan(double x, double y) {
@@ -128,25 +132,56 @@ public class DriveAssemblyController {
         if (!tankMode) {
             theta = getIMURotation() - startPos;
 
-            double translateScale = Math.pow(Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y), 2) * (1 - Math.min(Math.pow(Math.abs(gamepad1.right_stick_x), 2), 0.5));
-            if ((translateScale - mainTranslateScale) < 0.1)
-                mainTranslateScale = translateScale;
-            else
-                mainTranslateScale += Math.signum(translateScale - mainTranslateScale)*0.1;
+            //adjustedX += Math.signum(gamepad1.left_stick_x - adjustedX)*0.4;
+            //if ((gamepad1.left_stick_x - adjustedX) < 0.4)
+                adjustedX = gamepad1.left_stick_x;
 
+            //adjustedY += Math.signum(gamepad1.left_stick_y - adjustedY)*0.1;
+            //if ((gamepad1.left_stick_y - adjustedY) < 0.4)
+                adjustedY = gamepad1.left_stick_y;
 
+            //adjustedR += Math.signum(gamepad1.right_stick_x - adjustedR)*0.4;
+            //if ((gamepad1.right_stick_x - adjustedR) < 0.4)
+                adjustedR = gamepad1.right_stick_x;
+
+            double translateScale = Math.pow(Math.hypot(adjustedX, adjustedY), 9) * (1 - Math.min(Math.pow(Math.abs(adjustedR), 2), 0.5));
             double targetDirection = aTan(gamepad1.left_stick_x, -gamepad1.left_stick_y);
-            double rotateScale = Math.pow(Math.abs(gamepad1.right_stick_x), 2) * Math.signum(-gamepad1.right_stick_x) * (1 - Math.abs(translateScale));
-            if ((rotateScale - mainRotateScale) < 0.1)
-                mainRotateScale = rotateScale;
-            else
-                mainRotateScale += Math.signum(rotateScale - mainRotateScale)*0.1;
+            double rotateScale = Math.pow(Math.abs(adjustedR), 2) * Math.signum(-adjustedR) * (1 - Math.abs(translateScale));
 
-            targPow(motorUp, 0, mainTranslateScale * Math.cos((theta + targetDirection) * (Math.PI / 180d)) + (rotateScale));
-            targPow(motorDown, 1, -mainTranslateScale * Math.cos((theta + targetDirection) * (Math.PI / 180d)) + (rotateScale));
-            targPow(motorLeft, 2, mainTranslateScale * Math.sin((theta + targetDirection) * (Math.PI / 180d)) + (rotateScale));
-            targPow(motorRight, 3, -mainTranslateScale * Math.sin((theta + targetDirection) * (Math.PI / 180d)) + (rotateScale));
 
+            tempMotors[0] = Math.cos((theta + targetDirection) * (Math.PI / 180d));
+            tempMotors[1] = -Math.cos((theta + targetDirection) * (Math.PI / 180d));
+            tempMotors[2] = Math.sin((theta + targetDirection) * (Math.PI / 180d));
+            tempMotors[3] = -Math.sin((theta + targetDirection) * (Math.PI / 180d));
+
+            double scale = Math.max(Math.max(Math.abs(tempMotors[0]), Math.abs(tempMotors[1])), Math.max(Math.abs(tempMotors[2]), Math.abs(tempMotors[3])));
+            if (scale == 0) {
+                scale = 0;
+            } else {
+                scale = translateScale/(scale);
+            }
+
+            tempMotors[0] *= scale;
+            tempMotors[1] *= scale;
+            tempMotors[2] *= scale;
+            tempMotors[3] *= scale;
+
+            telemetry.addData("Scale", scale);
+
+            tempMotors[0] += rotateScale;
+            tempMotors[1] += rotateScale;
+            tempMotors[2] += rotateScale;
+            tempMotors[3] += rotateScale;
+
+            //tempMotors[0] *= 0.8;
+            //tempMotors[1] *= 0.8;
+            //tempMotors[2] *= 0.8;
+            //tempMotors[3] *= 0.8;
+
+            targPow(motorUp, 0, tempMotors[0]);
+            targPow(motorDown, 1, tempMotors[1]);
+            targPow(motorLeft, 2, tempMotors[2]);
+            targPow(motorRight, 3, tempMotors[3]);
 
             telemetry.addData("Theta", theta);
             telemetry.addData("IMU Rotation", getIMURotation());
