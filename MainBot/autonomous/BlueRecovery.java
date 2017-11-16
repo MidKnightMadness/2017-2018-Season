@@ -8,15 +8,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
-@Autonomous(name = "RedRecovery", group = "Main Bot")
-public class SimpleBotRedRecovery extends LinearOpMode {
-    private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.RED;
+@Autonomous(name = "BlueRecovery", group = "Main Bot")
+public class BlueRecovery extends LinearOpMode {
+    private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.BLUE;
     private static double JEWEL_ARM_POWER = 0.3;
     private static int JEWEL_ARM_DISTANCE = 600;
     private static double DRIVE_ROTATE_POWER = -0.3;
     private static int DRIVE_ROTATE_DISTANCE = 200;
     private static double DRIVE_MOVE_POWER = 0.4;
-    private static int DRIVE_MOVE_DISTANCE = 2500;
+    private static int DRIVE_MOVE_DISTANCE = -2500;
     private static int DRIVE_ROTATE90_DISTANCE = 1523;
     private DcMotor jewelMotor;
     private DcMotor driveUpMotor;
@@ -42,14 +42,17 @@ public class SimpleBotRedRecovery extends LinearOpMode {
         raiseArm();
         rotateBot(false);
         //moveBot();
-        if (visualC.pictograph == RelicRecoveryVuMark.RIGHT) {
-            DRIVE_MOVE_DISTANCE = 1850;
+        if (visualC.pictograph == RelicRecoveryVuMark.LEFT) {
+            DRIVE_MOVE_DISTANCE = -1850;
         }
-        else if (visualC.pictograph == RelicRecoveryVuMark.LEFT){
-            DRIVE_MOVE_DISTANCE = 3150;
+        else if (visualC.pictograph == RelicRecoveryVuMark.CENTER) {
+            DRIVE_MOVE_DISTANCE = -2500;
+        }
+        else if (visualC.pictograph == RelicRecoveryVuMark.RIGHT){
+            DRIVE_MOVE_DISTANCE = -3150;
         }
         else {
-            DRIVE_MOVE_DISTANCE = 2500;
+            DRIVE_MOVE_DISTANCE = -2500;
         }
         telemetry.addLine("Distance: " + DRIVE_MOVE_DISTANCE);
         telemetry.update();

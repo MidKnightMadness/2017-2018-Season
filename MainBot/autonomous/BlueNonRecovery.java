@@ -8,28 +8,31 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
-@Autonomous(name = "BlueRecovery", group = "Main Bot")
-public class SimpleBotBlueRecovery extends LinearOpMode {
+@Autonomous(name = "BlueNonRecovery", group = "Main Bot")
+public class BlueNonRecovery extends LinearOpMode {
     private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.BLUE;
     private static double JEWEL_ARM_POWER = 0.3;
     private static int JEWEL_ARM_DISTANCE = 600;
     private static double DRIVE_ROTATE_POWER = -0.3;
     private static int DRIVE_ROTATE_DISTANCE = 200;
     private static double DRIVE_MOVE_POWER = 0.4;
-    private static int DRIVE_MOVE_DISTANCE = -2500;
-    private static int DRIVE_ROTATE90_DISTANCE = 1523;
+    private static int DRIVE_MOVE_DISTANCE = -1900;
+    private static int DRIVE_MOVE_SIDE_DISTANCE = 825;
+
     private DcMotor jewelMotor;
     private DcMotor driveUpMotor;
     private DcMotor driveDownMotor;
     private DcMotor driveLeftMotor;
     private DcMotor driveRightMotor;
     private VisualController visualC = new VisualController();
+    private GlyphController glyphC = new GlyphController();
 
     @Override
     public void runOpMode() throws InterruptedException {
         initialize(hardwareMap);
 
         visualC.init(telemetry, hardwareMap);
+        glyphC.init(telemetry, hardwareMap);
 
         telemetry.addLine("Ready to go!");
         telemetry.update();
@@ -41,29 +44,15 @@ public class SimpleBotBlueRecovery extends LinearOpMode {
         rotateBot(true);
         raiseArm();
         rotateBot(false);
-        //moveBot();
-        if (visualC.pictograph == RelicRecoveryVuMark.RIGHT) {
-            DRIVE_MOVE_DISTANCE = -1850;
-        }
-        else if (visualC.pictograph == RelicRecoveryVuMark.CENTER) {
-            DRIVE_MOVE_DISTANCE = -2500;
+        moveBot();
+        if (visualC.pictograph == RelicRecoveryVuMark.RIGHT){
+            DRIVE_MOVE_SIDE_DISTANCE = DRIVE_MOVE_SIDE_DISTANCE + 650;
         }
         else if (visualC.pictograph == RelicRecoveryVuMark.LEFT){
-            DRIVE_MOVE_DISTANCE = -3150;
+            DRIVE_MOVE_SIDE_DISTANCE = DRIVE_MOVE_SIDE_DISTANCE - 650;
         }
-        else {
-            DRIVE_MOVE_DISTANCE = -2500;
-        }
-        telemetry.addLine("Distance: " + DRIVE_MOVE_DISTANCE);
-        telemetry.update();
-        /*double delay = time + 1;
-        while (time < delay) {
-            idle();
-        }*/
-        moveBot();
-        speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE);
-        DRIVE_ROTATE90_DISTANCE = 1523;
-    }
+        moveBotSideways();
+    }// -650, 0, 650
 
 
     void initialize(HardwareMap hardwareMap) {
@@ -114,27 +103,7 @@ public class SimpleBotBlueRecovery extends LinearOpMode {
         }
     }
 
-    void speedRotateBot(double speed, int driveRotateDistance) {
-        telemetry.addLine("Rotate Bot " + speed + " " + driveRotateDistance);
-        telemetry.update();
 
-        driveUpMotor.setTargetPosition(driveUpMotor.getCurrentPosition() + (driveRotateDistance));
-        driveUpMotor.setPower(speed);
-
-        driveDownMotor.setTargetPosition(driveDownMotor.getCurrentPosition() + (driveRotateDistance));
-        driveDownMotor.setPower(speed);
-
-        driveLeftMotor.setTargetPosition(driveLeftMotor.getCurrentPosition() + (driveRotateDistance));
-        driveLeftMotor.setPower(speed);
-
-        driveRightMotor.setTargetPosition(driveRightMotor.getCurrentPosition() + (driveRotateDistance));
-        driveRightMotor.setPower(speed);
-
-        while (driveUpMotor.isBusy()) {
-            idle();
-        }
-
-    }
 
     void rotateBot(Boolean reset) {
         telemetry.addLine("Rotate Bot " + (reset ? "First..." : "Second..."));
@@ -176,6 +145,26 @@ public class SimpleBotBlueRecovery extends LinearOpMode {
 
         driveRightMotor.setTargetPosition(driveRightMotor.getCurrentPosition() - DRIVE_MOVE_DISTANCE);
         driveRightMotor.setPower(-DRIVE_MOVE_POWER);
+
+        while (driveUpMotor.isBusy()) {
+            idle();
+        }
+    }
+    void moveBotSideways() {
+        telemetry.addLine("Move Bot...");
+        telemetry.update();
+
+        driveUpMotor.setTargetPosition(driveUpMotor.getCurrentPosition() + DRIVE_MOVE_SIDE_DISTANCE);
+        driveUpMotor.setPower(DRIVE_MOVE_POWER);
+
+        driveDownMotor.setTargetPosition(driveDownMotor.getCurrentPosition() - DRIVE_MOVE_SIDE_DISTANCE);
+        driveDownMotor.setPower(-DRIVE_MOVE_POWER);
+
+        driveLeftMotor.setTargetPosition(driveLeftMotor.getCurrentPosition() - DRIVE_MOVE_SIDE_DISTANCE);
+        driveLeftMotor.setPower(-DRIVE_MOVE_POWER);
+
+        driveRightMotor.setTargetPosition(driveRightMotor.getCurrentPosition() + DRIVE_MOVE_SIDE_DISTANCE);
+        driveRightMotor.setPower(DRIVE_MOVE_POWER);
 
         while (driveUpMotor.isBusy()) {
             idle();

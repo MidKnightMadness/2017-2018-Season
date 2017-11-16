@@ -8,51 +8,68 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
-@Autonomous(name = "RedNonRecovery", group = "Main Bot")
-public class SimpleBotRedNonRecovery extends LinearOpMode {
+@Autonomous(name = "RedRecovery", group = "Main Bot")
+public class RedRecovery extends LinearOpMode {
     private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.RED;
     private static double JEWEL_ARM_POWER = 0.3;
     private static int JEWEL_ARM_DISTANCE = 600;
     private static double DRIVE_ROTATE_POWER = -0.3;
     private static int DRIVE_ROTATE_DISTANCE = 200;
     private static double DRIVE_MOVE_POWER = 0.4;
-    private static int DRIVE_MOVE_DISTANCE = 1900;
-    private static int DRIVE_ROTATE90_DISTANCE = 1550;
+    private static int DRIVE_MOVE_DISTANCE = 2500;
+    private static int DRIVE_ROTATE90_DISTANCE = 1523;
     private DcMotor jewelMotor;
     private DcMotor driveUpMotor;
     private DcMotor driveDownMotor;
     private DcMotor driveLeftMotor;
     private DcMotor driveRightMotor;
     private VisualController visualC = new VisualController();
+    private GlyphController glyphC = new GlyphController();
+
 
     @Override
     public void runOpMode() throws InterruptedException {
         initialize(hardwareMap);
 
         visualC.init(telemetry, hardwareMap);
+        glyphC.init(telemetry, hardwareMap);
 
         telemetry.addLine("Ready to go!");
         telemetry.update();
 
         waitForStart();
 
+        glyphC.grab();
+        glyphC.lift();
         visualC.look();
         lowerArm();
         rotateBot(true);
         raiseArm();
         rotateBot(false);
-        moveBot();
-        speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE);
-        DRIVE_MOVE_DISTANCE = 925;
-        if (visualC.pictograph == RelicRecoveryVuMark.RIGHT){
-            DRIVE_MOVE_DISTANCE = DRIVE_MOVE_DISTANCE - 650;
+        //moveBot();
+        if (visualC.pictograph == RelicRecoveryVuMark.RIGHT) {
+            DRIVE_MOVE_DISTANCE = 1850;
         }
         else if (visualC.pictograph == RelicRecoveryVuMark.LEFT){
-            DRIVE_MOVE_DISTANCE = DRIVE_MOVE_DISTANCE + 650;
+            DRIVE_MOVE_DISTANCE = 3150;
         }
+        else {
+            DRIVE_MOVE_DISTANCE = 2500;
+        }
+        telemetry.addLine("Distance: " + DRIVE_MOVE_DISTANCE);
+        telemetry.update();
+        /*double delay = time + 1;
+        while (time < delay) {
+            idle();
+        }*/
         moveBot();
         speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE);
-    }// -650, 0, 650
+        DRIVE_ROTATE90_DISTANCE = 1523;
+
+        glyphC.drop();
+
+
+    }
 
 
     void initialize(HardwareMap hardwareMap) {
