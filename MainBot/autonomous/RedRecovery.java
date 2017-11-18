@@ -12,11 +12,11 @@ import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 public class RedRecovery extends LinearOpMode {
     private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.RED;
     private static double JEWEL_ARM_POWER = 0.3;
-    private static int JEWEL_ARM_DISTANCE = 600;
+    private static int JEWEL_ARM_DISTANCE = 625;
     private static double DRIVE_ROTATE_POWER = -0.3;
-    private static int DRIVE_ROTATE_DISTANCE = 200;
+    private static int DRIVE_ROTATE_DISTANCE = 250;
     private static double DRIVE_MOVE_POWER = 0.4;
-    private static int DRIVE_MOVE_DISTANCE = 2500;
+    private static int DRIVE_MOVE_DISTANCE = -75;
     private static int DRIVE_ROTATE90_DISTANCE = 1523;
     private DcMotor jewelMotor;
     private DcMotor driveUpMotor;
@@ -39,22 +39,27 @@ public class RedRecovery extends LinearOpMode {
 
         waitForStart();
 
-        glyphC.grab();
+
+        glyphC.close();
+        double waitUntil = time + 1;
+        while (time < waitUntil) {
+            idle();
+        }
         glyphC.lift();
-        visualC.look();
+        moveBot();
+        visualC.pictograph = RelicRecoveryVuMark.CENTER;
         lowerArm();
         rotateBot(true);
         raiseArm();
         rotateBot(false);
-        //moveBot();
         if (visualC.pictograph == RelicRecoveryVuMark.RIGHT) {
-            DRIVE_MOVE_DISTANCE = 1850;
+            DRIVE_MOVE_DISTANCE = 2100;
         }
         else if (visualC.pictograph == RelicRecoveryVuMark.LEFT){
-            DRIVE_MOVE_DISTANCE = 3150;
+            DRIVE_MOVE_DISTANCE = 3200;
         }
         else {
-            DRIVE_MOVE_DISTANCE = 2500;
+            DRIVE_MOVE_DISTANCE = 2650;
         }
         telemetry.addLine("Distance: " + DRIVE_MOVE_DISTANCE);
         telemetry.update();
@@ -63,13 +68,15 @@ public class RedRecovery extends LinearOpMode {
             idle();
         }*/
         moveBot();
-        speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE);
-        DRIVE_ROTATE90_DISTANCE = 1523;
+        speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE/2);
+        moveBotDiagonal();
+        glyphC.open();
+        //do the drop
 
-        glyphC.drop();
-
-
+        speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE*5/2 + 20);
+        glyphC.resetArm();
     }
+
 
 
     void initialize(HardwareMap hardwareMap) {
@@ -105,6 +112,8 @@ public class RedRecovery extends LinearOpMode {
         jewelMotor.setTargetPosition(jewelMotor.getCurrentPosition() - JEWEL_ARM_DISTANCE);
         jewelMotor.setPower(JEWEL_ARM_POWER);
         while (jewelMotor.isBusy()) {
+            telemetry.addData("Lowering Arm...", jewelMotor.getCurrentPosition());
+            telemetry.update();
             idle();
         }
     }
@@ -168,6 +177,27 @@ public class RedRecovery extends LinearOpMode {
     }
 
     void moveBot() {
+        telemetry.addLine("Move Bot...");
+        telemetry.update();
+
+        driveUpMotor.setTargetPosition(driveUpMotor.getCurrentPosition() + DRIVE_MOVE_DISTANCE);
+        driveUpMotor.setPower(DRIVE_MOVE_POWER);
+
+        driveDownMotor.setTargetPosition(driveDownMotor.getCurrentPosition() - DRIVE_MOVE_DISTANCE);
+        driveDownMotor.setPower(-DRIVE_MOVE_POWER);
+
+        driveLeftMotor.setTargetPosition(driveLeftMotor.getCurrentPosition() + DRIVE_MOVE_DISTANCE);
+        driveLeftMotor.setPower(DRIVE_MOVE_POWER);
+
+        driveRightMotor.setTargetPosition(driveRightMotor.getCurrentPosition() - DRIVE_MOVE_DISTANCE);
+        driveRightMotor.setPower(-DRIVE_MOVE_POWER);
+
+        while (driveUpMotor.isBusy()) {
+            idle();
+        }
+    }
+
+    void moveBotDiagonal() {
         telemetry.addLine("Move Bot...");
         telemetry.update();
 

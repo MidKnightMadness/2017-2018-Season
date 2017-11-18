@@ -13,12 +13,14 @@ public class GlyphController {
     private Telemetry telemetry;
     private DcMotor motor;
     private Servo servo;
+    private int pos;
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
         motor = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.MOTOR);
-        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        pos = motor.getCurrentPosition();
 
         servo = hardwareMap.servo.get(CrossCommunicator.Glyph.SERVO);
         servo.setPosition(1);
@@ -32,16 +34,25 @@ public class GlyphController {
 
     }
 
-    public void grab() {
+    public void close() {
         servo.setPosition(0);
+    }
+    public boolean isBusy() {
+        return servo.getPosition() != 0;
+    }
+
+    public void open() {
+        servo.setPosition(0.6);
     }
 
     public void lift() {
+        motor.setTargetPosition(pos+2000);
         motor.setPower(1);
     }
 
-    public void drop() {
-        servo.setPosition(1);
+    public void resetArm() {
+        servo.setPosition(0.6);
+        motor.setTargetPosition(pos-3000);
+        motor.setPower(-1);
     }
-
 }

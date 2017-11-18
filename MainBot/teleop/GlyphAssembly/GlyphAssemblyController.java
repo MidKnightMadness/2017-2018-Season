@@ -73,6 +73,7 @@ public class GlyphAssemblyController {
 
 
         telemetry.addData("Servo", servoPos);
+        telemetry.addData("Elev", motor.getCurrentPosition());
         servo.setPosition(servoPos);
 
 

@@ -213,8 +213,8 @@ public class VisualController {
                             redCount = 0;
                             blueCount = 0;
                             for (int j = 0; j < 4; j++) {
-                                redCount += Color.red(outBmp.getPixel(0, j));
-                                blueCount += Color.blue(outBmp.getPixel(0, j));
+                                redCount += Color.red(outBmp.getPixel(1, j));
+                                blueCount += Color.blue(outBmp.getPixel(1, j));
                             }
 
                             //END EDIT:
