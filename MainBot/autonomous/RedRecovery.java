@@ -15,8 +15,8 @@ public class RedRecovery extends LinearOpMode {
     private static int JEWEL_ARM_DISTANCE = 625;
     private static double DRIVE_ROTATE_POWER = -0.3;
     private static int DRIVE_ROTATE_DISTANCE = 250;
-    private static double DRIVE_MOVE_POWER = -0.4;
-    private static int DRIVE_MOVE_DISTANCE = 75;
+    private static double DRIVE_MOVE_POWER = 0.4;
+    private static int DRIVE_MOVE_DISTANCE = -75;
     private static int DRIVE_ROTATE90_DISTANCE = 1523;
     private DcMotor jewelMotor;
     private DcMotor driveUpMotor;
@@ -53,22 +53,23 @@ public class RedRecovery extends LinearOpMode {
         raiseArm();
         rotateBot(false);
         if (visualC.pictograph == RelicRecoveryVuMark.RIGHT) {
-            DRIVE_MOVE_DISTANCE = 2750 - 1500;
+            DRIVE_MOVE_DISTANCE = 2750 - 1300;
         }
         else if (visualC.pictograph == RelicRecoveryVuMark.LEFT){
-            DRIVE_MOVE_DISTANCE = 3950 - 1500;
+            DRIVE_MOVE_DISTANCE = 3950 - 1300;
         }
         else {
-            DRIVE_MOVE_DISTANCE = 3300 - 1500;
+            DRIVE_MOVE_DISTANCE = 3300 - 1300;
             telemetry.addLine("Distance: " + DRIVE_MOVE_DISTANCE);
             telemetry.update();
+        }
         /*double delay = time + 1;
         while (time < delay) {
             idle();
         }*/
-        }
+
         moveBot();
-        speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE * 2 / 3);
+        speedRotateBot(-0.3, (DRIVE_ROTATE90_DISTANCE * 4) / 3);
         DRIVE_MOVE_DISTANCE = -600;
         moveBot();
         glyphC.lower();
@@ -79,7 +80,7 @@ public class RedRecovery extends LinearOpMode {
             idle();
         }
         moveBot();
-        speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE / 3 * 5);
+        speedRotateBot(-0.3, (DRIVE_ROTATE90_DISTANCE * 5) / 5 + 20);
         glyphC.resetArm();
     }
 
