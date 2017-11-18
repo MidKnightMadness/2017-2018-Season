@@ -53,30 +53,34 @@ public class RedRecovery extends LinearOpMode {
         raiseArm();
         rotateBot(false);
         if (visualC.pictograph == RelicRecoveryVuMark.RIGHT) {
-            DRIVE_MOVE_DISTANCE = 2750 - 1200;
+            DRIVE_MOVE_DISTANCE = 2750 - 1500;
         }
         else if (visualC.pictograph == RelicRecoveryVuMark.LEFT){
-            DRIVE_MOVE_DISTANCE = 3950 - 1200;
+            DRIVE_MOVE_DISTANCE = 3950 - 1500;
         }
         else {
-            DRIVE_MOVE_DISTANCE = 3300 - 1200;
+            DRIVE_MOVE_DISTANCE = 3300 - 1500;
             telemetry.addLine("Distance: " + DRIVE_MOVE_DISTANCE);
             telemetry.update();
         /*double delay = time + 1;
         while (time < delay) {
             idle();
         }*/
-            moveBot();
-            speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE / 3 + DRIVE_ROTATE90_DISTANCE);
-            DRIVE_MOVE_DISTANCE = -600;
-            moveBot();
-            glyphC.lower();
-            glyphC.open();
-            DRIVE_MOVE_DISTANCE = 600;
-            moveBot();
-            speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE*5/2 + 20);
-            glyphC.resetArm();
         }
+        moveBot();
+        speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE * 2 / 3);
+        DRIVE_MOVE_DISTANCE = -600;
+        moveBot();
+        glyphC.lower();
+        glyphC.open();
+        DRIVE_MOVE_DISTANCE = 600;
+        waitUntil = time + 0.4;
+        while (time < waitUntil) {
+            idle();
+        }
+        moveBot();
+        speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE / 3 * 5);
+        glyphC.resetArm();
     }
 
 
