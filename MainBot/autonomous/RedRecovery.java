@@ -47,41 +47,60 @@ public class RedRecovery extends LinearOpMode {
         }
         glyphC.lift();
         moveBot();
-        visualC.pictograph = RelicRecoveryVuMark.CENTER;
+        visualC.look();
+        //visualC.pictograph = RelicRecoveryVuMark.CENTER;
         lowerArm();
         rotateBot(true);
         raiseArm();
         rotateBot(false);
         if (visualC.pictograph == RelicRecoveryVuMark.RIGHT) {
-            DRIVE_MOVE_DISTANCE = 2750 - 1300;
+            DRIVE_MOVE_DISTANCE = 3300;
+            moveBot();
+            speedRotateBot(0.3, DRIVE_ROTATE90_DISTANCE / 2);
+            DRIVE_MOVE_DISTANCE = -1000;
+            moveBot();
+            glyphC.lower();
+            glyphC.open();
+            DRIVE_MOVE_DISTANCE = 400;
+            waitUntil = time + 0.4;
+            while (time < waitUntil) {
+                idle();
+            }
+            moveBot();
+            speedRotateBot(0.3, (DRIVE_ROTATE90_DISTANCE / 2) + 2 * DRIVE_ROTATE90_DISTANCE);
+            glyphC.resetArm();
         }
-        else if (visualC.pictograph == RelicRecoveryVuMark.LEFT){
-            DRIVE_MOVE_DISTANCE = 3950 - 1300;
+         else {
+            if (visualC.pictograph == RelicRecoveryVuMark.LEFT) {
+                DRIVE_MOVE_DISTANCE = 3950 - 1400;
+            }
+            else {
+                DRIVE_MOVE_DISTANCE = 3300 - 1400;
+                telemetry.addLine("Distance: " + DRIVE_MOVE_DISTANCE);
+                telemetry.update();
+            }
+            moveBot();
+            speedRotateBot(-0.3, (DRIVE_ROTATE90_DISTANCE * 4) / 3);
+            DRIVE_MOVE_DISTANCE = -600;
+            moveBot();
+            glyphC.lower();
+            glyphC.open();
+            DRIVE_MOVE_DISTANCE = 400;
+            waitUntil = time + 0.4;
+            while (time < waitUntil) {
+                idle();
+            }
+            moveBot();
+            speedRotateBot(-0.3, ((DRIVE_ROTATE90_DISTANCE * 5) / 3) + 20);
+            glyphC.resetArm();
         }
-        else {
-            DRIVE_MOVE_DISTANCE = 3300 - 1300;
-            telemetry.addLine("Distance: " + DRIVE_MOVE_DISTANCE);
-            telemetry.update();
-        }
+
         /*double delay = time + 1;
         while (time < delay) {
             idle();
         }*/
 
-        moveBot();
-        speedRotateBot(-0.3, (DRIVE_ROTATE90_DISTANCE * 4) / 3);
-        DRIVE_MOVE_DISTANCE = -600;
-        moveBot();
-        glyphC.lower();
-        glyphC.open();
-        DRIVE_MOVE_DISTANCE = 600;
-        waitUntil = time + 0.4;
-        while (time < waitUntil) {
-            idle();
-        }
-        moveBot();
-        speedRotateBot(-0.3, (DRIVE_ROTATE90_DISTANCE * 5) / 5 + 20);
-        glyphC.resetArm();
+
     }
 
 
