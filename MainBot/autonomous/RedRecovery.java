@@ -41,7 +41,7 @@ public class RedRecovery extends LinearOpMode {
 
 
         glyphC.close();
-        double waitUntil = time + 1;
+        double waitUntil = time + .6;
         while (time < waitUntil) {
             idle();
         }
@@ -53,28 +53,30 @@ public class RedRecovery extends LinearOpMode {
         raiseArm();
         rotateBot(false);
         if (visualC.pictograph == RelicRecoveryVuMark.RIGHT) {
-            DRIVE_MOVE_DISTANCE = 2100;
+            DRIVE_MOVE_DISTANCE = 2750;
         }
         else if (visualC.pictograph == RelicRecoveryVuMark.LEFT){
-            DRIVE_MOVE_DISTANCE = 3200;
+            DRIVE_MOVE_DISTANCE = 3950;
         }
         else {
-            DRIVE_MOVE_DISTANCE = 2650;
-        }
-        telemetry.addLine("Distance: " + DRIVE_MOVE_DISTANCE);
-        telemetry.update();
+            DRIVE_MOVE_DISTANCE = 3300;
+            telemetry.addLine("Distance: " + DRIVE_MOVE_DISTANCE);
+            telemetry.update();
         /*double delay = time + 1;
         while (time < delay) {
             idle();
         }*/
-        moveBot();
-        speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE/2);
-        moveBotDiagonal();
-        glyphC.open();
-        //do the drop
-
-        speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE*5/2 + 20);
-        glyphC.resetArm();
+            moveBot();
+            speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE / 2);
+            DRIVE_MOVE_DISTANCE = -600;
+            moveBot();
+            glyphC.lower();
+            glyphC.open();
+            DRIVE_MOVE_DISTANCE = 600;
+            moveBot();
+            speedRotateBot(-0.3, DRIVE_ROTATE90_DISTANCE*5/2 + 20);
+            glyphC.resetArm();
+        }
     }
 
 
@@ -177,27 +179,6 @@ public class RedRecovery extends LinearOpMode {
     }
 
     void moveBot() {
-        telemetry.addLine("Move Bot...");
-        telemetry.update();
-
-        driveUpMotor.setTargetPosition(driveUpMotor.getCurrentPosition() + DRIVE_MOVE_DISTANCE);
-        driveUpMotor.setPower(DRIVE_MOVE_POWER);
-
-        driveDownMotor.setTargetPosition(driveDownMotor.getCurrentPosition() - DRIVE_MOVE_DISTANCE);
-        driveDownMotor.setPower(-DRIVE_MOVE_POWER);
-
-        driveLeftMotor.setTargetPosition(driveLeftMotor.getCurrentPosition() + DRIVE_MOVE_DISTANCE);
-        driveLeftMotor.setPower(DRIVE_MOVE_POWER);
-
-        driveRightMotor.setTargetPosition(driveRightMotor.getCurrentPosition() - DRIVE_MOVE_DISTANCE);
-        driveRightMotor.setPower(-DRIVE_MOVE_POWER);
-
-        while (driveUpMotor.isBusy()) {
-            idle();
-        }
-    }
-
-    void moveBotDiagonal() {
         telemetry.addLine("Move Bot...");
         telemetry.update();
 

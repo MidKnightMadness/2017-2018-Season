@@ -37,9 +37,6 @@ public class GlyphController {
     public void close() {
         servo.setPosition(0);
     }
-    public boolean isBusy() {
-        return servo.getPosition() != 0;
-    }
 
     public void open() {
         servo.setPosition(0.6);
@@ -48,6 +45,10 @@ public class GlyphController {
     public void lift() {
         motor.setTargetPosition(pos+2000);
         motor.setPower(1);
+    }
+
+    public void lower() {
+        motor.setTargetPosition(pos-8000);
     }
 
     public void resetArm() {
