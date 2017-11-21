@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.vuforia.EyewearUserCalibrator;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
@@ -109,6 +110,7 @@ public class RedRecovery extends LinearOpMode {
         jewelMotor = hardwareMap.dcMotor.get(CrossCommunicator.Jewel.MOTOR);
         jewelMotor.resetDeviceConfigurationForOpMode();
         jewelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        jewelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         driveUpMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.UP);
         driveUpMotor.resetDeviceConfigurationForOpMode();

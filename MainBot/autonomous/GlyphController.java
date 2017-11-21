@@ -43,12 +43,13 @@ public class GlyphController {
     }
 
     public void lift() {
-        motor.setTargetPosition(pos + 3000);
+        motor.setTargetPosition(pos + 1000);
         motor.setPower(1);
     }
 
     public void lower() {
-        motor.setTargetPosition(pos - 3000);
+        motor.setTargetPosition(pos);
+        motor.setPower(-1);
     }
 
     public void resetArm() {
