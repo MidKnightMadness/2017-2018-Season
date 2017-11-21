@@ -16,7 +16,7 @@ public class MainBotController {
 
     private Telemetry telemetry;
     private DriveAssemblyController driveAssemblyController;
-    private JewelAssemblyController jewelAssemblyController;
+    //private JewelAssemblyController jewelAssemblyController;
     private GlyphAssemblyController glyphAssemblyController;
 
     public MainBotController() {
