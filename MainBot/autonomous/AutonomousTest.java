@@ -32,7 +32,8 @@ public class AutonomousTest extends LinearOpMode {
             {ENC_90/2, ENC_90/2, -ENC_90/2},
             //push
             {-800, -800, -800},
-            //reverse
+            //reverse (1 = UD, 0 = LR)
+            {1, 0, 0},
             {400, 400, 400},
             //rotate
             {0, 0, ENC_90 * 2/3}
@@ -61,6 +62,9 @@ public class AutonomousTest extends LinearOpMode {
         a.close();
         wait(0.6);
 
+        a.lift();
+        waitFor(JEWEL);
+
         a.moveBot(targets[0][0]);
         waitFor(UP);
 
@@ -88,16 +92,27 @@ public class AutonomousTest extends LinearOpMode {
         a.rotateBot(targets[3][state], 0.7);
         waitFor(UP);
 
-        a.moveBot(targets[4][state]);
-        waitFor(UP);
+        if (targets[4][state] == 1) {
+            a.moveBotDiUD(targets[5][state]);
+            waitFor(UP);
+        } else {
+            a.moveBotDiLR(targets[5][state]);
+            waitFor(LEFT);
+        }
+
 
         a.lower();
         waitFor(GLYPH);
 
         a.open();
 
-        a.moveBot(targets[5][state]);
-        waitFor(UP);
+        if (targets[4][state] == 1) {
+            a.moveBotDiUD(-targets[5][state]);
+            waitFor(UP);
+        } else {
+            a.moveBotDiLR(-targets[5][state]);
+            waitFor(LEFT);
+        }
 
         a.rotateBot(targets[6][state]);
     }
@@ -105,11 +120,13 @@ public class AutonomousTest extends LinearOpMode {
     private void waitFor(int motor) {
         while (a.motors[motor].isBusy())
             idle();
+        a.reset();
     }
 
     private void wait(double s) {
         waitUntil = time + s;
         while (time < waitUntil)
             idle();
+        a.reset();
     }
 }

@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.MainBot.autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.sun.tools.javac.util.ArrayUtils;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
@@ -42,37 +41,31 @@ public class AutonomousController {
         motors[GLYPH].resetDeviceConfigurationForOpMode();
         motors[GLYPH].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motors[GLYPH].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        pos[GLYPH] = motors[GLYPH].getCurrentPosition();
 
         motors[JEWEL] = hardwareMap.dcMotor.get(CrossCommunicator.Jewel.MOTOR);
         motors[JEWEL].resetDeviceConfigurationForOpMode();
         motors[JEWEL].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motors[JEWEL].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        pos[JEWEL] = motors[JEWEL].getCurrentPosition();
 
         motors[UP] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.UP);
         motors[UP].resetDeviceConfigurationForOpMode();
         motors[UP].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motors[UP].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        pos[UP] = motors[UP].getCurrentPosition();
 
         motors[DOWN] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.DOWN);
         motors[DOWN].resetDeviceConfigurationForOpMode();
         motors[DOWN].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motors[DOWN].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        pos[DOWN] = motors[DOWN].getCurrentPosition();
 
         motors[LEFT] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.LEFT);
         motors[LEFT].resetDeviceConfigurationForOpMode();
         motors[LEFT].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motors[LEFT].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        pos[LEFT] = motors[LEFT].getCurrentPosition();
 
         motors[RIGHT] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.RIGHT);
         motors[RIGHT].resetDeviceConfigurationForOpMode();
         motors[RIGHT].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motors[RIGHT].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        pos[RIGHT] = motors[RIGHT].getCurrentPosition();
 
         glyphServo = hardwareMap.servo.get(CrossCommunicator.Glyph.SERVO);
         glyphServo.setPosition(0.6);
@@ -93,8 +86,7 @@ public class AutonomousController {
         move(GLYPH, -1000, -1);
     }
 
-    public void moveBot(int distance) {
-        double speed = DRIVE_SPEED;
+    public void moveBot(int distance, double speed) {
         if (Math.signum(distance) != Math.signum(speed))
             speed *= -1;
         move(UP, distance, speed);
@@ -112,8 +104,27 @@ public class AutonomousController {
         move(RIGHT, distance, speed);
     }
 
+    public void moveBotDiUD(int distance) {
+        double speed = DRIVE_SPEED;
+        if (Math.signum(distance) != Math.signum(speed))
+            speed *= -1;
+        move(UP, distance, speed);
+        move(DOWN, -distance, -speed);
+    }
+
+    public void moveBotDiLR(int distance) {
+        double speed = DRIVE_SPEED;
+        if (Math.signum(distance) != Math.signum(speed))
+            speed *= -1;
+        move(LEFT, distance, speed);
+        move(RIGHT, -distance, -speed);
+    }
+
     public void rotateBot(int distance) {
-        rotateBot(distance, ROTATE_SPEED * Math.signum(distance));
+        rotateBot(distance, ROTATE_SPEED);
+    }
+    public void moveBot(int distance) {
+        moveBot(distance, DRIVE_SPEED);
     }
 
     public void lowerJArm() {
@@ -122,5 +133,18 @@ public class AutonomousController {
 
     public void raiseJArm() {
         move(JEWEL, -625, -0.3);
+    }
+
+    public int getPos(int motor) {
+        return motors[motor].getCurrentPosition() - pos[motor];
+    }
+
+    public void reset() {
+        pos[GLYPH] = motors[GLYPH].getCurrentPosition();
+        pos[JEWEL] = motors[JEWEL].getCurrentPosition();
+        pos[UP] = motors[UP].getCurrentPosition();
+        pos[DOWN] = motors[DOWN].getCurrentPosition();
+        pos[LEFT] = motors[LEFT].getCurrentPosition();
+        pos[RIGHT] = motors[RIGHT].getCurrentPosition();
     }
 }
