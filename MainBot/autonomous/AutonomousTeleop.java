@@ -163,10 +163,11 @@ public class AutonomousTeleop extends LinearOpMode {
     }
 
     private void waitFor(int motor) {
-        while (a.motors[motor].isBusy())
+        while (a.motors[motor].isBusy()) {
             telemetry.addData("Amount: ", amount);
             telemetry.update();
             idle();
+        }
         a.reset();
     }
 
