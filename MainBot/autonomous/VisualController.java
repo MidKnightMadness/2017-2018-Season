@@ -246,4 +246,17 @@ public class VisualController {
             }
         }
     }
+
+    /*public void saveTeamColor(JewelColor team) {
+        try {
+            File file = new File("/storage/self/primary/Pictures/images/", "LastTeamColor.txt");
+            FileOutputStream outStream = new FileOutputStream(file);
+            outStream.write((team == JewelColor.RED) ? 1 : 0);
+            outStream.flush();
+            outStream.close();
+        } catch (Exception e) {
+            telemetry.addLine(e.toString());
+            telemetry.update();
+        }
+    }*/
 }
