@@ -23,20 +23,18 @@ public class AutonomousTest extends LinearOpMode {
     private int[][] targets = new int[][]{
            //L, C, R
             //shift
-            {-75, 0, 75},
+            {-150, 0, 0},
             //knock
             {250, 0, -250},
             //toCrypto
             {2550, 1900, 3300},
             //rotCrypto
-            {ENC_90/2, ENC_90/2, -ENC_90/2},
-            //push
+            {ENC_90*3/2, ENC_90*3/2, ENC_90/2},
+            //push (1 = UD, 0 = LR)
+            {1, 1, 0},
             {-800, -800, -800},
-            //reverse (1 = UD, 0 = LR)
-            {1, 0, 0},
-            {400, 400, 400},
             //rotate
-            {0, 0, ENC_90 * 2/3}
+            {0, 0, 0}
     };
 
 
@@ -63,7 +61,7 @@ public class AutonomousTest extends LinearOpMode {
         wait(0.6);
 
         a.lift();
-        waitFor(JEWEL);
+        waitFor(GLYPH);
 
         a.moveBot(targets[0][0]);
         waitFor(UP);
@@ -75,13 +73,12 @@ public class AutonomousTest extends LinearOpMode {
         a.lowerJArm();
         waitFor(JEWEL);
 
-        a.rotateBot(targets[1][state]);
+        a.rotateBot(targets[1][state], 0.7);
         waitFor(UP);
 
         a.raiseJArm();
-        waitFor(JEWEL);
 
-        a.rotateBot(-targets[1][state]);
+        a.rotateBot(-targets[1][state], 0.7);
         waitFor(UP);
 
         state = (v.pictograph == RelicRecoveryVuMark.LEFT ? 0 : (v.pictograph == RelicRecoveryVuMark.CENTER ? 1 : 2));
@@ -115,6 +112,7 @@ public class AutonomousTest extends LinearOpMode {
         }
 
         a.rotateBot(targets[6][state]);
+        waitFor(UP);
     }
 
     private void waitFor(int motor) {
