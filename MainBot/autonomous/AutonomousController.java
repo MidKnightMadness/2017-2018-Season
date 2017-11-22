@@ -70,6 +70,8 @@ public class AutonomousController {
         glyphServo = hardwareMap.servo.get(CrossCommunicator.Glyph.SERVO);
         glyphServo.setPosition(0.6);
 
+        reset();
+
         visualC.init(telemetry, hardwareMap);
     }
 
@@ -128,11 +130,11 @@ public class AutonomousController {
     }
 
     public void lowerJArm() {
-        move(JEWEL, 625, 0.3);
+        move(JEWEL, 0, -0.3);
     }
 
     public void raiseJArm() {
-        move(JEWEL, -625, -0.3);
+        move(JEWEL, 0, 0.3);
     }
 
     public int getPos(int motor) {
