@@ -5,10 +5,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
-import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.*;
+import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.GLYPH;
+import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.JEWEL;
+import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.LEFT;
+import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.UP;
 
 @Autonomous(name = "Autonomous Controller Test", group = "MainBot")
-public class AutonomousTest extends LinearOpMode {
+public class ATRedNonRecovery extends LinearOpMode {
 
     private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.RED;
     private AutonomousController a = new AutonomousController();
@@ -27,7 +30,7 @@ public class AutonomousTest extends LinearOpMode {
             //knock
             {250, 0, -250},
             //toCrypto
-            {2550, 1800, 2750},
+            {2550, 1900, 2750},
             //rotCrypto
             {ENC_90*3/2, ENC_90*3/2, ENC_90/2},
             //push (1 = UD, 0 = LR)
@@ -92,6 +95,16 @@ public class AutonomousTest extends LinearOpMode {
 
         a.rotateBot(targets[3][state], 0.7);
         waitFor(UP);
+
+        a.moveBot(targets[2][state]);
+        waitFor(UP);
+
+        a.rotateBot(targets[3][state], 0.7);
+        waitFor(UP);
+
+
+
+
 
         if (targets[4][state] == 0) {
             a.moveBotDiUD(targets[5][state]);

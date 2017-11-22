@@ -56,7 +56,7 @@ public class AutonomousTeleop extends LinearOpMode {
             waitFor(UP);
         }
 
-        p = a.getPos(UP);
+        p = amount;
 
         while (gamepad1.x)
             idle();
