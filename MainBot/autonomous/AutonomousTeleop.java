@@ -27,7 +27,8 @@ public class AutonomousTeleop extends LinearOpMode {
         wait(0.6);
 
         a.lift();
-        waitFor(JEWEL);
+        waitFor(GLYPH);
+        a.reset();
 
         while (!gamepad1.x && opModeIsActive()) {
             if (Math.abs(gamepad1.left_stick_x) > 0.2) {
@@ -62,14 +63,17 @@ public class AutonomousTeleop extends LinearOpMode {
         a.reset();
         amount = 0;
 
-        a.lowerJArm();
-        waitFor(JEWEL);
+        //a.lowerJArm();
+        //waitFor(JEWEL);
+        //a.reset();
 
         a.rotateBot(-p);
         waitFor(UP);
+        a.reset();
 
-        a.raiseJArm();
-        waitFor(JEWEL);
+        //a.raiseJArm();
+        //waitFor(JEWEL);
+        //a.reset();
 
         while (!gamepad1.x && opModeIsActive()) {
             if (Math.abs(gamepad1.left_stick_x) > 0.2) {
@@ -135,6 +139,7 @@ public class AutonomousTeleop extends LinearOpMode {
 
         a.lower();
         waitFor(GLYPH);
+        a.reset();
 
         a.open();
 
@@ -145,6 +150,7 @@ public class AutonomousTeleop extends LinearOpMode {
             a.moveBotDiLR(p);
             waitFor(LEFT);
         }
+        a.reset();
 
         while (!gamepad1.x && opModeIsActive()) {
             if (Math.abs(gamepad1.left_stick_x) > 0.2) {
@@ -164,11 +170,10 @@ public class AutonomousTeleop extends LinearOpMode {
 
     private void waitFor(int motor) {
         while (a.motors[motor].isBusy()) {
-            telemetry.addData("Amount: ", amount);
+            telemetry.addData("Amount" + motor + ": ", amount);
             telemetry.update();
             idle();
         }
-        a.reset();
     }
 
     private void wait(double s) {

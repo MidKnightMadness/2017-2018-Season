@@ -130,11 +130,11 @@ public class AutonomousController {
     }
 
     public void lowerJArm() {
-        move(JEWEL, -625, -0.3);
+        move(JEWEL, 0, -0.3);
     }
 
     public void raiseJArm() {
-        move(JEWEL, 625, 0.3);
+        move(JEWEL, 0, 0.3);
     }
 
     public int getPos(int motor) {
