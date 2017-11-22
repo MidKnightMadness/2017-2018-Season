@@ -31,11 +31,6 @@ public class AutonomousController {
     private VisualController visualC = new VisualController();
     private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.RED;
 
-    private void move(int motor, int encoder, double speed) {
-        motors[motor].setTargetPosition(motors[motor].getCurrentPosition() - pos[motor] + encoder);
-        motors[motor].setPower(-speed);
-    }
-
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         motors[GLYPH] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.MOTOR);
         motors[GLYPH].resetDeviceConfigurationForOpMode();
@@ -73,6 +68,11 @@ public class AutonomousController {
         reset();
 
         visualC.init(telemetry, hardwareMap);
+    }
+
+    private void move(int motor, int relTarget, double speed) {
+        motors[motor].setTargetPosition(motors[motor].getCurrentPosition() + relTarget);
+        motors[motor].setPower(-speed);
     }
 
     public void close() {
@@ -130,23 +130,23 @@ public class AutonomousController {
     }
 
     public void lowerJArm() {
-        move(JEWEL, 0, -0.3);
+        move(JEWEL, 600, -0.3);
     }
 
     public void raiseJArm() {
-        move(JEWEL, 0, 0.3);
+        move(JEWEL, -600, 0.3);
     }
 
     public int getPos(int motor) {
-        return motors[motor].getCurrentPosition() - pos[motor];
+        return motors[motor].getCurrentPosition();
     }
 
     public void reset() {
-        pos[GLYPH] = motors[GLYPH].getCurrentPosition();
-        pos[JEWEL] = motors[JEWEL].getCurrentPosition();
-        pos[UP] = motors[UP].getCurrentPosition();
-        pos[DOWN] = motors[DOWN].getCurrentPosition();
-        pos[LEFT] = motors[LEFT].getCurrentPosition();
-        pos[RIGHT] = motors[RIGHT].getCurrentPosition();
+        //pos[GLYPH] = motors[GLYPH].getCurrentPosition();
+        //pos[JEWEL] = motors[JEWEL].getCurrentPosition();
+        //pos[UP] = motors[UP].getCurrentPosition();
+        //pos[DOWN] = motors[DOWN].getCurrentPosition();
+        //pos[LEFT] = motors[LEFT].getCurrentPosition();
+        //pos[RIGHT] = motors[RIGHT].getCurrentPosition();
     }
 }
