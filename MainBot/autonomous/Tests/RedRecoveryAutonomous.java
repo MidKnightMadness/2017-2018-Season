@@ -1,14 +1,17 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+import org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualController;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
+@Disabled
 @Autonomous(name = "RedRecoveryAutonomous", group = "Main Bot")
 public class RedRecoveryAutonomous extends LinearOpMode {
     private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.RED;

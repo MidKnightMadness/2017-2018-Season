@@ -245,6 +245,7 @@ public class VisualController {
                 }
             }
         }
+        CameraDevice.getInstance().setFlashTorchMode(false);
     }
 
     /*public void saveTeamColor(JewelColor team) {
