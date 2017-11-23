@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-import org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController;
-import org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualController;
 
 import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.GLYPH;
 import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.JEWEL;
@@ -15,7 +13,7 @@ import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousContro
 @Autonomous(name = "Blue Non-Recovery", group = "MainBot")
 public class BlueNonRecovery extends LinearOpMode {
 
-    private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.BLUE;
+    private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.RED;
     private AutonomousController a = new AutonomousController();
     private VisualController v = new VisualController();
 
@@ -26,7 +24,7 @@ public class BlueNonRecovery extends LinearOpMode {
 
 
     private int[][] targets = new int[][]{
-           //L, C, R
+            //L, C, R
             //shift
             {-150, 0, 0},
             //knock
@@ -38,12 +36,12 @@ public class BlueNonRecovery extends LinearOpMode {
             //toCrypto
             {1900, 1500, 1000},
             //rotCrypto
-            {ENC_90/2, ENC_90/2, -ENC_90/2},
+            {ENC_90/2, ENC_90/2, ENC_90/2},
             //push (1 = UD, 0 = LR)
             {0, 0, 0},
-            {400, 400, 400},
-            {1100, 1100, 1100},
-            {-700, -700, -700},
+            {-400, -400, -400},
+            {-1100, -1100, -1100},
+            {700, 700, 700},
             //rotate
             {ENC_90*3/2, ENC_90*3/2, ENC_90*3/2},
             {600, 0, 0}
