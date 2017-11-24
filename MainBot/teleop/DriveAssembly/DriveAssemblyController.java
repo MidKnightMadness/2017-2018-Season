@@ -12,9 +12,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
+import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State;
+
 
 import java.io.File;
 import java.io.FileInputStream;
+
+import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.homeward;
+import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.justChanged;
+
 
 public class DriveAssemblyController {
 
@@ -34,7 +40,6 @@ public class DriveAssemblyController {
     private double theta = 0;
     private boolean bPressed = false;
     private boolean yPressed = false;
-    private boolean homeward = false;
     private boolean tankMode = false;
     private double motors[] = new double[4];
     private double tempMotors[] = new double[4];
@@ -135,6 +140,7 @@ public class DriveAssemblyController {
 
         if (gamepad1.y && !yPressed) {
             homeward = !homeward;
+            justChanged = true;
             yPressed = true;
         } else if (!gamepad1.y){
             yPressed = false;
@@ -148,6 +154,7 @@ public class DriveAssemblyController {
 
             if (Math.abs(adjustedR) > 0.1) {
                 homeward = false;
+                justChanged = true;
             }
 
             if (homeward && Math.abs((theta - target + 3780)%360 - 180) > 10) {
@@ -225,8 +232,6 @@ public class DriveAssemblyController {
                 targPow(motorRight, 3, -Math.pow(gamepad1.right_stick_y, 3));
             }
         }
-
-
     }
 
     public void stop() {}
