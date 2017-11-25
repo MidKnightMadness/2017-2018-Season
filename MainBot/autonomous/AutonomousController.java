@@ -129,7 +129,6 @@ public class AutonomousController {
     public void lowerJArm() {
         move(JEWEL, -700, 0.2);
     }
-
     public void raiseJArm() {
         move(JEWEL, 700, -0.2);
     }

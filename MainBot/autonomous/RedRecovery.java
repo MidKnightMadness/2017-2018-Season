@@ -55,6 +55,8 @@ public class RedRecovery extends LinearOpMode {
         a.init(telemetry, hardwareMap);
         v.init(telemetry, hardwareMap);
 
+        v.saveTeamColor(0);
+
         telemetry.addLine("Status: Initialized and ready!");
         telemetry.update();
 
@@ -74,7 +76,7 @@ public class RedRecovery extends LinearOpMode {
         state = (v.leftJewel == TEAM_COLOR ? 0 : 2);
 
         a.lowerJArm();
-        wait(1);
+        wait(1d);
 
         a.rotateBot(targets[1][state], 0.7);
         waitFor(UP);

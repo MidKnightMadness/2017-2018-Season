@@ -13,7 +13,7 @@ import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousContro
 @Autonomous(name = "Blue Non-Recovery", group = "MainBot")
 public class BlueNonRecovery extends LinearOpMode {
 
-    private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.RED;
+    private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.BLUE;
     private AutonomousController a = new AutonomousController();
     private VisualController v = new VisualController();
 
@@ -30,21 +30,21 @@ public class BlueNonRecovery extends LinearOpMode {
             //knock
             {250, 0, -250},
             //toCrypto
-            {1700, 1700, 1700},
+            {-1700, -1700, -1700},
             //rotate
             {ENC_90, ENC_90, ENC_90},
             //toCrypto
-            {1900, 1500, 1000},
+            {1100, 1400, 2000},
             //rotCrypto
-            {ENC_90/2, ENC_90/2, ENC_90/2},
+            {-ENC_90/2, -ENC_90/2, -ENC_90/2},
             //push (1 = UD, 0 = LR)
-            {0, 0, 0},
-            {-400, -400, -400},
-            {-1100, -1100, -1100},
+            {1, 1, 1},
+            {-500, -500, -500},
+            {-1300, -1300, -1300},
             {700, 700, 700},
             //rotate
-            {ENC_90*3/2, ENC_90*3/2, ENC_90*3/2},
-            {600, 0, 0}
+            {-ENC_90*3/2, -ENC_90*3/2, -ENC_90*3/2},
+            {0, 0, 600}
     };
 
 
@@ -62,6 +62,8 @@ public class BlueNonRecovery extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         a.init(telemetry, hardwareMap);
         v.init(telemetry, hardwareMap);
+
+        v.saveTeamColor(3);
 
         telemetry.addLine("Status: Initialized and ready!");
         telemetry.update();
@@ -82,7 +84,7 @@ public class BlueNonRecovery extends LinearOpMode {
         state = (v.leftJewel == TEAM_COLOR ? 0 : 2);
 
         a.lowerJArm();
-        wait(1);
+        wait(1d);
 
         a.rotateBot(targets[1][state], 0.7);
         waitFor(UP);
