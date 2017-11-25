@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 /**
  * Created by gregory.ling on 9/27/17.
  */
@@ -25,6 +27,7 @@ public class CrossCommunicator {
         public static boolean homeward = false;
         public static boolean justChanged = false;
         public static int curCol = 0;
+        public static ElapsedTime time = new ElapsedTime();
     }
 
 }
