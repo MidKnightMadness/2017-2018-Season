@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop.GlyphAssembly;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -26,12 +27,13 @@ public class GlyphAssemblyController {
     private double futureServo;
     private int timeToNext;
     private ElapsedTime time;
+    private boolean manual = false;
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
         time = new ElapsedTime();
         motor = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.MOTOR);
-        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         servo = hardwareMap.servo.get(CrossCommunicator.Glyph.SERVO);
@@ -54,23 +56,21 @@ public class GlyphAssemblyController {
     }
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
-
-        if (Math.abs(elevatorTarget - elevPos()) < 50 || gamepad1.right_bumper || gamepad1.left_bumper) {
-            elevatorTarget = -1;
-        }
-        boolean up = gamepad1.right_bumper || (elevatorTarget - elevPos() > 50 && elevatorTarget != -1);
-        boolean down = gamepad1.left_bumper || (elevatorTarget - elevPos() < -50 && elevatorTarget != -1);
+        boolean up = gamepad1.right_bumper;
+        boolean down = gamepad1.left_bumper;
         boolean override = gamepad1.x;
         boolean open = gamepad1.dpad_left || gamepad1.right_trigger > 0;
         boolean close = gamepad1.dpad_right || gamepad1.left_trigger > 0;
 
         telemetry.addData("Elevator", elevPos());
         if (up) {
-            motor.setPower((elevPos() < 6600 || override) ? 1 : 0);
+            elevatorTarget = 6600;
+            manual = true;
         } else if (down) {
-            motor.setPower((elevPos() > 0 || override) ? -1 : 0);
-        } else {
-            motor.setPower(0);
+            elevatorTarget = 0;
+            manual = true;
+        } else if (manual){
+            elevatorTarget = elevPos();
         }
 
         if (override) {
@@ -125,10 +125,14 @@ public class GlyphAssemblyController {
 
         telemetry.addData("Servo", servoPos);
         telemetry.addData("Buttons", gamepad1.right_bumper || gamepad1.left_bumper/* || gamepad2.left_stick_y > 0.1 || gamepad2.left_stick_y < 0.1*/);
-        telemetry.addData("Elev", motor.getCurrentPosition());
+        telemetry.addData("Elev", elevPos());
         telemetry.addData("Elevator Target", elevatorTarget);
         telemetry.addData("Future Target", futureTarget);
         telemetry.addData("Time Remaining", time.milliseconds() - timeToNext);
+
+
+        motor.setTargetPosition(elevatorTarget + pos);
+        motor.setPower(elevatorTarget - elevPos());
         servo.setPosition(servoPos);
 
 
@@ -136,6 +140,7 @@ public class GlyphAssemblyController {
     }
 
     public void update() {
+        manual = false;
         elevatorTarget = ((curLvl % 4) * 1250) + 200;
     }
 
@@ -146,6 +151,7 @@ public class GlyphAssemblyController {
     }
 
     public void grabLvl(int level) {
+        manual = false;
         servoPos = 0;
         timeToNext = (int)time.milliseconds() + 500;
         futureTarget = (level * 1250) + 200;
@@ -153,6 +159,7 @@ public class GlyphAssemblyController {
     }
 
     public void release() {
+        manual = false;
         elevatorTarget = 0;
         timeToNext = (int)time.milliseconds() + 500;
         futureTarget = -1;
