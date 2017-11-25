@@ -21,4 +21,9 @@ public class CrossCommunicator {
         public static String SERVO = "grabber";
     }
 
+    public static class State {
+        public static boolean homeward = false;
+        public static boolean justChanged = false;
+    }
+
 }

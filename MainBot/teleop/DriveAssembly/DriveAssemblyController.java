@@ -12,7 +12,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
-//AAUNIOEFIPSJNUPIUAENHPDfbj9w9ER -Your favorite annoyance
+import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State;
+
+
+import java.io.File;
+import java.io.FileInputStream;
+
+import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.homeward;
+import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.justChanged;
+
+
 public class DriveAssemblyController {
 
     private Telemetry telemetry;
@@ -25,14 +34,14 @@ public class DriveAssemblyController {
     private DcMotor motorRight;
 
     private static int BASE_ROTATION_ANGLE = -135;
+    private static int target = 90;
 
     private double startPos = 0;
     private double theta = 0;
     private boolean bPressed = false;
+    private boolean yPressed = false;
     private boolean tankMode = false;
     private double motors[] = new double[4];
-    private double mainTranslateScale = 0;
-    private double mainRotateScale = 0;
     private double tempMotors[] = new double[4];
     private double adjustedX = 0;
     private double adjustedY = 0;
@@ -129,25 +138,42 @@ public class DriveAssemblyController {
             bPressed = false;
         }
 
+        if (gamepad1.y && !yPressed) {
+            homeward = !homeward;
+            justChanged = true;
+            yPressed = true;
+        } else if (!gamepad1.y){
+            yPressed = false;
+        }
+
         if (!tankMode) {
             theta = getIMURotation() - startPos;
+            adjustedX = gamepad1.left_stick_x;
+            adjustedY = gamepad1.left_stick_y;
+            adjustedR = gamepad1.right_stick_x;
 
-            //adjustedX += Math.signum(gamepad1.left_stick_x - adjustedX)*0.4;
-            //if ((gamepad1.left_stick_x - adjustedX) < 0.4)
-                adjustedX = gamepad1.left_stick_x;
+            if (Math.abs(adjustedR) > 0.1) {
+                homeward = false;
+                justChanged = true;
+            }
 
-            //adjustedY += Math.signum(gamepad1.left_stick_y - adjustedY)*0.1;
-            //if ((gamepad1.left_stick_y - adjustedY) < 0.4)
-                adjustedY = gamepad1.left_stick_y;
+            if (homeward && Math.abs((theta - target + 3780)%360 - 180) > 10) {
+                adjustedR = Math.min(Math.max(((theta - target + 3780)%360 - 180)/30, -1), 1);
+            } else if (homeward) {
+                adjustedR = 0;
+            }
 
-            //adjustedR += Math.signum(gamepad1.right_stick_x - adjustedR)*0.4;
-            //if ((gamepad1.right_stick_x - adjustedR) < 0.4)
-                adjustedR = gamepad1.right_stick_x;
-
-            double translateScale = Math.pow(Math.hypot(adjustedX, adjustedY), 9) * (1 - Math.min(Math.pow(Math.abs(adjustedR), 2), 0.5));
+            double translateScale = Math.pow(Math.hypot(adjustedX, adjustedY), 5) * (1 - Math.min(Math.pow(Math.abs(adjustedR), 2), 0.6));
             double targetDirection = aTan(gamepad1.left_stick_x, -gamepad1.left_stick_y);
-            double rotateScale = Math.pow(Math.abs(adjustedR), 2) * Math.signum(-adjustedR) * (1 - Math.abs(translateScale));
+            double rotateScale = Math.pow(Math.abs(adjustedR), 5) * Math.signum(-adjustedR) * (1 - Math.abs(translateScale));
 
+            telemetry.addData("Offset", (theta - target + 3780)%360 - 180);
+            telemetry.addData("Needs To Move", Math.abs((theta - target + 3780)%360 - 180) > 10);
+            telemetry.addData("Theta", theta);
+            telemetry.addData("Target", target);
+            telemetry.addData("Homeward", homeward);
+
+            telemetry.addData("Rotate Scale", rotateScale);
 
             tempMotors[0] = Math.cos((theta + targetDirection) * (Math.PI / 180d));
             tempMotors[1] = -Math.cos((theta + targetDirection) * (Math.PI / 180d));
@@ -166,7 +192,7 @@ public class DriveAssemblyController {
             tempMotors[2] *= scale;
             tempMotors[3] *= scale;
 
-            telemetry.addData("Scale", scale);
+            //telemetry.addData("Scale", scale);
 
             tempMotors[0] += rotateScale;
             tempMotors[1] += rotateScale;
@@ -183,14 +209,14 @@ public class DriveAssemblyController {
             targPow(motorLeft, 2, tempMotors[2]);
             targPow(motorRight, 3, tempMotors[3]);
 
-            telemetry.addData("Theta", theta);
-            telemetry.addData("IMU Rotation", getIMURotation());
-            telemetry.addData("Start Position", startPos);
-            telemetry.addData("Target Direction", targetDirection);
-            telemetry.addData("Target Rotation Speed", rotateScale);
-            telemetry.addData("Translate Scale", translateScale);
-            telemetry.addData("Cosine", Math.cos((theta + targetDirection) * (Math.PI / 180d)));
-            telemetry.addData("Sine", Math.sin((theta + targetDirection) * (Math.PI / 180d)));
+            //telemetry.addData("Theta", theta);
+            //telemetry.addData("IMU Rotation", getIMURotation());
+            //telemetry.addData("Start Position", startPos);
+            //telemetry.addData("Target Direction", targetDirection);
+            //telemetry.addData("Target Rotation Speed", rotateScale);
+            //telemetry.addData("Translate Scale", translateScale);
+            //telemetry.addData("Cosine", Math.cos((theta + targetDirection) * (Math.PI / 180d)));
+            //telemetry.addData("Sine", Math.sin((theta + targetDirection) * (Math.PI / 180d)));
 
             telemetry.update();
         } else {
@@ -206,9 +232,22 @@ public class DriveAssemblyController {
                 targPow(motorRight, 3, -Math.pow(gamepad1.right_stick_y, 3));
             }
         }
-
-
     }
 
     public void stop() {}
+
+    /*private void readTeamColor() {
+        try {
+            FileInputStream f = new FileInputStream("/storage/self/primary/Pictures/images/LastTeamColor.txt");
+            if (f.available() > 1) {
+                if (f.read() == 1) {
+                    target = 90;
+                } else {
+                    target = 180;
+                }
+            }
+        } catch (Exception e) {
+            //Do Nothing
+        }
+    }*/
 }

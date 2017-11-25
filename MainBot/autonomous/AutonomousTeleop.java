@@ -33,7 +33,7 @@ public class AutonomousTeleop extends LinearOpMode {
         while (!gamepad1.x && opModeIsActive()) {
             if (Math.abs(gamepad1.left_stick_x) > 0.2) {
                 amount += (int)Math.signum(gamepad1.left_stick_x)*50;
-                a.moveBot(amount);
+                a.moveBot((int)Math.signum(gamepad1.left_stick_x)*50);
             }
             telemetry.addData("StartMove: ", amount);
             telemetry.addData("StartMove: ", gamepad1.left_stick_x);
@@ -49,36 +49,36 @@ public class AutonomousTeleop extends LinearOpMode {
         while (!gamepad1.x && opModeIsActive()) {
             if (Math.abs(gamepad1.left_stick_x) > 0.2) {
                 amount += (int)Math.signum(gamepad1.left_stick_x)*50;
-                a.rotateBot(amount);
+                a.rotateBot((int)Math.signum(gamepad1.left_stick_x)*50);
             }
             telemetry.addData("UP: ", amount);
             telemetry.update();
             waitFor(UP);
         }
 
-        p = a.getPos(UP);
+        p = amount;
 
         while (gamepad1.x)
             idle();
         a.reset();
         amount = 0;
 
-        //a.lowerJArm();
-        //waitFor(JEWEL);
-        //a.reset();
+        a.lowerJArm();
+        waitFor(JEWEL);
+        a.reset();
 
         a.rotateBot(-p);
         waitFor(UP);
         a.reset();
 
-        //a.raiseJArm();
-        //waitFor(JEWEL);
-        //a.reset();
+        a.raiseJArm();
+        waitFor(JEWEL);
+        a.reset();
 
         while (!gamepad1.x && opModeIsActive()) {
             if (Math.abs(gamepad1.left_stick_x) > 0.2) {
                 amount += (int)Math.signum(gamepad1.left_stick_x)*50;
-                a.moveBot(amount);
+                a.moveBot((int)Math.signum(gamepad1.left_stick_x)*50);
             }
             telemetry.addData("UP: ", amount);
             telemetry.update();
@@ -93,7 +93,7 @@ public class AutonomousTeleop extends LinearOpMode {
         while (!gamepad1.x && opModeIsActive()) {
             if (Math.abs(gamepad1.left_stick_x) > 0.2) {
                 amount += (int)Math.signum(gamepad1.left_stick_x)*50;
-                a.rotateBot(amount);
+                a.rotateBot((int)Math.signum(gamepad1.left_stick_x)*50);
             }
             telemetry.addData("UP: ", amount);
             telemetry.update();
@@ -112,7 +112,7 @@ public class AutonomousTeleop extends LinearOpMode {
             while (!gamepad1.x && opModeIsActive()) {
                 if (Math.abs(gamepad1.left_stick_x) > 0.2) {
                 amount += (int) Math.signum(gamepad1.left_stick_x) * 50;
-                    a.moveBotDiUD(amount);
+                    a.moveBotDiUD((int) Math.signum(gamepad1.left_stick_x) * 50);
                 }
                 telemetry.addData("UP: ", amount);
                 telemetry.update();
@@ -123,7 +123,7 @@ public class AutonomousTeleop extends LinearOpMode {
             while (!gamepad1.x && opModeIsActive()) {
                 if (Math.abs(gamepad1.left_stick_y) > 0.2) {
                 amount += (int) Math.signum(gamepad1.left_stick_y) * 50;
-                    a.moveBotDiLR(amount);
+                    a.moveBotDiLR((int) Math.signum(gamepad1.left_stick_y) * 50);
                 }
                 telemetry.addData("UP: ", a.getPos(LEFT));
                 telemetry.update();
@@ -155,7 +155,7 @@ public class AutonomousTeleop extends LinearOpMode {
         while (!gamepad1.x && opModeIsActive()) {
             if (Math.abs(gamepad1.left_stick_x) > 0.2) {
                 amount += (int)Math.signum(gamepad1.left_stick_x)*50;
-                a.rotateBot(amount);
+                a.rotateBot((int)Math.signum(gamepad1.left_stick_x)*50);
             }
             telemetry.addData("UP: ", amount);
             telemetry.update();
@@ -174,6 +174,7 @@ public class AutonomousTeleop extends LinearOpMode {
             telemetry.update();
             idle();
         }
+        idle();
     }
 
     private void wait(double s) {

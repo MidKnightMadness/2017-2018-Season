@@ -2,226 +2,143 @@ package org.firstinspires.ftc.teamcode.MainBot.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.vuforia.EyewearUserCalibrator;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
-@Autonomous(name = "RedRecovery", group = "Main Bot")
+import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.*;
+
+@Autonomous(name = "Red Recovery", group = "MainBot")
 public class RedRecovery extends LinearOpMode {
+
     private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.RED;
-    private static double JEWEL_ARM_POWER = 0.3;
-    private static int JEWEL_ARM_DISTANCE = 625;
-    private static double DRIVE_ROTATE_POWER = -0.3;
-    private static int DRIVE_ROTATE_DISTANCE = 250;
-    private static double DRIVE_MOVE_POWER = 0.4;
-    private static int DRIVE_MOVE_DISTANCE = -75;
-    private static int DRIVE_ROTATE90_DISTANCE = 1523;
-    private DcMotor jewelMotor;
-    private DcMotor driveUpMotor;
-    private DcMotor driveDownMotor;
-    private DcMotor driveLeftMotor;
-    private DcMotor driveRightMotor;
-    private VisualController visualC = new VisualController();
-    private GlyphController glyphC = new GlyphController();
+    private AutonomousController a = new AutonomousController();
+    private VisualController v = new VisualController();
+
+    private static int ENC_90 = 1575;
+
+    private double waitUntil = 0;
+    private int state = 0;
+
+
+    private int[][] targets = new int[][]{
+           //L, C, R
+            //shift
+            {-150, 0, 0},
+            //knock
+            {250, 0, -250},
+            //toCrypto
+            {2550, 1700, 2750},
+            //rotCrypto
+            {ENC_90*3/2, ENC_90*3/2, ENC_90/2},
+            //push (1 = UD, 0 = LR)
+            {1, 1, 0},
+            {-400, -400, -400},
+            {-1100, -1100, -1100},
+            {1200, 1200, 1200},
+            //rotate
+            {ENC_90*3/2, ENC_90*3/2, ENC_90*5/2}
+    };
+
+
+
+
+
+
+
+
+
+
 
 
     @Override
     public void runOpMode() throws InterruptedException {
-        initialize(hardwareMap);
+        a.init(telemetry, hardwareMap);
+        v.init(telemetry, hardwareMap);
 
-        visualC.init(telemetry, hardwareMap);
-        glyphC.init(telemetry, hardwareMap);
-
-        telemetry.addLine("Ready to go!");
+        telemetry.addLine("Status: Initialized and ready!");
         telemetry.update();
 
         waitForStart();
 
+        a.close();
+        wait(0.6);
 
-        glyphC.close();
-        double waitUntil = time + .6;
-        while (time < waitUntil) {
-            idle();
-        }
-        glyphC.lift();
-        moveBot();
-        visualC.look();
-        //visualC.pictograph = RelicRecoveryVuMark.CENTER;
-        lowerArm();
-        rotateBot(true);
-        raiseArm();
-        rotateBot(false);
-        if (visualC.pictograph == RelicRecoveryVuMark.RIGHT) {
-            DRIVE_MOVE_DISTANCE = 3300;
-            moveBot();
-            speedRotateBot(0.3, DRIVE_ROTATE90_DISTANCE / 2);
-            DRIVE_MOVE_DISTANCE = -1000;
-            moveBot();
-            glyphC.lower();
-            glyphC.open();
-            DRIVE_MOVE_DISTANCE = 400;
-            waitUntil = time + 0.4;
-            while (time < waitUntil) {
-                idle();
-            }
-            moveBot();
-            speedRotateBot(0.3, (DRIVE_ROTATE90_DISTANCE / 2) + 2 * DRIVE_ROTATE90_DISTANCE);
-            glyphC.resetArm();
-        }
-         else {
-            if (visualC.pictograph == RelicRecoveryVuMark.LEFT) {
-                DRIVE_MOVE_DISTANCE = 3950 - 1400;
-            }
-            else {
-                DRIVE_MOVE_DISTANCE = 3300 - 1400;
-                telemetry.addLine("Distance: " + DRIVE_MOVE_DISTANCE);
-                telemetry.update();
-            }
-            moveBot();
-            speedRotateBot(-0.3, (DRIVE_ROTATE90_DISTANCE * 4) / 3);
-            DRIVE_MOVE_DISTANCE = -600;
-            moveBot();
-            glyphC.lower();
-            glyphC.open();
-            DRIVE_MOVE_DISTANCE = 400;
-            waitUntil = time + 0.4;
-            while (time < waitUntil) {
-                idle();
-            }
-            moveBot();
-            speedRotateBot(-0.3, ((DRIVE_ROTATE90_DISTANCE * 5) / 3) + 20);
-            glyphC.resetArm();
+        a.lift();
+        waitFor(GLYPH);
+
+        a.moveBot(targets[0][0]);
+        waitFor(UP);
+
+        v.look();
+
+        state = (v.leftJewel == TEAM_COLOR ? 0 : 2);
+
+        a.lowerJArm();
+        waitFor(JEWEL);
+        wait(0.5);
+
+        a.rotateBot(targets[1][state], 0.7);
+        waitFor(UP);
+
+        a.raiseJArm();
+
+        a.rotateBot(-targets[1][state], 0.7);
+        waitFor(UP);
+
+        state = (v.pictograph == RelicRecoveryVuMark.LEFT ? 0 : (v.pictograph == RelicRecoveryVuMark.CENTER ? 1 : 2));
+
+        a.moveBot(targets[2][state]);
+        waitFor(UP);
+
+        a.rotateBot(targets[3][state], 0.7);
+        waitFor(UP);
+
+        if (targets[4][state] == 0) {
+            a.moveBotDiUD(targets[5][state]);
+            waitFor(UP);
+        } else {
+            a.moveBotDiLR(targets[5][state]);
+            waitFor(LEFT);
         }
 
-        /*double delay = time + 1;
-        while (time < delay) {
-            idle();
-        }*/
 
 
+
+        a.lower();
+        waitFor(GLYPH);
+
+        a.open();
+
+        if (targets[4][state] == 0) {
+            a.moveBotDiUD(targets[6][state]);
+            waitFor(UP);
+        } else {
+            a.moveBotDiLR(targets[6][state]);
+            waitFor(LEFT);
+        }
+
+        if (targets[4][state] == 0) {
+            a.moveBotDiUD(targets[7][state]);
+            waitFor(UP);
+        } else {
+            a.moveBotDiLR(targets[7][state]);
+            waitFor(LEFT);
+        }
+
+        a.rotateBot(targets[8][state]);
+        waitFor(UP);
     }
 
-
-
-    void initialize(HardwareMap hardwareMap) {
-        jewelMotor = hardwareMap.dcMotor.get(CrossCommunicator.Jewel.MOTOR);
-        jewelMotor.resetDeviceConfigurationForOpMode();
-        jewelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        jewelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        driveUpMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.UP);
-        driveUpMotor.resetDeviceConfigurationForOpMode();
-        driveUpMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveUpMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        driveDownMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.DOWN);
-        driveDownMotor.resetDeviceConfigurationForOpMode();
-        driveDownMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveDownMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        driveLeftMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.LEFT);
-        driveLeftMotor.resetDeviceConfigurationForOpMode();
-        driveLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        driveRightMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.RIGHT);
-        driveRightMotor.resetDeviceConfigurationForOpMode();
-        driveRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        driveRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    private void waitFor(int motor) {
+        while (a.motors[motor].isBusy())
+            idle();
+        a.reset();
     }
 
-    void lowerArm() {
-        telemetry.addLine("Lowering Arm...");
-        telemetry.update();
-
-        jewelMotor.setTargetPosition(jewelMotor.getCurrentPosition() - JEWEL_ARM_DISTANCE);
-        jewelMotor.setPower(JEWEL_ARM_POWER);
-        while (jewelMotor.isBusy()) {
-            telemetry.addData("Lowering Arm...", jewelMotor.getCurrentPosition());
-            telemetry.update();
+    private void wait(double s) {
+        waitUntil = time + s;
+        while (time < waitUntil)
             idle();
-        }
-    }
-
-    void raiseArm() {
-        telemetry.addLine("Raise Arm...");
-        telemetry.update();
-
-        jewelMotor.setTargetPosition(jewelMotor.getCurrentPosition() + JEWEL_ARM_DISTANCE);
-        jewelMotor.setPower(-JEWEL_ARM_POWER); // TODO: why negative if distance positive?
-        while (jewelMotor.isBusy()) {
-            idle();
-        }
-    }
-
-    void speedRotateBot(double speed, int driveRotateDistance) {
-        telemetry.addLine("Rotate Bot " + speed + " " + driveRotateDistance);
-        telemetry.update();
-
-        driveUpMotor.setTargetPosition(driveUpMotor.getCurrentPosition() + (driveRotateDistance));
-        driveUpMotor.setPower(speed);
-
-        driveDownMotor.setTargetPosition(driveDownMotor.getCurrentPosition() + (driveRotateDistance));
-        driveDownMotor.setPower(speed);
-
-        driveLeftMotor.setTargetPosition(driveLeftMotor.getCurrentPosition() + (driveRotateDistance));
-        driveLeftMotor.setPower(speed);
-
-        driveRightMotor.setTargetPosition(driveRightMotor.getCurrentPosition() + (driveRotateDistance));
-        driveRightMotor.setPower(speed);
-
-        while (driveUpMotor.isBusy()) {
-            idle();
-        }
-
-    }
-
-    void rotateBot(Boolean reset) {
-        telemetry.addLine("Rotate Bot " + (reset ? "First..." : "Second..."));
-        telemetry.update();
-
-        int neg = (visualC.leftJewel == TEAM_COLOR) ? 1 : -1;
-        neg = (reset) ? neg : -neg;
-
-        driveUpMotor.setTargetPosition(driveUpMotor.getCurrentPosition() + (neg * DRIVE_ROTATE_DISTANCE));
-        driveUpMotor.setPower(neg * DRIVE_ROTATE_POWER);
-
-        driveDownMotor.setTargetPosition(driveDownMotor.getCurrentPosition() + (neg * DRIVE_ROTATE_DISTANCE));
-        driveDownMotor.setPower(neg * DRIVE_ROTATE_POWER);
-
-        driveLeftMotor.setTargetPosition(driveLeftMotor.getCurrentPosition() + (neg * DRIVE_ROTATE_DISTANCE));
-        driveLeftMotor.setPower(neg * DRIVE_ROTATE_POWER);
-
-        driveRightMotor.setTargetPosition(driveRightMotor.getCurrentPosition() + (neg * DRIVE_ROTATE_DISTANCE));
-        driveRightMotor.setPower(neg * DRIVE_ROTATE_POWER);
-
-        while (driveUpMotor.isBusy()) {
-            idle();
-        }
-
-    }
-
-    void moveBot() {
-        telemetry.addLine("Move Bot...");
-        telemetry.update();
-
-        driveUpMotor.setTargetPosition(driveUpMotor.getCurrentPosition() + DRIVE_MOVE_DISTANCE);
-        driveUpMotor.setPower(DRIVE_MOVE_POWER);
-
-        driveDownMotor.setTargetPosition(driveDownMotor.getCurrentPosition() - DRIVE_MOVE_DISTANCE);
-        driveDownMotor.setPower(-DRIVE_MOVE_POWER);
-
-        driveLeftMotor.setTargetPosition(driveLeftMotor.getCurrentPosition() + DRIVE_MOVE_DISTANCE);
-        driveLeftMotor.setPower(DRIVE_MOVE_POWER);
-
-        driveRightMotor.setTargetPosition(driveRightMotor.getCurrentPosition() - DRIVE_MOVE_DISTANCE);
-        driveRightMotor.setPower(-DRIVE_MOVE_POWER);
-
-        while (driveUpMotor.isBusy()) {
-            idle();
-        }
+        a.reset();
     }
 }
