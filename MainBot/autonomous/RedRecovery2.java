@@ -41,7 +41,7 @@ public class RedRecovery2 extends LinearOpMode {
 
 
         glyphC.close();
-        double waitUntil = time + .6;
+        double waitUntil = time + .4;
         while (time < waitUntil) {
             idle();
         }
@@ -79,7 +79,7 @@ public class RedRecovery2 extends LinearOpMode {
             DRIVE_ROTATE_DISTANCE = DRIVE_ROTATE90_DISTANCE * 3 / 2;
             moveBot();
             speedRotateBot(0.3, DRIVE_ROTATE_DISTANCE);
-            DRIVE_MOVE_DISTANCE = 1250;
+            DRIVE_MOVE_DISTANCE = -1250;
             moveBotDiagSide();
             glyphC.lower();
             waitUntil = time + 1;
@@ -87,7 +87,7 @@ public class RedRecovery2 extends LinearOpMode {
                 idle();
             }
             glyphC.open();
-            DRIVE_MOVE_DISTANCE = -700;
+            DRIVE_MOVE_DISTANCE = 700;
             waitUntil = time + 0.8;
             while (time < waitUntil) {
                 idle();
@@ -95,11 +95,11 @@ public class RedRecovery2 extends LinearOpMode {
             moveBotDiagSide();
         }
         else {
-            DRIVE_MOVE_DISTANCE = 2000;
+            DRIVE_MOVE_DISTANCE = 1800;
             DRIVE_ROTATE_DISTANCE = DRIVE_ROTATE90_DISTANCE * 3 / 2;
             moveBot();
             speedRotateBot(0.3, DRIVE_ROTATE_DISTANCE);
-            DRIVE_MOVE_DISTANCE = 1250;
+            DRIVE_MOVE_DISTANCE = -1250;
             moveBotDiagSide();
             glyphC.lower();
             waitUntil = time + 1;
@@ -107,7 +107,7 @@ public class RedRecovery2 extends LinearOpMode {
                 idle();
             }
             glyphC.open();
-            DRIVE_MOVE_DISTANCE = -700;
+            DRIVE_MOVE_DISTANCE = 700;
             waitUntil = time + 0.8;
             while (time < waitUntil) {
                 idle();
