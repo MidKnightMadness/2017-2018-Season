@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State;
 import java.io.File;
 import java.io.FileInputStream;
 
+import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.curCol;
 import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.homeward;
 import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.justChanged;
 
@@ -34,7 +35,18 @@ public class DriveAssemblyController {
     private DcMotor motorRight;
 
     private static int BASE_ROTATION_ANGLE = -135;
-    private static int target = 90;
+    private int corner = 0;
+    private int target = 0;
+    private static int[][] targets = new int[][]{
+            //RedRecovery
+            {90, 90, 180},
+            //RedNonRecovery
+            {90, 90, 90},
+            //BlueRecovery
+            {90, 90, 180},
+            //BlueNonRecovery
+            {90, 90, 180}
+    };
 
     private double startPos = 0;
     private double theta = 0;
@@ -127,6 +139,11 @@ public class DriveAssemblyController {
     }
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
+        target = targets[corner][curCol];
+
+
+
+
         if (gamepad1.a) {
             resetHeading();
         }
@@ -236,18 +253,15 @@ public class DriveAssemblyController {
 
     public void stop() {}
 
-    /*private void readTeamColor() {
+    private void readTeamColor() {
         try {
-            FileInputStream f = new FileInputStream("/storage/self/primary/Pictures/images/LastTeamColor.txt");
-            if (f.available() > 1) {
-                if (f.read() == 1) {
-                    target = 90;
-                } else {
-                    target = 180;
-                }
+            FileInputStream f = new FileInputStream("/storage/self/primary/LastTeamColor.txt");
+            if (f.available() >= 1) {
+                corner = f.read();
             }
         } catch (Exception e) {
-            //Do Nothing
+            telemetry.addData("Error: ", e);
+            telemetry.update();
         }
-    }*/
+    }
 }

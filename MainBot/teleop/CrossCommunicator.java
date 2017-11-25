@@ -24,6 +24,7 @@ public class CrossCommunicator {
     public static class State {
         public static boolean homeward = false;
         public static boolean justChanged = false;
+        public static int curCol = 0;
     }
 
 }
