@@ -74,8 +74,7 @@ public class RedRecovery extends LinearOpMode {
         state = (v.leftJewel == TEAM_COLOR ? 0 : 2);
 
         a.lowerJArm();
-        waitFor(JEWEL);
-        wait(0.5);
+        wait(1);
 
         a.rotateBot(targets[1][state], 0.7);
         waitFor(UP);
