@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
+import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.curCol;
 import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.homeward;
 import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.justChanged;
 
@@ -54,15 +55,15 @@ public class GlyphAssemblyController {
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
 
+        if (Math.abs(elevatorTarget - elevPos()) < 50 || gamepad1.right_bumper || gamepad1.left_bumper) {
+            elevatorTarget = -1;
+        }
         boolean up = gamepad1.right_bumper || (elevatorTarget - elevPos() > 50 && elevatorTarget != -1);
         boolean down = gamepad1.left_bumper || (elevatorTarget - elevPos() < -50 && elevatorTarget != -1);
         boolean override = gamepad1.x;
         boolean open = gamepad1.dpad_left || gamepad1.right_trigger > 0;
         boolean close = gamepad1.dpad_right || gamepad1.left_trigger > 0;
 
-        if (gamepad1.right_bumper || gamepad1.left_bumper) {
-            elevatorTarget = -1;
-        }
         telemetry.addData("Elevator", elevPos());
         if (up) {
             motor.setPower((elevPos() < 6600 || override) ? 1 : 0);
@@ -111,9 +112,13 @@ public class GlyphAssemblyController {
         }
 
         if (gamepad1.dpad_up) {
-            grab();
+            curLvl++;
+            curCol = (int)Math.floor(curLvl / 4);
+            update();
         } else if (gamepad1.dpad_down) {
-            release();
+            curLvl--;
+            curCol = (int)Math.floor(curLvl / 4);
+            update();
         }
 
 
@@ -130,15 +135,20 @@ public class GlyphAssemblyController {
         telemetry.addLine("Servo Position: " + servo.getPosition());
     }
 
+    public void update() {
+        elevatorTarget = ((curLvl % 4) * 1250) + 200;
+    }
+
     public void grab() {
         grabLvl(curLvl % 4);
         curLvl++;
+        curCol = (int)Math.floor(curLvl / 4);
     }
 
     public void grabLvl(int level) {
         servoPos = 0;
         timeToNext = (int)time.milliseconds() + 500;
-        futureTarget = level * 1250;
+        futureTarget = (level * 1250) + 200;
         futureServo = -1;
     }
 
