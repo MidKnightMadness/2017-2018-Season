@@ -18,9 +18,7 @@ import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State;
 import java.io.File;
 import java.io.FileInputStream;
 
-import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.curCol;
-import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.homeward;
-import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.justChanged;
+import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.*;
 
 
 public class DriveAssemblyController {
@@ -37,15 +35,17 @@ public class DriveAssemblyController {
     private static int BASE_ROTATION_ANGLE = -135;
     private int corner = 0;
     private int target = 0;
+    private double timeToHomeward = 0;
+    private boolean timeForHomeward = false;
     private static int[][] targets = new int[][]{
             //RedRecovery
-            {90, 90, 180},
+            {90, 90, 0},
             //RedNonRecovery
             {90, 90, 90},
             //BlueRecovery
-            {90, 90, 180},
+            {180, 180, -90},
             //BlueNonRecovery
-            {90, 90, 180}
+            {-90, -90, -90}
     };
 
     private double startPos = 0;
@@ -139,7 +139,12 @@ public class DriveAssemblyController {
     }
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
-        target = targets[corner][curCol];
+        try {
+            target = targets[corner][curCol];
+        } catch (Exception e) {
+            curCol--;
+            target = targets[corner][curCol];
+        }
 
 
 
@@ -157,11 +162,19 @@ public class DriveAssemblyController {
 
         if (gamepad1.y && !yPressed) {
             homeward = !homeward;
+            timeForHomeward = false;
+            timeToHomeward = time.seconds() + 1d;
             justChanged = true;
             yPressed = true;
         } else if (!gamepad1.y){
             yPressed = false;
         }
+
+        if (time.seconds() > timeToHomeward) {
+            timeForHomeward = true;
+        }
+
+
 
         if (!tankMode) {
             theta = getIMURotation() - startPos;
@@ -174,9 +187,9 @@ public class DriveAssemblyController {
                 justChanged = true;
             }
 
-            if (homeward && Math.abs((theta - target + 3780)%360 - 180) > 10) {
+            if (homeward && timeForHomeward && Math.abs((theta - target + 3780)%360 - 180) > 10) {
                 adjustedR = Math.min(Math.max(((theta - target + 3780)%360 - 180)/30, -1), 1);
-            } else if (homeward) {
+            } else if (homeward && timeForHomeward) {
                 adjustedR = 0;
             }
 

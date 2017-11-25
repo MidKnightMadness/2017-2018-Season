@@ -13,6 +13,8 @@ import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.curCol;
 import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.homeward;
 import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.justChanged;
+import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.time;
+
 
 public class GlyphAssemblyController {
 
@@ -26,7 +28,6 @@ public class GlyphAssemblyController {
     private int futureTarget;
     private double futureServo;
     private int timeToNext;
-    private ElapsedTime time;
     private boolean manual = false;
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
@@ -141,7 +142,7 @@ public class GlyphAssemblyController {
 
     public void update() {
         manual = false;
-        elevatorTarget = ((curLvl % 4) * 1250) + 200;
+        elevatorTarget = ((curLvl % 4) * 1250) + 500;
     }
 
     public void grab() {
@@ -154,14 +155,14 @@ public class GlyphAssemblyController {
         manual = false;
         servoPos = 0;
         timeToNext = (int)time.milliseconds() + 500;
-        futureTarget = (level * 1250) + 200;
+        futureTarget = (level * 1250) + 500;
         futureServo = -1;
     }
 
     public void release() {
         manual = false;
         elevatorTarget = 0;
-        timeToNext = (int)time.milliseconds() + 500;
+        timeToNext = (int)time.milliseconds() + 50;
         futureTarget = -1;
         futureServo = 0.5;
     }
