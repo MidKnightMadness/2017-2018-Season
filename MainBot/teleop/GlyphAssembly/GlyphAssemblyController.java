@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop.GlyphAssembly;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -9,34 +10,42 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
+import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.curCol;
+import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.homeward;
+import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.justChanged;
+import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.time;
+
+
 public class GlyphAssemblyController {
 
     private Telemetry telemetry;
     private DcMotor motor;
     private Servo servo;
-    private boolean open;
+    private int curLvl;
     private int pos;
     private double servoPos;
     private int elevatorTarget;
     private int futureTarget;
-    private int targetTime;
-    private ElapsedTime time;
+    private double futureServo;
+    private int timeToNext;
+    private boolean manual = false;
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
         time = new ElapsedTime();
         motor = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.MOTOR);
-        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         servo = hardwareMap.servo.get(CrossCommunicator.Glyph.SERVO);
-        servo.setPosition(0.5);
-        open = true;
+        servo.setPosition(1);
         pos = motor.getCurrentPosition();
-        servoPos = 0.5;
+        servoPos = 1;
+        futureServo = -1;
         elevatorTarget = -1;
         futureTarget = -1;
-        targetTime = 0;
+        timeToNext = 0;
+        curLvl = 0;
     }
 
     public void start() {
@@ -48,76 +57,114 @@ public class GlyphAssemblyController {
     }
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
+        boolean up = gamepad1.right_bumper;
+        boolean down = gamepad1.left_bumper;
+        boolean override = gamepad1.x;
+        boolean open = gamepad1.dpad_left || gamepad1.right_trigger > 0;
+        boolean close = gamepad1.dpad_right || gamepad1.left_trigger > 0;
 
-        if (gamepad1.right_bumper || gamepad1.left_bumper/* || gamepad2.left_stick_y > 0.1 || gamepad2.left_stick_y < 0.1*/) {
-            elevatorTarget = -1;
-        }
         telemetry.addData("Elevator", elevPos());
-        if (gamepad1.right_bumper || ((elevatorTarget - elevPos()) > 100 && elevatorTarget != -1)) {
-            motor.setPower((elevPos() < 6600 || gamepad1.x) ? 1 : 0);
-        } else if (gamepad1.left_bumper ||((elevatorTarget - elevPos()) < -100 && elevatorTarget != -1)) {
-            motor.setPower((elevPos() > 0 || gamepad1.x) ? -1 : 0);
-        } else if (gamepad2.left_stick_y > 0.1) {
-            motor.setPower((elevPos() < 6600) ? gamepad2.left_stick_y : 0);
-        } else if (gamepad2.left_stick_y < 0.1) {
-            motor.setPower((elevPos() > 0) ? gamepad2.left_stick_y : 0);
-        } else {
-            motor.setPower(0);
+        if (up) {
+            elevatorTarget = 6600;
+            manual = true;
+        } else if (down) {
+            elevatorTarget = 0;
+            manual = true;
+        } else if (manual){
+            elevatorTarget = elevPos();
         }
 
-        if (gamepad1.x) {
+        if (override) {
             pos = motor.getCurrentPosition();
         }
 
-        if (time.milliseconds() > targetTime && futureTarget != -1) {
-            elevatorTarget = futureTarget;
-            futureTarget = -1;
+        if (time.milliseconds() > timeToNext) {
+            if (futureTarget == -1 && futureServo != -1) {
+                servoPos = futureServo;
+                futureServo = -1;
+            } else if (futureTarget != -1 && futureServo == -1) {
+                elevatorTarget = futureTarget;
+                futureTarget = -1;
+            }
         }
 
-        if (gamepad1.dpad_left || gamepad1.right_trigger > 0) {
+        if (open) {
             if (servoPos < 0.1) {
                 servoPos = 0;
             } else {
                 servoPos -= 0.1;
             }
-        } else if (gamepad1.dpad_right || gamepad1.left_trigger > 0){
-            if (servoPos > 0.45) {
-                servoPos = 0.55;
+        } else if (close){
+            if (servoPos > 0.9) {
+                servoPos = 1;
             } else {
                 servoPos += 0.1;
             }
         }
 
+
+        if (justChanged) {
+            if (homeward) {
+                grab();
+            } else {
+                release();
+            }
+            justChanged = false;
+        }
+
         if (gamepad1.dpad_up) {
-            grab(2);
+            curLvl++;
+            curCol = (int)Math.floor(curLvl / 4);
+            update();
         } else if (gamepad1.dpad_down) {
-            release();
+            curLvl--;
+            curCol = (int)Math.floor(curLvl / 4);
+            update();
         }
 
 
 
         telemetry.addData("Servo", servoPos);
         telemetry.addData("Buttons", gamepad1.right_bumper || gamepad1.left_bumper/* || gamepad2.left_stick_y > 0.1 || gamepad2.left_stick_y < 0.1*/);
-        telemetry.addData("Elev", motor.getCurrentPosition());
+        telemetry.addData("Elev", elevPos());
         telemetry.addData("Elevator Target", elevatorTarget);
         telemetry.addData("Future Target", futureTarget);
-        telemetry.addData("Time Remaining", time.milliseconds() - targetTime);
+        telemetry.addData("Time Remaining", time.milliseconds() - timeToNext);
+
+
+        motor.setTargetPosition(elevatorTarget + pos);
+        motor.setPower(elevatorTarget - elevPos());
         servo.setPosition(servoPos);
 
 
         telemetry.addLine("Servo Position: " + servo.getPosition());
     }
 
+    public void update() {
+        manual = false;
+        elevatorTarget = ((curLvl % 4) * 1250) + 500;
+    }
 
-    public void grab(int level) {
+    public void grab() {
+        grabLvl(curLvl % 4);
+        curLvl++;
+        curCol = (int)Math.floor(curLvl / 4);
+    }
+
+    public void grabLvl(int level) {
+        manual = false;
         servoPos = 0;
-        targetTime = (int)time.milliseconds() + 1000;
-        futureTarget = level * 1250;
+        timeToNext = (int)time.milliseconds() + 500;
+        futureTarget = (level * 1250) + 500;
+        futureServo = -1;
     }
 
     public void release() {
-        elevatorTarget = elevPos() - 200;
-        servoPos = 0.5;
+        manual = false;
+        elevatorTarget = 0;
+        timeToNext = (int)time.milliseconds() + 50;
+        futureTarget = -1;
+        futureServo = 0.5;
     }
 
     public void stop() {

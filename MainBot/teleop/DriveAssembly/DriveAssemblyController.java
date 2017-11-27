@@ -12,9 +12,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
+import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State;
+
 
 import java.io.File;
 import java.io.FileInputStream;
+
+import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.*;
+
 
 public class DriveAssemblyController {
 
@@ -28,13 +33,25 @@ public class DriveAssemblyController {
     private DcMotor motorRight;
 
     private static int BASE_ROTATION_ANGLE = -135;
-    private static int target = 90;
+    private int corner = 0;
+    private int target = 0;
+    private double timeToHomeward = 0;
+    private boolean timeForHomeward = false;
+    private static int[][] targets = new int[][]{
+            //RedRecovery
+            {90, 90, 0},
+            //RedNonRecovery
+            {90, 90, 90},
+            //BlueRecovery
+            {180, 180, -90},
+            //BlueNonRecovery
+            {-90, -90, -90}
+    };
 
     private double startPos = 0;
     private double theta = 0;
     private boolean bPressed = false;
     private boolean yPressed = false;
-    private boolean homeward = false;
     private boolean tankMode = false;
     private double motors[] = new double[4];
     private double tempMotors[] = new double[4];
@@ -122,6 +139,16 @@ public class DriveAssemblyController {
     }
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
+        try {
+            target = targets[corner][curCol];
+        } catch (Exception e) {
+            curCol--;
+            target = targets[corner][curCol];
+        }
+
+
+
+
         if (gamepad1.a) {
             resetHeading();
         }
@@ -135,10 +162,19 @@ public class DriveAssemblyController {
 
         if (gamepad1.y && !yPressed) {
             homeward = !homeward;
+            timeForHomeward = false;
+            timeToHomeward = time.seconds() + 1d;
+            justChanged = true;
             yPressed = true;
         } else if (!gamepad1.y){
             yPressed = false;
         }
+
+        if (time.seconds() > timeToHomeward) {
+            timeForHomeward = true;
+        }
+
+
 
         if (!tankMode) {
             theta = getIMURotation() - startPos;
@@ -148,11 +184,12 @@ public class DriveAssemblyController {
 
             if (Math.abs(adjustedR) > 0.1) {
                 homeward = false;
+                justChanged = true;
             }
 
-            if (homeward && Math.abs((theta - target + 3780)%360 - 180) > 10) {
+            if (homeward && timeForHomeward && Math.abs((theta - target + 3780)%360 - 180) > 10) {
                 adjustedR = Math.min(Math.max(((theta - target + 3780)%360 - 180)/30, -1), 1);
-            } else if (homeward) {
+            } else if (homeward && timeForHomeward) {
                 adjustedR = 0;
             }
 
@@ -225,24 +262,19 @@ public class DriveAssemblyController {
                 targPow(motorRight, 3, -Math.pow(gamepad1.right_stick_y, 3));
             }
         }
-
-
     }
 
     public void stop() {}
 
-    /*private void readTeamColor() {
+    private void readTeamColor() {
         try {
-            FileInputStream f = new FileInputStream("/storage/self/primary/Pictures/images/LastTeamColor.txt");
-            if (f.available() > 1) {
-                if (f.read() == 1) {
-                    target = 90;
-                } else {
-                    target = 180;
-                }
+            FileInputStream f = new FileInputStream("/storage/self/primary/LastTeamColor.txt");
+            if (f.available() >= 1) {
+                corner = f.read();
             }
         } catch (Exception e) {
-            //Do Nothing
+            telemetry.addData("Error: ", e);
+            telemetry.update();
         }
-    }*/
+    }
 }

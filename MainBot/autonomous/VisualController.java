@@ -245,18 +245,19 @@ public class VisualController {
                 }
             }
         }
+        CameraDevice.getInstance().setFlashTorchMode(false);
     }
 
-    /*public void saveTeamColor(JewelColor team) {
+    public void saveTeamColor(int team) {
         try {
-            File file = new File("/storage/self/primary/Pictures/images/", "LastTeamColor.txt");
+            File file = new File("/storage/self/primary/", "LastTeamColor.txt");
             FileOutputStream outStream = new FileOutputStream(file);
-            outStream.write((team == JewelColor.RED) ? 1 : 0);
+            outStream.write(team);
             outStream.flush();
             outStream.close();
         } catch (Exception e) {
             telemetry.addLine(e.toString());
             telemetry.update();
         }
-    }*/
+    }
 }
