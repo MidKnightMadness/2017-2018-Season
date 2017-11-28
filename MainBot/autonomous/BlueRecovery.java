@@ -32,16 +32,16 @@ public class BlueRecovery extends LinearOpMode {
             //knock
             {250, 0, -250},
             //toCrypto
-            {-2550, -1500, -2450},
+            {-2450, -2000, -2450},
             //rotCrypto
             {ENC_90*3/2, ENC_90/2, ENC_90/2},
-            //push (1 = UD, 0 = LR)
+            //push (1 = LR, 0 = UD)
             {1, 0, 0},
             {-400, -400, -400},
             {-1100, -1100, -1100},
             {1200, 1200, 1200},
             //rotate
-            {ENC_90*3/2, ENC_90*3/2, ENC_90*5/2}
+            {ENC_90*3/2, ENC_90*5/2, ENC_90*5/2}
     };
 
 
@@ -73,10 +73,10 @@ public class BlueRecovery extends LinearOpMode {
         a.lift();
         waitFor(GLYPH);
 
+        v.look();
+
         a.moveBot(targets[0][0]);
         waitFor(UP);
-
-        v.look();
 
         state = (v.leftJewel == TEAM_COLOR ? 0 : 2);
 
@@ -87,6 +87,7 @@ public class BlueRecovery extends LinearOpMode {
         waitFor(UP);
 
         a.raiseJArm();
+        wait(1d);
 
         a.rotateBot(-targets[1][state], 0.7);
         waitFor(UP);

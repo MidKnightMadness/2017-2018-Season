@@ -27,12 +27,12 @@ public class RedRecovery extends LinearOpMode {
             //knock
             {250, 0, -250},
             //toCrypto
-            {2550, 1700, 2750},
+            {2550, 1900, 2750},
             //rotCrypto
             {ENC_90*3/2, ENC_90*3/2, ENC_90/2},
-            //push (1 = UD, 0 = LR)
+            //push (1 = LR, 0 = UD)
             {1, 1, 0},
-            {-400, -400, -400},
+            {-500, -500, -500},
             {-1100, -1100, -1100},
             {1200, 1200, 1200},
             //rotate
@@ -68,10 +68,10 @@ public class RedRecovery extends LinearOpMode {
         a.lift();
         waitFor(GLYPH);
 
+        v.look();
+
         a.moveBot(targets[0][0]);
         waitFor(UP);
-
-        v.look();
 
         state = (v.leftJewel == TEAM_COLOR ? 0 : 2);
 
@@ -82,6 +82,7 @@ public class RedRecovery extends LinearOpMode {
         waitFor(UP);
 
         a.raiseJArm();
+        wait(1d);
 
         a.rotateBot(-targets[1][state], 0.7);
         waitFor(UP);
