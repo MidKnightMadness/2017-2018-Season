@@ -37,9 +37,9 @@ public class RedNonRecovery extends LinearOpMode {
             {1900, 1500, 1000},
             //rotCrypto
             {ENC_90/2, ENC_90/2, ENC_90/2},
-            //push (1 = UD, 0 = LR)
+            //push (1 = LR, 0 = UD)
             {0, 0, 0},
-            {-400, -400, -400},
+            {-500, -500, -500},
             {-1100, -1100, -1100},
             {700, 700, 700},
             //rotate
@@ -76,10 +76,10 @@ public class RedNonRecovery extends LinearOpMode {
         a.lift();
         waitFor(GLYPH);
 
+        v.look();
+
         a.moveBot(targets[0][0]);
         waitFor(UP);
-
-        v.look();
 
         state = (v.leftJewel == TEAM_COLOR ? 0 : 2);
 
@@ -90,6 +90,7 @@ public class RedNonRecovery extends LinearOpMode {
         waitFor(UP);
 
         a.raiseJArm();
+        wait(1d);
 
         a.rotateBot(-targets[1][state], 0.7);
         waitFor(UP);

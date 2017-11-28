@@ -82,7 +82,7 @@ public class VisualController {
         pictographTrackables = vuforia.loadTrackablesFromAsset("RelicVuMark");
 
         //Enable flash
-        CameraDevice.getInstance().setFlashTorchMode(true);
+        //CameraDevice.getInstance().setFlashTorchMode(true);
     }
 
     public void look() throws InterruptedException {
