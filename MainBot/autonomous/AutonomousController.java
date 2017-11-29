@@ -12,29 +12,29 @@ public class AutonomousController {
 
     //TODO: CHECK WIRING ON JEWEL ARM: REVERSED? WHY REVERSED SPEED AND ENCODERS??
 
-    public static int GLYPH = 0;
+    public static int ELEV = 0;
     public static int JEWEL = 1;
     public static int UP = 2;
     public static int DOWN = 3;
     public static int LEFT = 4;
     public static int RIGHT = 5;
+    public static int GRAB = 6;
 
     private static double DRIVE_SPEED = 0.4;
     private static double ROTATE_SPEED = 0.3;
 
 
 
-    public Servo glyphServo;
     public int[] pos = new int[6];
-    public DcMotor[] motors = new DcMotor[6];
+    public DcMotor[] motors = new DcMotor[7];
 
     private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.RED;
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
-        motors[GLYPH] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.MOTOR);
-        motors[GLYPH].resetDeviceConfigurationForOpMode();
-        motors[GLYPH].setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motors[GLYPH].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motors[ELEV] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.ELEV);
+        motors[ELEV].resetDeviceConfigurationForOpMode();
+        motors[ELEV].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motors[ELEV].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         motors[JEWEL] = hardwareMap.dcMotor.get(CrossCommunicator.Jewel.MOTOR);
         motors[JEWEL].resetDeviceConfigurationForOpMode();
@@ -61,8 +61,10 @@ public class AutonomousController {
         motors[RIGHT].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motors[RIGHT].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        glyphServo = hardwareMap.servo.get(CrossCommunicator.Glyph.SERVO);
-        glyphServo.setPosition(1);
+        motors[GRAB] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.GRAB);
+        motors[GRAB].resetDeviceConfigurationForOpMode();
+        motors[GRAB].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motors[GRAB].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         reset();
     }
@@ -73,16 +75,20 @@ public class AutonomousController {
     }
 
     public void close() {
-        glyphServo.setPosition(0);
+        motors[GRAB].setPower(-0.3);
+    }
+
+    public void grabStop() {
+        motors[GRAB].setPower(0);
     }
     public void open() {
-        glyphServo.setPosition(1);
+        motors[GRAB].setPower(0.8);
     }
     public void lift() {
-        move(GLYPH, 1000, 1);
+        move(ELEV, 1000, 1);
     }
     public void lower() {
-        move(GLYPH, -1000, -1);
+        move(ELEV, -1000, -1);
     }
 
     public void moveBot(int distance, double speed) {
@@ -138,7 +144,7 @@ public class AutonomousController {
     }
 
     public void reset() {
-        //pos[GLYPH] = motors[GLYPH].getCurrentPosition();
+        //pos[ELEV] = motors[ELEV].getCurrentPosition();
         //pos[JEWEL] = motors[JEWEL].getCurrentPosition();
         //pos[UP] = motors[UP].getCurrentPosition();
         //pos[DOWN] = motors[DOWN].getCurrentPosition();

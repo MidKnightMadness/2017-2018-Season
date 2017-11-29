@@ -19,8 +19,8 @@ public class CrossCommunicator {
     }
 
     public static class Glyph {
-        public static String MOTOR = "glyph elevator";
-        public static String SERVO = "grabber";
+        public static String ELEV = "glyph elevator";
+        public static String GRAB = "grabber";
     }
 
     public static class State {
