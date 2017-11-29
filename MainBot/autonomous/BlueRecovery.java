@@ -132,6 +132,8 @@ public class BlueRecovery extends LinearOpMode {
             waitFor(LEFT);
         }
 
+        a.grabStop();
+
         a.rotateBot(targets[8][state]);
         waitFor(UP);
     }

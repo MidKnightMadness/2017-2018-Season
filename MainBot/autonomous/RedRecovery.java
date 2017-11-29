@@ -127,6 +127,8 @@ public class RedRecovery extends LinearOpMode {
             waitFor(LEFT);
         }
 
+        a.grabStop();
+
         a.rotateBot(targets[8][state]);
         waitFor(UP);
     }

@@ -145,6 +145,8 @@ public class RedNonRecovery extends LinearOpMode {
             waitFor(LEFT);
         }
 
+        a.grabStop();
+
         a.rotateBot(targets[10][state]);
         waitFor(UP);
 
