@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -12,10 +13,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
-import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State;
 
 
-import java.io.File;
 import java.io.FileInputStream;
 
 import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.*;
@@ -31,6 +30,7 @@ public class DriveAssemblyController {
     private DcMotor motorDown;
     private DcMotor motorLeft;
     private DcMotor motorRight;
+    private Servo vsd;
 
     private static int BASE_ROTATION_ANGLE = -135;
     private int corner = 0;
@@ -38,22 +38,25 @@ public class DriveAssemblyController {
     private double timeToHomeward = 0;
     private boolean timeForHomeward = false;
     private static int[][] targets = new int[][]{
+            //When Left (0) or When Right (1)?
             //RedRecovery
-            {90, 90, 0},
+            {60, 30},
             //RedNonRecovery
-            {90, 90, 90},
+            {-45, -45},
             //BlueRecovery
-            {180, 180, -90},
+            {60, 30},
             //BlueNonRecovery
-            {-90, -90, -90}
+            {-45, -45}
     };
 
     private double startPos = 0;
     private double theta = 0;
     private boolean bPressed = false;
+    private boolean backPressed = false;
     private boolean yPressed = false;
     private boolean tankMode = false;
-    private double motors[] = new double[4];
+    private boolean slow = false;
+    private int turnDir = 0;
     private double tempMotors[] = new double[4];
     private double adjustedX = 0;
     private double adjustedY = 0;
@@ -118,9 +121,12 @@ public class DriveAssemblyController {
         motorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         resetHeading();
+
+        vsd = hardwareMap.servo.get("vsd");
+        readTeamColor();
     }
 
-    public void start() {}
+    public void start() {vsd.setPosition(1);}
 
     private void resetHeading() {
         startPos = getIMURotation() - BASE_ROTATION_ANGLE;
@@ -131,50 +137,51 @@ public class DriveAssemblyController {
     }
 
     private void targPow(DcMotor motor, int id, double speed) {
-        if ((speed - motors[id]) < 0.05)
-            motors[id] = speed;
-        else
-            motors[id] += Math.signum(speed - motors[id])*0.1;
         motor.setPower(speed);
     }
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
-        try {
-            target = targets[corner][curCol];
-        } catch (Exception e) {
-            curCol--;
-            target = targets[corner][curCol];
-        }
+        target = targets[corner][turnDir];
 
-
-
-
-        if (gamepad1.a) {
+        if ((gamepad1.a || gamepad2.a)) {
             resetHeading();
         }
 
-        if (gamepad1.b && !bPressed) {
+        if ((gamepad1.b || gamepad2.b )&& !bPressed) {
             toggleTankMode();
             bPressed = true;
-        } else if (!gamepad1.b){
+        } else if (!(gamepad1.b|| gamepad2.b)){
             bPressed = false;
         }
 
-        if (gamepad1.y && !yPressed) {
+        if ((gamepad1.back || gamepad2.back )&& !backPressed) {
+            slow = !slow;
+            backPressed = true;
+        } else if (!(gamepad1.back|| gamepad2.back)){
+            backPressed = false;
+        }
+
+        if ((gamepad1.y || gamepad2.y )&& !yPressed) {
             homeward = !homeward;
-            timeForHomeward = false;
-            timeToHomeward = time.seconds() + 1d;
+            if (homeward) {
+                timeForHomeward = false;
+                timeToHomeward = time.seconds() + 1d;
+            }
             justChanged = true;
             yPressed = true;
-        } else if (!gamepad1.y){
+        } else if (!(gamepad1.y|| gamepad2.y)){
             yPressed = false;
+        }
+
+        if ((gamepad1.dpad_left|| gamepad2.dpad_left)) {
+            turnDir = 0;
+        } else if ((gamepad1.dpad_right|| gamepad2.dpad_right)) {
+            turnDir = 1;
         }
 
         if (time.seconds() > timeToHomeward) {
             timeForHomeward = true;
         }
-
-
 
         if (!tankMode) {
             theta = getIMURotation() - startPos;
@@ -182,9 +189,9 @@ public class DriveAssemblyController {
             adjustedY = gamepad1.left_stick_y;
             adjustedR = gamepad1.right_stick_x;
 
-            if (Math.abs(adjustedR) > 0.1) {
-                homeward = false;
-                justChanged = true;
+            if (Math.abs(adjustedR) > 0.1 && homeward && timeForHomeward) {
+                timeToHomeward = Integer.MAX_VALUE;
+                timeForHomeward = false;
             }
 
             if (homeward && timeForHomeward && Math.abs((theta - target + 3780)%360 - 180) > 10) {
@@ -193,9 +200,9 @@ public class DriveAssemblyController {
                 adjustedR = 0;
             }
 
-            double translateScale = Math.pow(Math.hypot(adjustedX, adjustedY), 5) * (1 - Math.min(Math.pow(Math.abs(adjustedR), 2), 0.6));
+            double translateScale = Math.pow(Math.hypot(adjustedX, adjustedY), 5) * (1 - Math.min(Math.pow(Math.abs(adjustedR), 2), 0.6)) * (slow ? 0.5 : 1);
             double targetDirection = aTan(gamepad1.left_stick_x, -gamepad1.left_stick_y);
-            double rotateScale = Math.pow(Math.abs(adjustedR), 5) * Math.signum(-adjustedR) * (1 - Math.abs(translateScale));
+            double rotateScale = Math.pow(Math.abs(adjustedR), 5) * Math.signum(-adjustedR) * (1 - Math.abs(translateScale)) * (slow ? 0.5 : 1);
 
             telemetry.addData("Offset", (theta - target + 3780)%360 - 180);
             telemetry.addData("Needs To Move", Math.abs((theta - target + 3780)%360 - 180) > 10);
@@ -222,33 +229,18 @@ public class DriveAssemblyController {
             tempMotors[2] *= scale;
             tempMotors[3] *= scale;
 
-            //telemetry.addData("Scale", scale);
-
             tempMotors[0] += rotateScale;
             tempMotors[1] += rotateScale;
             tempMotors[2] += rotateScale;
             tempMotors[3] += rotateScale;
-
-            //tempMotors[0] *= 0.8;
-            //tempMotors[1] *= 0.8;
-            //tempMotors[2] *= 0.8;
-            //tempMotors[3] *= 0.8;
 
             targPow(motorUp, 0, tempMotors[0]);
             targPow(motorDown, 1, tempMotors[1]);
             targPow(motorLeft, 2, tempMotors[2]);
             targPow(motorRight, 3, tempMotors[3]);
 
-            //telemetry.addData("Theta", theta);
-            //telemetry.addData("IMU Rotation", getIMURotation());
-            //telemetry.addData("Start Position", startPos);
-            //telemetry.addData("Target Direction", targetDirection);
-            //telemetry.addData("Target Rotation Speed", rotateScale);
-            //telemetry.addData("Translate Scale", translateScale);
-            //telemetry.addData("Cosine", Math.cos((theta + targetDirection) * (Math.PI / 180d)));
-            //telemetry.addData("Sine", Math.sin((theta + targetDirection) * (Math.PI / 180d)));
-
             telemetry.update();
+            vsd.setPosition(1);
         } else {
             if (Math.abs(gamepad1.left_stick_x + gamepad1.right_stick_x) > 1.5) {
                 targPow(motorUp, 0, -gamepad1.left_stick_x);
@@ -261,6 +253,7 @@ public class DriveAssemblyController {
                 targPow(motorLeft, 2, Math.pow(gamepad1.left_stick_y, 3));
                 targPow(motorRight, 3, -Math.pow(gamepad1.right_stick_y, 3));
             }
+            vsd.setPosition(0.5);
         }
     }
 
@@ -273,7 +266,7 @@ public class DriveAssemblyController {
                 corner = f.read();
             }
         } catch (Exception e) {
-            telemetry.addData("Error: ", e);
+            telemetry.addData("Unable to read config. Error: ", e);
             telemetry.update();
         }
     }
