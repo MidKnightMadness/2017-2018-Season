@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -17,12 +16,12 @@ public class GlyphController {
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
-        motor = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.MOTOR);
+        motor = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.ELEV);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         pos = motor.getCurrentPosition();
 
-        servo = hardwareMap.servo.get(CrossCommunicator.Glyph.SERVO);
+        servo = hardwareMap.servo.get(CrossCommunicator.Glyph.GRAB);
         servo.setPosition(1);
     }
 

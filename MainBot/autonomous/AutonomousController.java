@@ -2,15 +2,12 @@ package org.firstinspires.ftc.teamcode.MainBot.autonomous;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
 
 public class AutonomousController {
-
-    //TODO: CHECK WIRING ON JEWEL ARM: REVERSED? WHY REVERSED SPEED AND ENCODERS??
 
     public static int ELEV = 0;
     public static int JEWEL = 1;
@@ -25,10 +22,7 @@ public class AutonomousController {
 
 
 
-    public int[] pos = new int[6];
     public DcMotor[] motors = new DcMotor[7];
-
-    private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.RED;
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         motors[ELEV] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.ELEV);
@@ -143,12 +137,5 @@ public class AutonomousController {
         return motors[motor].getCurrentPosition();
     }
 
-    public void reset() {
-        //pos[ELEV] = motors[ELEV].getCurrentPosition();
-        //pos[JEWEL] = motors[JEWEL].getCurrentPosition();
-        //pos[UP] = motors[UP].getCurrentPosition();
-        //pos[DOWN] = motors[DOWN].getCurrentPosition();
-        //pos[LEFT] = motors[LEFT].getCurrentPosition();
-        //pos[RIGHT] = motors[RIGHT].getCurrentPosition();
-    }
+    public void reset() {}
 }

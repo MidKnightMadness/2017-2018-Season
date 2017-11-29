@@ -4,11 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-import org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController;
-import org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualController;
 
-import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.GLYPH;
-import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.JEWEL;
+import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.ELEV;
 import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.LEFT;
 import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.UP;
 
@@ -71,7 +68,7 @@ public class BlueRecovery extends LinearOpMode {
         wait(0.6);
 
         a.lift();
-        waitFor(GLYPH);
+        waitFor(ELEV);
 
         v.look();
 
@@ -112,7 +109,7 @@ public class BlueRecovery extends LinearOpMode {
 
 
         a.lower();
-        waitFor(GLYPH);
+        waitFor(ELEV);
 
         a.open();
 

@@ -27,7 +27,7 @@ public class AutonomousTeleop extends LinearOpMode {
         wait(0.6);
 
         a.lift();
-        waitFor(GLYPH);
+        waitFor(ELEV);
         a.reset();
 
         while (!gamepad1.x && opModeIsActive()) {
@@ -138,7 +138,7 @@ public class AutonomousTeleop extends LinearOpMode {
         amount = 0;
 
         a.lower();
-        waitFor(GLYPH);
+        waitFor(ELEV);
         a.reset();
 
         a.open();
