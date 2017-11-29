@@ -66,7 +66,7 @@ public class RedRecovery extends LinearOpMode {
         wait(0.6);
 
         a.lift();
-        waitFor(GLYPH);
+        waitFor(ELEV);
 
         v.look();
 
@@ -107,7 +107,7 @@ public class RedRecovery extends LinearOpMode {
 
 
         a.lower();
-        waitFor(GLYPH);
+        waitFor(ELEV);
 
         a.open();
 

@@ -60,14 +60,14 @@ public class RedRecoveryAutonomous extends LinearOpMode {
         jewelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         jewelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        glyphMotor = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.MOTOR);
+        glyphMotor = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.ELEV);
         glyphMotor.resetDeviceConfigurationForOpMode();
         glyphMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         glyphMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         glyphMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         glyphStartPosition = glyphMotor.getCurrentPosition();
 
-        glyphServo = hardwareMap.servo.get(CrossCommunicator.Glyph.SERVO);
+        glyphServo = hardwareMap.servo.get(CrossCommunicator.Glyph.GRAB);
 
         driveUpMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.UP);
         driveUpMotor.resetDeviceConfigurationForOpMode();
