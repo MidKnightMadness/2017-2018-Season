@@ -18,28 +18,30 @@ import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.St
 
 public class GlyphAssemblyController {
 
+    private static double SERVO_MAX = 1;
     private Telemetry telemetry;
     private DcMotor motor;
-    private Servo servo;
+    private DcMotor servo;
     private int curLvl;
-    private int pos;
     private double servoPos;
     private int elevatorTarget;
     private int futureTarget;
     private double futureServo;
     private int timeToNext;
+    private boolean dPressed = false;
+    private boolean uPressed = false;
     private boolean manual = false;
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
         time = new ElapsedTime();
         motor = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.MOTOR);
-        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        servo = hardwareMap.servo.get(CrossCommunicator.Glyph.SERVO);
-        servo.setPosition(1);
-        pos = motor.getCurrentPosition();
+        servo = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.SERVO);
+        servo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        servo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         servoPos = 1;
         futureServo = -1;
         elevatorTarget = -1;
@@ -49,19 +51,19 @@ public class GlyphAssemblyController {
     }
 
     public void start() {
-
+        motor.setPower(1);
     }
 
     private int elevPos() {
-        return (motor.getCurrentPosition() - pos);
+        return (motor.getCurrentPosition());
     }
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
-        boolean up = gamepad1.right_bumper;
-        boolean down = gamepad1.left_bumper;
-        boolean override = gamepad1.x;
-        boolean open = gamepad1.dpad_left || gamepad1.right_trigger > 0;
-        boolean close = gamepad1.dpad_right || gamepad1.left_trigger > 0;
+        boolean up = gamepad1.right_bumper || gamepad2.right_bumper;
+        boolean down = gamepad1.left_bumper || gamepad2.left_bumper;
+        boolean override = gamepad1.x || gamepad2.x;
+        boolean open = gamepad1.right_trigger > 0 || gamepad2.right_trigger > 0;
+        boolean close = gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0;
 
         telemetry.addData("Elevator", elevPos());
         if (up) {
@@ -75,7 +77,8 @@ public class GlyphAssemblyController {
         }
 
         if (override) {
-            pos = motor.getCurrentPosition();
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
         if (time.milliseconds() > timeToNext) {
@@ -95,8 +98,8 @@ public class GlyphAssemblyController {
                 servoPos -= 0.1;
             }
         } else if (close){
-            if (servoPos > 0.9) {
-                servoPos = 1;
+            if (servoPos > SERVO_MAX - 0.1) {
+                servoPos = SERVO_MAX;
             } else {
                 servoPos += 0.1;
             }
@@ -112,37 +115,44 @@ public class GlyphAssemblyController {
             justChanged = false;
         }
 
-        if (gamepad1.dpad_up) {
+
+        if ((gamepad1.dpad_up || gamepad2.dpad_up) && !uPressed) {
             curLvl++;
             curCol = (int)Math.floor(curLvl / 4);
             update();
-        } else if (gamepad1.dpad_down) {
+            uPressed = true;
+        } else if (!(gamepad1.dpad_up || gamepad2.dpad_up)){
+            uPressed = false;
+        }
+
+        if ((gamepad1.dpad_down || gamepad2.dpad_down) && !dPressed) {
             curLvl--;
             curCol = (int)Math.floor(curLvl / 4);
             update();
+            dPressed = true;
+        } else if (!(gamepad1.dpad_down || gamepad2.dpad_down)){
+            dPressed = false;
         }
 
 
-
         telemetry.addData("Servo", servoPos);
-        telemetry.addData("Buttons", gamepad1.right_bumper || gamepad1.left_bumper/* || gamepad2.left_stick_y > 0.1 || gamepad2.left_stick_y < 0.1*/);
+        telemetry.addData("Buttons", gamepad1.right_bumper || gamepad1.left_bumper);
         telemetry.addData("Elev", elevPos());
         telemetry.addData("Elevator Target", elevatorTarget);
         telemetry.addData("Future Target", futureTarget);
         telemetry.addData("Time Remaining", time.milliseconds() - timeToNext);
 
 
-        motor.setTargetPosition(elevatorTarget + pos);
-        motor.setPower(elevatorTarget - elevPos());
-        servo.setPosition(servoPos);
+        motor.setPower(Math.min(Math.max(((elevatorTarget)-motor.getCurrentPosition())/300d, -1), 1));
+        servo.setPower(Math.min(Math.max(((servoPos*280)-servo.getCurrentPosition())/500d, -1), 1));
 
-
-        telemetry.addLine("Servo Position: " + servo.getPosition());
+        telemetry.addData("Speed Grabber: ", ((servoPos*280)-servo.getCurrentPosition())/500d);
+        telemetry.addData("Speed Elevator: ", ((elevatorTarget)-motor.getCurrentPosition())/300d);
     }
 
     public void update() {
         manual = false;
-        elevatorTarget = ((curLvl % 4) * 1250) + 500;
+        elevatorTarget = ((curLvl % 4) * 1000) + 500;
     }
 
     public void grab() {
@@ -154,17 +164,17 @@ public class GlyphAssemblyController {
     public void grabLvl(int level) {
         manual = false;
         servoPos = 0;
-        timeToNext = (int)time.milliseconds() + 500;
-        futureTarget = (level * 1250) + 500;
+        timeToNext = (int)time.milliseconds() + 1000;
+        futureTarget = (level * 1000) + 500;
         futureServo = -1;
     }
 
     public void release() {
         manual = false;
-        elevatorTarget = 0;
-        timeToNext = (int)time.milliseconds() + 50;
-        futureTarget = -1;
-        futureServo = 0.5;
+        servoPos = SERVO_MAX;
+        timeToNext = (int)time.milliseconds() + 1500;
+        futureTarget = 0;
+        futureServo = -1;
     }
 
     public void stop() {
