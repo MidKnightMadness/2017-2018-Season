@@ -33,7 +33,7 @@ public class DriveAssemblyController {
     private Servo vsd;
 
     private static int BASE_ROTATION_ANGLE = -135;
-    private int corner = 3;
+    private int corner = 0;
     private int target = 0;
     private double timeToHomeward = 0;
     private boolean timeForHomeward = false;
@@ -123,7 +123,7 @@ public class DriveAssemblyController {
         resetHeading();
 
         vsd = hardwareMap.servo.get("vsd");
-        //readTeamColor();
+        readTeamColor();
     }
 
     public void start() {vsd.setPosition(1);}
