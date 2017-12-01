@@ -69,14 +69,14 @@ public class AutonomousController {
     }
 
     public void close() {
-        motors[GRAB].setPower(-0.3);
+        motors[GRAB].setPower(0.3);
     }
 
     public void grabStop() {
         motors[GRAB].setPower(0);
     }
     public void open() {
-        motors[GRAB].setPower(0.8);
+        motors[GRAB].setPower(-0.8);
     }
     public void lift() {
         move(ELEV, 1000, 1);
