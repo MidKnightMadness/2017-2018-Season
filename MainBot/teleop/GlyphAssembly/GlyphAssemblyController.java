@@ -16,7 +16,7 @@ import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.St
 
 public class GlyphAssemblyController {
 
-    private static double SERVO_MAX = 1;
+    private static double GRAB_MAX = 1;
     private Telemetry telemetry;
     private DcMotor elev;
     private DcMotor grab;
@@ -29,6 +29,8 @@ public class GlyphAssemblyController {
     private boolean dPressed = false;
     private boolean uPressed = false;
     private boolean manual = false;
+    private boolean isFullyClosed = false;
+    private int lastdiff = 0;
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
@@ -39,8 +41,8 @@ public class GlyphAssemblyController {
         elev.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         grab = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.GRAB);
         grab.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        grab.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        grabPos = 1;
+        grab.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        grabPos = 0;
         futureServo = -1;
         elevatorTarget = -1;
         futureTarget = -1;
@@ -49,7 +51,12 @@ public class GlyphAssemblyController {
     }
 
     public void start() {
-        elev.setPower(1);
+        grab.setTargetPosition(200);
+        grab.setPower(0.2);
+        while (grab.isBusy()) {}
+        grab.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        grab.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
 
     private int elevPos() {
@@ -60,8 +67,8 @@ public class GlyphAssemblyController {
         boolean up = gamepad1.right_bumper || gamepad2.right_bumper;
         boolean down = gamepad1.left_bumper || gamepad2.left_bumper;
         boolean override = gamepad1.x || gamepad2.x;
-        boolean open = gamepad1.right_trigger > 0 || gamepad2.right_trigger > 0;
-        boolean close = gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0;
+        boolean close = gamepad1.right_trigger > 0 || gamepad2.right_trigger > 0;
+        boolean open = gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0;
 
         telemetry.addData("Elevator", elevPos());
         if (up) {
@@ -72,6 +79,7 @@ public class GlyphAssemblyController {
             manual = true;
         } else if (manual){
             elevatorTarget = elevPos();
+            manual = false;
         }
 
         if (override) {
@@ -96,13 +104,21 @@ public class GlyphAssemblyController {
                 grabPos -= 0.1;
             }
         } else if (close){
-            if (grabPos > SERVO_MAX - 0.1) {
-                grabPos = SERVO_MAX;
+            if (grabPos > GRAB_MAX - 0.1) {
+                grabPos = GRAB_MAX;
             } else {
                 grabPos += 0.1;
             }
         }
 
+        if (true) {
+            if (Math.abs(lastdiff - (grabPos * 800 - grab.getCurrentPosition())) < 10) {
+                isFullyClosed = true;
+            } else {
+                isFullyClosed = false;
+            }
+            lastdiff = Math.abs((int)(grabPos * 800 - grab.getCurrentPosition()));
+        }
 
         if (justChanged) {
             if (homeward) {
@@ -140,12 +156,14 @@ public class GlyphAssemblyController {
         telemetry.addData("Future Target", futureTarget);
         telemetry.addData("Time Remaining", time.milliseconds() - timeToNext);
 
-
         elev.setPower(Math.min(Math.max(((elevatorTarget)- elev.getCurrentPosition())/300d, -1), 1));
-        grab.setPower(Math.min(Math.max(((grabPos*280)-grab.getCurrentPosition())/500d, -1), 1));
+        grab.setPower(Math.min(Math.max(((grabPos*800)-grab.getCurrentPosition())/300d,
+                isFullyClosed ? -0.03 : -0.5),
+                isFullyClosed ? 0.03 : 0.5));
 
-        telemetry.addData("Speed Grabber: ", ((grabPos*280)-grab.getCurrentPosition())/500d);
+        telemetry.addData("Speed Grabber: ", grab.getPower());
         telemetry.addData("Speed Elevator: ", ((elevatorTarget)- elev.getCurrentPosition())/300d);
+        telemetry.addData("Fully Closed", isFullyClosed);
     }
 
     public void update() {
@@ -161,7 +179,7 @@ public class GlyphAssemblyController {
 
     public void grabLvl(int level) {
         manual = false;
-        grabPos = 0;
+        grabPos = GRAB_MAX;
         timeToNext = (int)time.milliseconds() + 1000;
         futureTarget = (level * 1000) + 500;
         futureServo = -1;
@@ -169,7 +187,7 @@ public class GlyphAssemblyController {
 
     public void release() {
         manual = false;
-        grabPos = SERVO_MAX;
+        grabPos = 0;
         timeToNext = (int)time.milliseconds() + 1500;
         futureTarget = 0;
         futureServo = -1;
