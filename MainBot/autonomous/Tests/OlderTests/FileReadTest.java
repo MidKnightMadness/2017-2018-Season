@@ -1,12 +1,14 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests.OlderTests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
+@Disabled
 @Autonomous(name = "File Read Test", group = "File")
 public class FileReadTest extends LinearOpMode {
 

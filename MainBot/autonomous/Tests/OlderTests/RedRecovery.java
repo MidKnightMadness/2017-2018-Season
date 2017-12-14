@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests.OlderTests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -11,17 +11,16 @@ import org.firstinspires.ftc.teamcode.MainBot.autonomous.VisualController;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
 @Disabled
-@Autonomous(name = "BlueNonRecovery", group = "Main Bot")
-public class BlueNonRecovery extends LinearOpMode {
-    private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.BLUE;
+@Autonomous(name = "RedRecovery", group = "Main Bot")
+public class RedRecovery extends LinearOpMode {
+    private static VisualController.JewelColor TEAM_COLOR = VisualController.JewelColor.RED;
     private static double JEWEL_ARM_POWER = 0.3;
-    private static int JEWEL_ARM_DISTANCE = 600;
+    private static int JEWEL_ARM_DISTANCE = 625;
     private static double DRIVE_ROTATE_POWER = -0.3;
-    private static int DRIVE_ROTATE_DISTANCE = 200;
+    private static int DRIVE_ROTATE_DISTANCE = 250;
     private static double DRIVE_MOVE_POWER = 0.4;
-    private static int DRIVE_MOVE_DISTANCE = -1900;
-    private static int DRIVE_MOVE_SIDE_DISTANCE = 825;
-
+    private static int DRIVE_MOVE_DISTANCE = -75;
+    private static int DRIVE_ROTATE90_DISTANCE = 1523;
     private DcMotor jewelMotor;
     private DcMotor driveUpMotor;
     private DcMotor driveDownMotor;
@@ -29,6 +28,7 @@ public class BlueNonRecovery extends LinearOpMode {
     private DcMotor driveRightMotor;
     private VisualController visualC = new VisualController();
     private GlyphController glyphC = new GlyphController();
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -42,26 +42,77 @@ public class BlueNonRecovery extends LinearOpMode {
 
         waitForStart();
 
+
+        glyphC.close();
+        double waitUntil = time + .6;
+        while (time < waitUntil) {
+            idle();
+        }
+        glyphC.lift();
+        moveBot();
         visualC.look();
+        //visualC.pictograph = RelicRecoveryVuMark.CENTER;
         lowerArm();
         rotateBot(true);
         raiseArm();
         rotateBot(false);
-        moveBot();
-        if (visualC.pictograph == RelicRecoveryVuMark.RIGHT){
-            DRIVE_MOVE_SIDE_DISTANCE = DRIVE_MOVE_SIDE_DISTANCE + 650;
+        if (visualC.pictograph == RelicRecoveryVuMark.RIGHT) {
+            DRIVE_MOVE_DISTANCE = 3300;
+            moveBot();
+            speedRotateBot(0.3, DRIVE_ROTATE90_DISTANCE / 2);
+            DRIVE_MOVE_DISTANCE = -1000;
+            moveBot();
+            glyphC.lower();
+            glyphC.open();
+            DRIVE_MOVE_DISTANCE = 400;
+            waitUntil = time + 0.4;
+            while (time < waitUntil) {
+                idle();
+            }
+            moveBot();
+            speedRotateBot(0.3, (DRIVE_ROTATE90_DISTANCE / 2) + 2 * DRIVE_ROTATE90_DISTANCE);
+            glyphC.resetArm();
         }
-        else if (visualC.pictograph == RelicRecoveryVuMark.LEFT){
-            DRIVE_MOVE_SIDE_DISTANCE = DRIVE_MOVE_SIDE_DISTANCE - 650;
+         else {
+            if (visualC.pictograph == RelicRecoveryVuMark.LEFT) {
+                DRIVE_MOVE_DISTANCE = 3950 - 1400;
+            }
+            else {
+                DRIVE_MOVE_DISTANCE = 3300 - 1400;
+                telemetry.addLine("Distance: " + DRIVE_MOVE_DISTANCE);
+                telemetry.update();
+            }
+            moveBot();
+            speedRotateBot(-0.3, (DRIVE_ROTATE90_DISTANCE * 4) / 3);
+            DRIVE_MOVE_DISTANCE = -600;
+            moveBot();
+            glyphC.lower();
+            glyphC.open();
+            DRIVE_MOVE_DISTANCE = 400;
+            waitUntil = time + 0.4;
+            while (time < waitUntil) {
+                idle();
+            }
+            moveBot();
+            speedRotateBot(-0.3, ((DRIVE_ROTATE90_DISTANCE * 5) / 3) + 20);
+            glyphC.resetArm();
         }
-        moveBotSideways();
-    }// -650, 0, 650
+
+        /*double delay = time + 1;
+        while (time < delay) {
+            idle();
+        }*/
+
+
+    }
+
 
 
     void initialize(HardwareMap hardwareMap) {
         jewelMotor = hardwareMap.dcMotor.get(CrossCommunicator.Jewel.MOTOR);
         jewelMotor.resetDeviceConfigurationForOpMode();
         jewelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        jewelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         driveUpMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.UP);
         driveUpMotor.resetDeviceConfigurationForOpMode();
@@ -91,6 +142,8 @@ public class BlueNonRecovery extends LinearOpMode {
         jewelMotor.setTargetPosition(jewelMotor.getCurrentPosition() - JEWEL_ARM_DISTANCE);
         jewelMotor.setPower(JEWEL_ARM_POWER);
         while (jewelMotor.isBusy()) {
+            telemetry.addData("Lowering Arm...", jewelMotor.getCurrentPosition());
+            telemetry.update();
             idle();
         }
     }
@@ -104,6 +157,28 @@ public class BlueNonRecovery extends LinearOpMode {
         while (jewelMotor.isBusy()) {
             idle();
         }
+    }
+
+    void speedRotateBot(double speed, int driveRotateDistance) {
+        telemetry.addLine("Rotate Bot " + speed + " " + driveRotateDistance);
+        telemetry.update();
+
+        driveUpMotor.setTargetPosition(driveUpMotor.getCurrentPosition() + (driveRotateDistance));
+        driveUpMotor.setPower(speed);
+
+        driveDownMotor.setTargetPosition(driveDownMotor.getCurrentPosition() + (driveRotateDistance));
+        driveDownMotor.setPower(speed);
+
+        driveLeftMotor.setTargetPosition(driveLeftMotor.getCurrentPosition() + (driveRotateDistance));
+        driveLeftMotor.setPower(speed);
+
+        driveRightMotor.setTargetPosition(driveRightMotor.getCurrentPosition() + (driveRotateDistance));
+        driveRightMotor.setPower(speed);
+
+        while (driveUpMotor.isBusy()) {
+            idle();
+        }
+
     }
 
     void rotateBot(Boolean reset) {
@@ -146,26 +221,6 @@ public class BlueNonRecovery extends LinearOpMode {
 
         driveRightMotor.setTargetPosition(driveRightMotor.getCurrentPosition() - DRIVE_MOVE_DISTANCE);
         driveRightMotor.setPower(-DRIVE_MOVE_POWER);
-
-        while (driveUpMotor.isBusy()) {
-            idle();
-        }
-    }
-    void moveBotSideways() {
-        telemetry.addLine("Move Bot...");
-        telemetry.update();
-
-        driveUpMotor.setTargetPosition(driveUpMotor.getCurrentPosition() + DRIVE_MOVE_SIDE_DISTANCE);
-        driveUpMotor.setPower(DRIVE_MOVE_POWER);
-
-        driveDownMotor.setTargetPosition(driveDownMotor.getCurrentPosition() - DRIVE_MOVE_SIDE_DISTANCE);
-        driveDownMotor.setPower(-DRIVE_MOVE_POWER);
-
-        driveLeftMotor.setTargetPosition(driveLeftMotor.getCurrentPosition() - DRIVE_MOVE_SIDE_DISTANCE);
-        driveLeftMotor.setPower(-DRIVE_MOVE_POWER);
-
-        driveRightMotor.setTargetPosition(driveRightMotor.getCurrentPosition() + DRIVE_MOVE_SIDE_DISTANCE);
-        driveRightMotor.setPower(DRIVE_MOVE_POWER);
 
         while (driveUpMotor.isBusy()) {
             idle();

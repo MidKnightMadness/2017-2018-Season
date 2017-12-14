@@ -88,10 +88,11 @@ public class GlyphAssemblyController {
         }
 
         if (time.milliseconds() > timeToNext) {
-            if (futureTarget == -1 && futureServo != -1) {
+            if (futureServo != -1) {
                 grabPos = futureServo;
                 futureServo = -1;
-            } else if (futureTarget != -1 && futureServo == -1) {
+            }
+            if (futureTarget != -1) {
                 elevatorTarget = futureTarget;
                 futureTarget = -1;
             }
@@ -111,14 +112,12 @@ public class GlyphAssemblyController {
             }
         }
 
-        if (true) {
-            if (Math.abs(lastdiff - (grabPos * 800 - grab.getCurrentPosition())) < 10) {
-                isFullyClosed = true;
-            } else {
-                isFullyClosed = false;
-            }
-            lastdiff = Math.abs((int)(grabPos * 800 - grab.getCurrentPosition()));
+        if (Math.abs(lastdiff - (grabPos * 800 - grab.getCurrentPosition())) < 10) {
+            isFullyClosed = true;
+        } else {
+            isFullyClosed = false;
         }
+        lastdiff = Math.abs((int)(grabPos * 800 - grab.getCurrentPosition()));
 
         if (justChanged) {
             if (homeward) {
@@ -187,10 +186,10 @@ public class GlyphAssemblyController {
 
     public void release() {
         manual = false;
-        grabPos = 0;
+        grabPos = 0.4;
         timeToNext = (int)time.milliseconds() + 1500;
         futureTarget = 0;
-        futureServo = -1;
+        futureServo = 0;
     }
 
     public void stop() {

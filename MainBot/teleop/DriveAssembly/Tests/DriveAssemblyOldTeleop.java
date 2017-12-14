@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop.DriveAssembly.Tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+@Disabled
 @TeleOp(name = "Main Bot Old Drive", group = "Main Bot")
 public class DriveAssemblyOldTeleop extends OpMode {
 
