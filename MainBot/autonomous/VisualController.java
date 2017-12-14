@@ -83,16 +83,17 @@ public class VisualController {
 
         //Enable flash
         //CameraDevice.getInstance().setFlashTorchMode(true);
+        pictographTrackables.activate();
+
     }
 
     public void look() throws InterruptedException {
 
         /* ************BEGIN!************* */
         //Begin tracking pictographs
-        pictographTrackables.activate();
-        boolean pictographFound = false;
+        //boolean pictographFound = false;
         //While opMode is active, iterate through all trackables
-        while (!pictographFound) {
+        //while (!pictographFound) {
             for (VuforiaTrackable item : pictographTrackables) {
                 /* ************DECIDE WHICH JEWEL IS WHERE************* */
                 // calculate on first 5 runs through to have more resilience to shaking
@@ -102,7 +103,7 @@ public class VisualController {
                     Matrix34F rawPose = new Matrix34F();
                     float[] poseData = Arrays.copyOfRange(rawPoseV.transposed().getData(), 0, 12);
                     rawPose.setData(poseData);
-                    //Get points of corners of jewels based on pictograph in the 2d image Units: Inch
+                    //Get points of corners of jewels based on pictograph in the 2d image Units: Inch?
                     float[][] srcPoints = new float[4][2];
                     srcPoints[0] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(375f, -100f, 0f)).getData();
                     srcPoints[1] = Tool.projectPoint(vuforia.getCameraCalibration(), rawPose, new Vec3F(100f, -100f, 0f)).getData();
@@ -235,7 +236,7 @@ public class VisualController {
                                 continue;
                             }
                             pictograph = RelicRecoveryVuMark.from(pictographTrackables.get(0));
-                            pictographFound = true;
+                            //pictographFound = true;
 
                             telemetry.addLine("Pictograph: " + RelicRecoveryVuMark.from(pictographTrackables.get(0)));
                             telemetry.update();
@@ -244,8 +245,18 @@ public class VisualController {
                     }
                 }
             }
+        //}
+        //CameraDevice.getInstance().setFlashTorchMode(false);
+    }
+
+    public OpenGLMatrix pos() {
+        for (VuforiaTrackable item : pictographTrackables) {
+            OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) item.getListener()).getPose();
+            if (pose != null) {
+                return pose;
+            }
         }
-        CameraDevice.getInstance().setFlashTorchMode(false);
+        return null;
     }
 
     public void saveTeamColor(int team) {

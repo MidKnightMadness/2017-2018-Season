@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop.GlyphAssembly.Tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -8,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+@Disabled
 @TeleOp(name = "VEX Servo Test", group = "Tests")
 public class VEXServoTest extends OpMode {
 

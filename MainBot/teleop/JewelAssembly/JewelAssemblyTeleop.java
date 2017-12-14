@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop.JewelAssembly;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+@Disabled
 @TeleOp(name = "Main Bot Jewel", group = "Main Bot")
 public class JewelAssemblyTeleop extends OpMode {
 

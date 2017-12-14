@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
+@Disabled
 @Autonomous(name = "Encoder Testing", group = "Main Bot")
 public class EncoderTesting extends LinearOpMode {
 

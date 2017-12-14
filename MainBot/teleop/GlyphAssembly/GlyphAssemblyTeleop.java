@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop.GlyphAssembly;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
+@Disabled
 @TeleOp(name = "Main Bot Glyph", group = "Main Bot")
 public class GlyphAssemblyTeleop extends OpMode {
 

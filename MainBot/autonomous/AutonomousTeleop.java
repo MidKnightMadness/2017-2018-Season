@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.MainBot.autonomous;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.*;
 
+@Disabled
 @TeleOp(name = "Autonomous Teleop", group = "MainBot")
 public class AutonomousTeleop extends LinearOpMode {
 

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop.SimpleDriveAssembly;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -7,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * Created by nisha.prasad on 10/17/17.
  */
 
+@Disabled
 @TeleOp(name = "Simple Drive", group = "Main Bot")
 public class SimpleDriveAssemblyTeleop extends OpMode {
 
