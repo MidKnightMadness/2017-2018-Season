@@ -52,7 +52,7 @@ public class RedRecovery extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        a.init(telemetry, hardwareMap);
+        a.init(telemetry, hardwareMap, v);
         v.init(telemetry, hardwareMap);
 
         v.saveTeamColor(0);
@@ -68,7 +68,7 @@ public class RedRecovery extends LinearOpMode {
         a.lift();
         waitFor(ELEV);
 
-        v.look();
+        a.look();
 
         a.moveBot(targets[0][0]);
         waitFor(UP);

@@ -13,7 +13,6 @@ import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.St
 import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.justChanged;
 import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.time;
 
-
 public class GlyphAssemblyController {
 
     private static double GRAB_MAX = 1;

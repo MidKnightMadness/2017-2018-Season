@@ -54,7 +54,7 @@ public class BlueRecovery extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        a.init(telemetry, hardwareMap);
+        a.init(telemetry, hardwareMap, v);
         v.init(telemetry, hardwareMap);
 
         v.saveTeamColor(2);
@@ -70,7 +70,7 @@ public class BlueRecovery extends LinearOpMode {
         a.lift();
         waitFor(ELEV);
 
-        v.look();
+        a.look();
 
         a.moveBot(targets[0][0]);
         waitFor(UP);

@@ -1,8 +1,10 @@
-package org.firstinspires.ftc.teamcode.MainBot.autonomous;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous.Tests.OlderTests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController;
 
 import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.*;
 
@@ -22,7 +24,7 @@ public class AutonomousTeleop extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        a.init(telemetry, hardwareMap);
+        //a.init(telemetry, hardwareMap);
         waitForStart();
 
         a.close();

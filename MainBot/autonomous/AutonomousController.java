@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
 
@@ -17,6 +18,7 @@ public class AutonomousController {
     public static int RIGHT = 5;
     public static int GRAB = 6;
 
+    private VisualController v;
     private static double DRIVE_SPEED = 0.4;
     private static double ROTATE_SPEED = 0.3;
 
@@ -24,7 +26,8 @@ public class AutonomousController {
 
     public DcMotor[] motors = new DcMotor[7];
 
-    public void init(Telemetry telemetry, HardwareMap hardwareMap) {
+    public void init(Telemetry telemetry, HardwareMap hardwareMap, VisualController v) {
+        this.v = v;
         motors[ELEV] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.ELEV);
         motors[ELEV].resetDeviceConfigurationForOpMode();
         motors[ELEV].setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -137,5 +140,28 @@ public class AutonomousController {
         return motors[motor].getCurrentPosition();
     }
 
+    public void look() throws InterruptedException {
+        v.look();
+        int i;
+        if (v.pictograph == null) {
+            move(UP, 50, 0.1);
+            move(LEFT, -50, -0.1);
+            move(DOWN, 50, 0.1);
+            move(RIGHT, -50, -0.1);
+            for (i = 0; i < 50; i++) {
+                v.look();
+            }
+            move(UP, -50, -0.1);
+            move(LEFT, 50, 0.1);
+            move(DOWN, -50, -0.1);
+            move(RIGHT, 50, 0.1);
+            for (i = 0; i < 50; i++) {
+                v.look();
+            }
+        }
+        if (v.pictograph == null) {
+            v.pictograph = RelicRecoveryVuMark.CENTER;
+        }
+    }
     public void reset() {}
 }
