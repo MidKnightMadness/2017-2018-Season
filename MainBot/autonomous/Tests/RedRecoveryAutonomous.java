@@ -100,12 +100,14 @@ public class RedRecoveryAutonomous extends LinearOpMode {
         telemetry.update();
         glyphServo.setPosition(0);
 
+
         wait(0.6);
+
 
         // Raise Glyph
         telemetry.addLine("Raise Glyph...");
         telemetry.update();
-        glyphMotor.setTargetPosition(glyphStartPosition);
+        glyphMotor.setTargetPosition(glyphStartPosition + 1000);
         glyphMotor.setPower(-1);
     }
 
@@ -113,7 +115,7 @@ public class RedRecoveryAutonomous extends LinearOpMode {
         // lower glyph
         telemetry.addLine("Lower Glyph...");
         telemetry.update();
-        glyphMotor.setTargetPosition(glyphStartPosition + 1000);
+        glyphMotor.setTargetPosition(glyphStartPosition - 1000);
         glyphMotor.setPower(1);
 
         wait(1.0);
@@ -130,7 +132,7 @@ public class RedRecoveryAutonomous extends LinearOpMode {
         final double DRIVE_ROTATE_POWER = -0.3;
         final int DRIVE_ROTATE_DISTANCE = 250;
         final double JEWEL_ARM_POWER = 0.3;
-        final int JEWEL_ARM_DISTANCE = 625;
+        final int JEWEL_ARM_DISTANCE = 600;
 
         int neg = (senseLeftJewelColor() == TEAM_COLOR) ? 1 : -1;
 
@@ -207,7 +209,7 @@ public class RedRecoveryAutonomous extends LinearOpMode {
     private void placeGlyphInCenterColumnAndParkInSafeZone() {
         final double DRIVE_MOVE_POWER = 0.4;
         final int CryptoboxDistance = 1250;
-        final int horizontalDistance = 2000;
+        final int horizontalDistance = 900;
         final int rotate = DRIVE_ROTATE90_DISTANCE * 3 / 2;
         final int direction = 1;
 
@@ -218,7 +220,7 @@ public class RedRecoveryAutonomous extends LinearOpMode {
         placeGlyph();
 
         // position bot for teleop
-        final int safeZoneDistance = -700;
+        final int safeZoneDistance = -1600;
         moveBotDiag(DRIVE_MOVE_POWER, safeZoneDistance, direction);
     }
 
@@ -268,10 +270,10 @@ public class RedRecoveryAutonomous extends LinearOpMode {
         telemetry.addLine("Move Bot Diagonal " + power + distance);
         telemetry.update();
 
-        driveLeftMotor.setTargetPosition(driveLeftMotor.getCurrentPosition() + direction * distance);
+        driveLeftMotor.setTargetPosition(driveLeftMotor.getCurrentPosition() - direction * distance);
         driveLeftMotor.setPower(power);
 
-        driveRightMotor.setTargetPosition(driveRightMotor.getCurrentPosition() - direction * distance);
+        driveRightMotor.setTargetPosition(driveRightMotor.getCurrentPosition() + direction * distance);
         driveRightMotor.setPower(-power);
     }
 
