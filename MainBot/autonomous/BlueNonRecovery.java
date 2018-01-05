@@ -70,7 +70,7 @@ public class BlueNonRecovery extends LinearOpMode {
         waitForStart();
 
         a.close();
-        wait(0.6);
+        wait(1d);
 
         a.lift();
         waitFor(ELEV);
@@ -80,19 +80,21 @@ public class BlueNonRecovery extends LinearOpMode {
         a.moveBot(targets[0][0]);
         waitFor(UP);
 
-        state = (v.leftJewel == TEAM_COLOR ? 0 : 2);
+        if (v.leftJewel != null) {
+            state = (v.leftJewel == TEAM_COLOR ? 0 : 2);
 
-        a.lowerJArm();
-        wait(1d);
+            a.lowerJArm();
+            wait(1d);
 
-        a.rotateBot(targets[1][state], 0.7);
-        waitFor(UP);
+            a.rotateBot(targets[1][state], 0.7);
+            waitFor(UP);
 
-        a.raiseJArm();
-        wait(1d);
+            a.raiseJArm();
+            wait(1d);
 
-        a.rotateBot(-targets[1][state], 0.7);
-        waitFor(UP);
+            a.rotateBot(-targets[1][state], 0.7);
+            waitFor(UP);
+        }
 
         state = (v.pictograph == RelicRecoveryVuMark.LEFT ? 0 : (v.pictograph == RelicRecoveryVuMark.CENTER ? 1 : 2));
 

@@ -37,12 +37,12 @@ public class DriveAssemblyController {
     private final static int BASE_ROTATION_ANGLE = -135;
     private int corner = 0;
     private int target = 0;
-    private double timeToHomeward = 0;
+    private double timeToHomeward = 10000;
     private boolean timeForHomeward = false;
     private final static int[][] targets = new int[][]{
             //When Left (0) or When Right (1)?
             //RedRecovery
-            {180 - 60, 180 + 60},
+            {180 - 30, 180 + 30},
             //RedNonRecovery
             {125, 125},
             //BlueRecovery
@@ -127,7 +127,7 @@ public class DriveAssemblyController {
         resetHeading();
 
         vsd = hardwareMap.servo.get("vsd");
-        readTeamColor();
+        //readTeamColor();
     }
 
     public void start() {vsd.setPosition(1);}
@@ -199,8 +199,8 @@ public class DriveAssemblyController {
             }
 
             //Subtracting base rotation angle so the numbers are the rotation of the glyph arm instead of the IMU.
-            if (homeward && timeForHomeward && Math.abs((theta - (target - BASE_ROTATION_ANGLE) + 3780)%360 - 180) > 3) {
-                adjustedR = Math.min(Math.max((theta - (target - BASE_ROTATION_ANGLE) + 3780)%360 - 180, -1), 1);
+            if (homeward && timeForHomeward && Math.abs((theta - (target + BASE_ROTATION_ANGLE) + 3780)%360 - 180) > 3) {
+                adjustedR = Math.min(Math.max(((theta - (target + BASE_ROTATION_ANGLE) + 3780)%360 - 180)/10.0d, -1), 1);
             } else if (homeward && timeForHomeward) {
                 adjustedR = 0;
             }
