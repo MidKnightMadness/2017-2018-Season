@@ -32,15 +32,17 @@ public class DriveAssemblyController {
     private DcMotor motorRight;
     private Servo vsd;
 
-    private static int BASE_ROTATION_ANGLE = -135;
-    private int corner = 3;
+
+    //When initialized, the rotation of the IMU from "north"
+    private final static int BASE_ROTATION_ANGLE = -135;
+    private int corner = 0;
     private int target = 0;
-    private double timeToHomeward = 0;
+    private double timeToHomeward = 10000;
     private boolean timeForHomeward = false;
-    private static int[][] targets = new int[][]{
+    private final static int[][] targets = new int[][]{
             //When Left (0) or When Right (1)?
             //RedRecovery
-            {20, 70},
+            {180 - 30, 180 + 30},
             //RedNonRecovery
             {125, 125},
             //BlueRecovery
@@ -49,7 +51,9 @@ public class DriveAssemblyController {
             {-20, -70}
     };
 
+    //The last initialized position of the IMU
     private double startPos = 0;
+    //The rotation of the IMU from the field north
     private double theta = 0;
     private boolean bPressed = false;
     private boolean backPressed = false;
@@ -194,8 +198,9 @@ public class DriveAssemblyController {
                 timeForHomeward = false;
             }
 
-            if (homeward && timeForHomeward && Math.abs((theta + 3780)%360 - (target + 3780)%360) > 3) {
-                adjustedR = Math.min(Math.max(((theta + 3780)%360 - (target + 3780)%360)/10, -1), 1);
+            //Subtracting base rotation angle so the numbers are the rotation of the glyph arm instead of the IMU.
+            if (homeward && timeForHomeward && Math.abs((theta - (target + BASE_ROTATION_ANGLE) + 3780)%360 - 180) > 3) {
+                adjustedR = Math.min(Math.max(((theta - (target + BASE_ROTATION_ANGLE) + 3780)%360 - 180)/10.0d, -1), 1);
             } else if (homeward && timeForHomeward) {
                 adjustedR = 0;
             }
@@ -205,7 +210,7 @@ public class DriveAssemblyController {
             double rotateScale = Math.pow(Math.abs(adjustedR), 5) * Math.signum(-adjustedR) * (1 - Math.abs(translateScale)) * (slow ? 0.5 : 1);
 
             telemetry.addData("AdjustedR", adjustedR);
-            telemetry.addData("Offset", (theta - target + 3780)%360 - 180);
+            telemetry.addData("Offset", (theta - (target - BASE_ROTATION_ANGLE) + 3780)%360 - 180);
             telemetry.addData("Needs To Move", Math.abs((theta - target + 3780)%360 - 180) > 1);
             telemetry.addData("Theta", theta);
             telemetry.addData("Target", target);

@@ -148,19 +148,36 @@ public class AutonomousController {
             move(LEFT, -50, -0.1);
             move(DOWN, 50, 0.1);
             move(RIGHT, -50, -0.1);
-            for (i = 0; i < 50; i++) {
+            while(motors[UP].isBusy()) {
                 v.look();
+                if (v.pictograph != null) {
+                    break;
+                }
             }
-            move(UP, -50, -0.1);
-            move(LEFT, 50, 0.1);
-            move(DOWN, -50, -0.1);
-            move(RIGHT, 50, 0.1);
-            for (i = 0; i < 50; i++) {
-                v.look();
+            move(UP, 0, 0);
+            move(LEFT, 0, 0);
+            move(DOWN, 0, 0);
+            move(RIGHT, 0, 0);
+            if (v.pictograph == null) {
+                move(UP, -50, -0.1);
+                move(LEFT, 50, 0.1);
+                move(DOWN, -50, -0.1);
+                move(RIGHT, 50, 0.1);
+                while(motors[UP].isBusy()) {
+                    v.look();
+                    if (v.pictograph != null) {
+                        break;
+                    }
+                }
             }
+            move(UP, 0, 0);
+            move(LEFT, 0, 0);
+            move(DOWN, 0, 0);
+            move(RIGHT, 0, 0);
         }
         if (v.pictograph == null) {
             v.pictograph = RelicRecoveryVuMark.CENTER;
+            v.leftJewel = null;
         }
     }
     public void reset() {}
