@@ -25,6 +25,7 @@ public class MainBotController {
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         glyphAssemblyController.init(telemetry, hardwareMap);
         driveAssemblyController.init(telemetry, hardwareMap);
+        telemetry.addLine("Ready");
     }
 
     public void start() {
