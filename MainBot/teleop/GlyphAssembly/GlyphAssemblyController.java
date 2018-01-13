@@ -89,8 +89,9 @@ public class GlyphAssemblyController {
     }
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
-        boolean up = gamepad1.right_bumper || gamepad2.right_bumper;
-        boolean down = gamepad1.left_bumper || gamepad2.left_bumper;
+        boolean up = gamepad1.right_bumper || gamepad2.right_trigger > 0 || gamepad2.left_stick_y < -0.1;
+        boolean down = gamepad1.left_bumper || gamepad2.left_trigger > 0 || gamepad2.left_stick_y > 0.1;
+
         boolean override = gamepad1.x || gamepad2.x;
         boolean close = gamepad1.right_trigger > 0 || gamepad2.right_trigger > 0;
         boolean open = gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0;
