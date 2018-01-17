@@ -80,7 +80,7 @@ public class GlyphAssemblyController {
         grabber.setPower(0.2);
         while (grabber.isBusy()) {}
         grabber.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        grabber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        grabber.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
     }
 
@@ -109,7 +109,7 @@ public class GlyphAssemblyController {
 
         if (override) {
             elev.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            elev.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            elev.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
 
         if (time.milliseconds() > timeToUpdate) {
@@ -137,7 +137,7 @@ public class GlyphAssemblyController {
             }
         }
 
-        if (Math.abs(lastdiff - (percentageClosed * 800 - grabber.getCurrentPosition())) < 10) {
+        if (Math.abs(lastdiff - Math.abs((percentageClosed * 800 - grabber.getCurrentPosition()))) < 10) {
             isFullyClosed = true;
         } else {
             isFullyClosed = false;
@@ -181,9 +181,9 @@ public class GlyphAssemblyController {
         telemetry.addData("Time Remaining", time.milliseconds() - timeToUpdate);
 
         elev.setPower(Math.min(Math.max(((elevatorTargetPos)- elev.getCurrentPosition())/300d, -1), 1));
-        grabber.setPower(Math.min(Math.max(((percentageClosed *800)- grabber.getCurrentPosition())/300d,
-                isFullyClosed ? -0.03 : -0.5),
-                isFullyClosed ? 0.03 : 0.5));
+        grabber.setPower(Math.min(Math.max(((percentageClosed * 800) - grabber.getCurrentPosition())/300d,
+                isFullyClosed ? -0.15 : -0.5),
+                isFullyClosed ? 0.15 : 0.5));
         upperServo.setPosition(percentageClosed);
 
         telemetry.addData("Speed Grabber: ", grabber.getPower());
@@ -212,7 +212,7 @@ public class GlyphAssemblyController {
 
     public void release() {
         manual = false;
-        percentageClosed = 0.4;
+        percentageClosed = 0.6;
         timeToUpdate = (int)time.milliseconds() + 1500;
         futureElevTargetPos = 0;
         futurePercentageClosed = 0;
