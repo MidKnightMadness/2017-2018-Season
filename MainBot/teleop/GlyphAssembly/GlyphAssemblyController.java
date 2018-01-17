@@ -212,8 +212,8 @@ public class GlyphAssemblyController {
 
     public void release() {
         manual = false;
-        percentageClosed = 0.6;
-        timeToUpdate = (int)time.milliseconds() + 1500;
+        percentageClosed = 0.7;
+        timeToUpdate = (int)time.milliseconds() + 1000;
         futureElevTargetPos = 0;
         futurePercentageClosed = 0;
     }
