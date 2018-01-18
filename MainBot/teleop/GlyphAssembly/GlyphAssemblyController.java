@@ -118,7 +118,7 @@ public class GlyphAssemblyController {
 
         /*if (override) {
             elev.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            elev.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            elev.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }*/
 
         if (time.milliseconds() > timeToUpdate) {
@@ -213,7 +213,7 @@ public class GlyphAssemblyController {
 
     public void release(int arm) {
         manual = false;
-        percentageClosed[arm] = 0.4;
+        percentageClosed[arm] = 0.3;
         timeToUpdate = (int) time.milliseconds() + 1500;
         futureElevTargetPos = arm == LOWER ? HEIGHT_TO_GRAB_SECOND_GLYPH : 0;
         futurePercentageClosed[arm] = 0;
