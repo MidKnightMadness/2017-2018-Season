@@ -20,15 +20,18 @@ public class CrossCommunicator {
 
     public static class Glyph {
         public static final String ELEV = "glyph elevator";
-        public static final String GRAB = "grabber";
-        public static final String UPPER_SERVO = "finger";
+        public static final String GRAB_UPPER = "grab_upper";
+        public static final String GRAB_LOWER = "grab_lower";
     }
 
     public static class State {
-        public static boolean homeward = false;
         public static boolean justChanged = false;
-        public static int curCol = 0;
         public static ElapsedTime time = new ElapsedTime();
+        public static int yState = 0;
+        public static void yIncrease() {yState = yState + 1 > 2? 0 : yState + 1;}
+        public static void yDecrease() {yState = yState - 1 < 0? 2 : yState - 1;}
+        public static boolean yIncreased = false;
+        public static boolean yDecreased = false;
     }
 
 }

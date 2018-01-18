@@ -37,8 +37,6 @@ public class DriveAssemblyController {
     private final static int BASE_ROTATION_ANGLE = -135;
     private int corner = 0;
     private int target = 0;
-    private double timeToHomeward = 10000;
-    private boolean timeForHomeward = false;
     private final static int[][] targets = new int[][]{
             //When Left (0) or When Right (1)?
             //RedRecovery
@@ -65,6 +63,10 @@ public class DriveAssemblyController {
     private double adjustedX = 0;
     private double adjustedY = 0;
     private double adjustedR = 0;
+    private double lastKnownRotation = 0;
+    private boolean resettingRotation = false;
+    private boolean isTimeToRotate = false;
+    private double timeToRotate = -1;
 
     //Gets angle of vector <x,y>
     private double aTan(double x, double y) {
@@ -127,7 +129,6 @@ public class DriveAssemblyController {
         resetHeading();
 
         vsd = hardwareMap.servo.get("vsd");
-        //readTeamColor();
     }
 
     public void start() {vsd.setPosition(1);}
@@ -159,17 +160,26 @@ public class DriveAssemblyController {
         }
 
         if ((gamepad1.back || gamepad2.back )&& !backPressed) {
-            slow = !slow;
+            yDecreased = true;
+            yIncreased = false;
+            yDecrease();
+            if (yState == 0) {
+                resettingRotation = true;
+                timeToRotate = time.seconds() + 1d;
+            }
             backPressed = true;
         } else if (!(gamepad1.back|| gamepad2.back)){
             backPressed = false;
         }
 
         if ((gamepad1.y || gamepad2.y )&& !yPressed) {
-            homeward = !homeward;
-            if (homeward) {
-                timeForHomeward = false;
-                timeToHomeward = time.seconds() + 1d;
+            yIncreased = true;
+            yDecreased = false;
+            yIncrease();
+            isTimeToRotate = false;
+            if (yState == 1) {
+                timeToRotate = time.seconds() + 1d;
+                lastKnownRotation = theta;
             }
             justChanged = true;
             yPressed = true;
@@ -183,26 +193,39 @@ public class DriveAssemblyController {
             turnDir = 1;
         }
 
-        if (time.seconds() > timeToHomeward) {
-            timeForHomeward = true;
+        if (time.seconds() > timeToRotate && timeToRotate != -1) {
+            timeToRotate = -1;
+            isTimeToRotate = true;
         }
 
-        if (!tankMode) {
+        {
             theta = getIMURotation() - startPos;
             adjustedX = gamepad1.left_stick_x;
             adjustedY = gamepad1.left_stick_y;
             adjustedR = gamepad1.right_stick_x;
 
-            if (Math.abs(adjustedR) > 0.1 && homeward && timeForHomeward) {
-                timeToHomeward = Integer.MAX_VALUE;
-                timeForHomeward = false;
+            if (Math.abs(adjustedR) > 0.1 && isTimeToRotate) {
+                timeToRotate = -1;
+                isTimeToRotate = false;
+                resettingRotation = false;
             }
 
-            //Subtracting base rotation angle so the numbers are the rotation of the glyph arm instead of the IMU.
-            if (homeward && timeForHomeward && Math.abs((theta - (target + BASE_ROTATION_ANGLE) + 3780)%360 - 180) > 3) {
-                adjustedR = Math.min(Math.max(((theta - (target + BASE_ROTATION_ANGLE) + 3780)%360 - 180)/10.0d, -1), 1);
-            } else if (homeward && timeForHomeward) {
-                adjustedR = 0;
+            //Adding base rotation angle so the numbers are the rotation of the glyph arm instead of the IMU.
+            if (isTimeToRotate) {
+                double tempTarget;
+                if (resettingRotation) {
+                    tempTarget = lastKnownRotation;
+                } else {
+                    tempTarget = (target + BASE_ROTATION_ANGLE);
+                }
+                telemetry.addData("Offset", (theta - tempTarget + 3780) % 360 - 180);
+
+
+                if (Math.abs((theta - tempTarget + 3780) % 360 - 180) > 3) {
+                    adjustedR = Math.min(Math.max(((theta - tempTarget + 3780) % 360 - 180) / 10.0d, -1), 1);
+                } else {
+                    adjustedR = 0;
+                }
             }
 
             double translateScale = Math.pow(Math.hypot(adjustedX, adjustedY), 5) * (1 - Math.min(Math.pow(Math.abs(adjustedR), 2), 0.6)) * (slow ? 0.5 : 1);
@@ -210,11 +233,10 @@ public class DriveAssemblyController {
             double rotateScale = Math.pow(Math.abs(adjustedR), 5) * Math.signum(-adjustedR) * (1 - Math.abs(translateScale)) * (slow ? 0.5 : 1);
 
             telemetry.addData("AdjustedR", adjustedR);
-            telemetry.addData("Offset", (theta - (target - BASE_ROTATION_ANGLE) + 3780)%360 - 180);
-            telemetry.addData("Needs To Move", Math.abs((theta - target + 3780)%360 - 180) > 1);
+            telemetry.addData("Needs To Move", Math.abs((theta - target + 3780) % 360 - 180) > 1);
             telemetry.addData("Theta", theta);
             telemetry.addData("Target", target);
-            telemetry.addData("Homeward", homeward);
+            telemetry.addData("Homeward", isTimeToRotate);
             telemetry.addData("Corner", corner);
 
             telemetry.addData("Rotate Scale", rotateScale);
@@ -228,7 +250,7 @@ public class DriveAssemblyController {
             if (scale == 0) {
                 scale = 0;
             } else {
-                scale = translateScale/(scale);
+                scale = translateScale / (scale);
             }
 
             tempMotors[0] *= scale;
@@ -247,20 +269,6 @@ public class DriveAssemblyController {
             targPow(motorRight, 3, tempMotors[3]);
 
             telemetry.update();
-            vsd.setPosition(1);
-        } else {
-            if (Math.abs(gamepad1.left_stick_x + gamepad1.right_stick_x) > 1.5) {
-                targPow(motorUp, 0, -gamepad1.left_stick_x);
-                targPow(motorDown, 1, gamepad1.left_stick_x);
-                targPow(motorLeft, 2, gamepad1.left_stick_x);
-                targPow(motorRight, 3, -gamepad1.left_stick_x);
-            } else {
-                targPow(motorUp, 0, Math.pow(gamepad1.left_stick_y, 3));
-                targPow(motorDown, 1, -Math.pow(gamepad1.right_stick_y, 3));
-                targPow(motorLeft, 2, Math.pow(gamepad1.left_stick_y, 3));
-                targPow(motorRight, 3, -Math.pow(gamepad1.right_stick_y, 3));
-            }
-            vsd.setPosition(0.5);
         }
     }
 
