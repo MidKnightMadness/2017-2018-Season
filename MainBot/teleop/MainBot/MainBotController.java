@@ -25,6 +25,7 @@ public class MainBotController {
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         glyphAssemblyController.init(telemetry, hardwareMap);
         driveAssemblyController.init(telemetry, hardwareMap);
+        telemetry.addLine("Ready");
     }
 
     public void start() {
@@ -36,16 +37,7 @@ public class MainBotController {
         gamepad1.setJoystickDeadzone(0f);
         gamepad2.setJoystickDeadzone(0f);
         glyphAssemblyController.loop(gamepad1, gamepad2);
-
-
-
-        if (gamepad1.atRest() && !gamepad2.atRest()) {
-            glyphAssemblyController.loop(gamepad2, gamepad1);
-            driveAssemblyController.loop(gamepad2, gamepad1);
-        } else {
-            driveAssemblyController.loop(gamepad1, gamepad2);
-        }
-
+        driveAssemblyController.loop(gamepad1, gamepad2);
     }
 
     public void stop() {

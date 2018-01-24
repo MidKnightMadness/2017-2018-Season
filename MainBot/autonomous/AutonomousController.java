@@ -176,8 +176,8 @@ public class AutonomousController {
             move(RIGHT, 0, 0);
         }
         if (v.pictograph == null) {
+            v.blindLook();
             v.pictograph = RelicRecoveryVuMark.CENTER;
-            v.leftJewel = null;
         }
     }
     public void reset() {}

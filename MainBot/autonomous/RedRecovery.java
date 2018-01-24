@@ -34,7 +34,7 @@ public class RedRecovery extends LinearOpMode {
             {1, 1, 0},
             {-500, -500, -500},
             {-1100, -1100, -1100},
-            {1200, 1200, 1200},
+            {1000, 1000, 1000},
             //rotate
             {ENC_90*3/2, ENC_90*3/2, ENC_90*5/2}
     };

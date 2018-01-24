@@ -142,11 +142,11 @@ public class VisualController {
                                     medBmp.compress(Bitmap.CompressFormat.PNG, 100, outStream);
                                     outStream.close();
                                 } catch (Exception e) {
-                                    telemetry.addLine(e.toString());
-                                    telemetry.update();
+                                    //telemetry.addLine(e.toString());
+                                    //telemetry.update();
                                 }
-                                telemetry.addLine("MedBMP!");
-                                telemetry.update();
+                                //telemetry.addLine("MedBMP!");
+                                //telemetry.update();
                                 outBmp = Bitmap.createScaledBitmap(medBmp, 2, 4, false);
                                 try {
                                     File file = new File("/storage/self/primary/Pictures/images/", "Output_O" + Math.random() + ".png");
@@ -154,8 +154,8 @@ public class VisualController {
                                     outBmp.compress(Bitmap.CompressFormat.PNG, 100, outStream);
                                     outStream.close();
                                 } catch (Exception e) {
-                                    telemetry.addLine(e.toString());
-                                    telemetry.update();
+                                    //telemetry.addLine(e.toString());
+                                    //telemetry.update();
                                 }
                             } else {
                                 outBmp = Bitmap.createScaledBitmap(Bitmap.createBitmap(srcBmp, (int) x, (int) y, (int) width, (int) height), 2, 4, false);
@@ -186,12 +186,12 @@ public class VisualController {
 
                             //END EDIT:
                             JewelColor left, right;
-                            telemetry.addLine("Column 0: " + redCount + " " + blueCount);
+                            //telemetry.addLine("Column 0: " + redCount + " " + blueCount);
                             if (redCount > blueCount) {
-                                telemetry.addLine("Red left");
+                                //telemetry.addLine("Red left");
                                 left = JewelColor.RED;
                             } else {
-                                telemetry.addLine("Blue left");
+                                //telemetry.addLine("Blue left");
                                 left = JewelColor.BLUE;
                             }
                             /*
@@ -220,17 +220,17 @@ public class VisualController {
 
                             //END EDIT:
 
-                            telemetry.addLine("Column 1: " + redCount + " " + blueCount);
+                            //telemetry.addLine("Column 1: " + redCount + " " + blueCount);
                             if (redCount > blueCount) {
-                                telemetry.addLine("Red right");
+                                //telemetry.addLine("Red right");
                                 right = JewelColor.RED;
                             } else {
-                                telemetry.addLine("Blue right");
+                                //telemetry.addLine("Blue right");
                                 right = JewelColor.BLUE;
                             }
 
                             if (left != right) {
-                                telemetry.addLine("Yay");
+                                //telemetry.addLine("Yay");
                                 leftJewel = left;
                             } else {
                                 continue;
@@ -238,13 +238,132 @@ public class VisualController {
                             pictograph = RelicRecoveryVuMark.from(pictographTrackables.get(0));
                             //pictographFound = true;
 
-                            telemetry.addLine("Pictograph: " + RelicRecoveryVuMark.from(pictographTrackables.get(0)));
-                            telemetry.update();
+                            //telemetry.addLine("Pictograph: " + RelicRecoveryVuMark.from(pictographTrackables.get(0)));
+                            //telemetry.update();
                             break;
                         }
                     }
                 }
             }
+        //}
+        //CameraDevice.getInstance().setFlashTorchMode(false);
+    }
+
+
+
+
+
+
+
+
+    public void blindLook() throws InterruptedException {
+
+        /* ************BEGIN!************* */
+        //Begin tracking pictographs
+        //boolean pictographFound = false;
+        //While opMode is active, iterate through all trackables
+        //while (!pictographFound) {
+        telemetry.addLine("a");
+        telemetry.update();
+                /* ************DECIDE WHICH JEWEL IS WHERE************* */
+            // calculate on first 5 runs through to have more resilience to shaking
+                //Get position data in matrix form for Tool.projectPoint
+                //Get points of corners of jewels based on pictograph in the 2d image Units: Inch?
+                    /* ************Get Image From Camera************* */
+                //get frame: 5 types: 1 rgb and 4 grayscale --> We want rgb
+                VuforiaLocalizer.CloseableFrame frame = vuforia.getFrameQueue().take();
+                telemetry.addLine("pic taken");
+                telemetry.update();
+                //iterate to find rgb565
+                for (int i = 0; i < frame.getNumImages(); i++) {
+                    if (frame.getImage(i).getFormat() == PIXEL_FORMAT.RGB565) {
+                        Image vuforiaImage = frame.getImage(i);
+                        // make bitmap (Android default image format) from Vuforia Image
+                        Bitmap srcBmp = Bitmap.createBitmap(vuforiaImage.getWidth(), vuforiaImage.getHeight(), Bitmap.Config.RGB_565);
+                        srcBmp.copyPixelsFromBuffer(vuforiaImage.getPixels());
+                        telemetry.update();
+                        Bitmap outBmp;
+                        if (SAVE_CROPPED) {
+                            Bitmap medBmp = Bitmap.createBitmap(srcBmp, 50, 0, 650, 190);
+                            try {
+                                File file = new File("/storage/self/primary/Pictures/images/", "Output_M" + Math.random() + ".png");
+                                FileOutputStream outStream = new FileOutputStream(file);
+                                medBmp.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+                                outStream.close();
+                                telemetry.addLine("we tried");
+                                telemetry.update();
+                            } catch (Exception e) {
+                                telemetry.addLine(e.toString());
+                                telemetry.update();
+                            }
+                            telemetry.addLine("MedBMP!");
+                            telemetry.update();
+                            outBmp = Bitmap.createScaledBitmap(medBmp, 4, 4, false);
+                            try {
+                                File file = new File("/storage/self/primary/Pictures/images/", "Output_O" + Math.random() + ".png");
+                                FileOutputStream outStream = new FileOutputStream(file);
+                                outBmp.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+                                outStream.close();
+                            } catch (Exception e) {
+                                telemetry.addLine(e.toString());
+                                telemetry.update();
+                            }
+                        } else {
+                            outBmp = Bitmap.createScaledBitmap(Bitmap.createBitmap(srcBmp, 50, 0, 580, 190), 2, 4, false);
+                        }
+
+
+                            /*//Check color
+                            int blueCount = 0, redCount = 0, difference;
+                            for (i = 0; i < 4; i++) {
+                                for (int j = 0; j < 1; j++) {
+                                    difference = Color.red(outBmp.getPixel(j, i)) - Color.blue(outBmp.getPixel(j, i));
+                                    if (Math.abs(difference) < 40) {
+                                        break;
+                                    } else if (difference < 0) {
+                                        blueCount++;
+                                    } else {
+                                        redCount++;
+                                    }
+                                }
+                            }*/
+                        // BEGIN EDIT:
+
+                        int maxRed = 0;
+                        int maxRedColumn = 0;
+                        int maxBlue = 0;
+                        int maxBlueColumn = 0;
+                        int columns[][] = new int[4][2];
+                        for (int k = 0; k < 4; k++) {
+                            for (int j = 0; j < 4; j++) {
+                                columns[k][0] += Color.red(outBmp.getPixel(k, j));
+                                columns[k][1] += Color.blue(outBmp.getPixel(k, j));
+                                if (columns[k][0] > maxRed) {
+                                    maxRed = columns[k][0];
+                                    maxRedColumn = k;
+                                }
+                                if (columns[k][1] > maxBlue) {
+                                    maxBlue = columns[k][1];
+                                    maxBlueColumn = k;
+                                }
+                            }
+                            telemetry.addLine(columns[k][0] + ", " + columns[k][1]);
+                        }
+                        telemetry.update();
+                        if (maxRed > 50 && maxBlue > 50 && Math.abs(maxRed - maxBlue) > 50) {
+                            if (maxRedColumn > maxBlueColumn) {
+                                leftJewel = JewelColor.BLUE;
+                            } else {
+                                leftJewel = JewelColor.RED;
+                            }
+                        } else {
+                            leftJewel = null;
+                        }
+                        break;
+                    }
+
+
+        }
         //}
         //CameraDevice.getInstance().setFlashTorchMode(false);
     }
