@@ -65,7 +65,7 @@ public class GlyphAssemblyController {
         grabber.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         grabber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         upperServo = hardwareMap.servo.get(CrossCommunicator.Glyph.UPPER_SERVO);
-        upperServo.scaleRange(0, 1);
+        upperServo.scaleRange(0, 0.9);
         percentageClosed = 0;
         futurePercentageClosed = -1;
         elevatorTargetPos = -1;
@@ -89,11 +89,11 @@ public class GlyphAssemblyController {
     }
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
-        boolean up = gamepad1.right_bumper || gamepad2.right_trigger > 0 || gamepad2.left_stick_y > 0.1;
-        boolean down = gamepad1.left_bumper || gamepad2.left_trigger > 0 || gamepad2.left_stick_y < -0.1;
+        boolean up = gamepad1.right_bumper || gamepad2.right_trigger > 0 || gamepad2.left_stick_y < -0.1 || gamepad2.right_stick_y < -0.1;
+        boolean down = gamepad1.left_bumper || gamepad2.left_trigger > 0 || gamepad2.left_stick_y > 0.1 || gamepad2.right_stick_y > 0.1;
         boolean override = gamepad1.x || gamepad2.x;
-        boolean open = gamepad1.right_trigger > 0 || gamepad2.right_bumper;
-        boolean close = gamepad1.left_trigger > 0 || gamepad2.left_bumper;
+        boolean open = gamepad1.left_trigger > 0  || gamepad2.right_bumper;
+        boolean close = gamepad1.right_trigger > 0 || gamepad2.left_bumper;
 
         telemetry.addData("Elevator", elevPos());
         if (up) {
@@ -206,13 +206,13 @@ public class GlyphAssemblyController {
         manual = false;
         percentageClosed = 1;
         timeToUpdate = (int)time.milliseconds() + 1000;
-        futureElevTargetPos = (level * 1000) + 500;
+        futureElevTargetPos = (1 * 1000) + 500;
         futurePercentageClosed = -1;
     }
 
     public void release() {
         manual = false;
-        percentageClosed = 0.7;
+        percentageClosed = 0.35;
         timeToUpdate = (int)time.milliseconds() + 1000;
         futureElevTargetPos = 0;
         futurePercentageClosed = 0;
