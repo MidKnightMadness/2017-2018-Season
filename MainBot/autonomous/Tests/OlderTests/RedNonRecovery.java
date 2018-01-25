@@ -132,7 +132,7 @@ public class RedNonRecovery extends LinearOpMode {
         telemetry.addLine("Rotate Bot " + (reset ? "First..." : "Second..."));
         telemetry.update();
 
-        int neg = (visualC.leftJewel == TEAM_COLOR) ? 1 : -1;
+        int neg = (visualC.rightJewel == TEAM_COLOR) ? 1 : -1;
         neg = (reset) ? neg : -neg;
 
         driveUpMotor.setTargetPosition(driveUpMotor.getCurrentPosition() + (neg * DRIVE_ROTATE_DISTANCE));

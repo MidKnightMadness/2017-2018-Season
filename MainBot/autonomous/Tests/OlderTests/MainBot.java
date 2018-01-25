@@ -35,7 +35,7 @@ public class MainBot extends LinearOpMode {
             idle();
         }
 
-        driveC.setTarget(0.1, 0, 0, (visualC.leftJewel == TEAM_COLOR ? 100 : 80), 1, false);
+        driveC.setTarget(0.1, 0, 0, (visualC.rightJewel == TEAM_COLOR ? 100 : 80), 1, false);
         while (!driveC.reachedTargetRotation) {
             driveC.update();
             telemetry.update();
@@ -54,7 +54,7 @@ public class MainBot extends LinearOpMode {
             idle();
         }
 
-        driveC.setTarget(0.5, 0, 0, (visualC.leftJewel == TEAM_COLOR ? 100 : 80), 1, false);
+        driveC.setTarget(0.5, 0, 0, (visualC.rightJewel == TEAM_COLOR ? 100 : 80), 1, false);
         while (!driveC.reachedTargetRotation) {
             driveC.update();
             telemetry.update();

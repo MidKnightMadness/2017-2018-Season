@@ -302,7 +302,7 @@ public class RedRecoveryAutonomous extends LinearOpMode {
             visualC.look();
             pictographIsUknown = false;
         }
-        return visualC.leftJewel;
+        return visualC.rightJewel;
     }
 
 }
