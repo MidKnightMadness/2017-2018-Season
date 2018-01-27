@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.MainBot.autonomous;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
@@ -19,14 +20,17 @@ public class AutonomousController {
     public static int GRAB = 6;
 
     private VisualController v;
-    private static double DRIVE_SPEED = 0.4;
-    private static double ROTATE_SPEED = 0.3;
+    private static double DRIVE_SPEED = 0.85;
+    private static double ROTATE_SPEED = 0.6;
+    private Telemetry telemetry;
 
 
 
     public DcMotor[] motors = new DcMotor[7];
+    public Servo servo;
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap, VisualController v) {
+        this.telemetry = telemetry;
         this.v = v;
         motors[ELEV] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.ELEV);
         motors[ELEV].resetDeviceConfigurationForOpMode();
@@ -63,6 +67,7 @@ public class AutonomousController {
         motors[GRAB].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motors[GRAB].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        servo = hardwareMap.servo.get(CrossCommunicator.Glyph.UPPER_SERVO);
         reset();
     }
 
@@ -71,8 +76,19 @@ public class AutonomousController {
         motors[motor].setPower(-speed);
     }
 
+    public void updateMotors() {
+        for (int i = 2; i < 6; i++) {
+            if (motors[i].getPower() != 0) {
+                motors[i].setPower(Math.min(Math.max(Math.abs(motors[i].getTargetPosition() - motors[i].getCurrentPosition())/100d - 0.01, 0), 0.9) * (10d/90d));
+                telemetry.addData("" + i, Math.min(Math.max(Math.abs(motors[i].getTargetPosition() - motors[i].getCurrentPosition())/100d - 0.1, 0), 0.9) * (10d/9d));
+            }
+        }
+        telemetry.update();
+    }
+
     public void close() {
         motors[GRAB].setPower(0.3);
+        servo.setPosition(0.9);
     }
 
     public void grabStop() {
@@ -80,10 +96,11 @@ public class AutonomousController {
     }
     public void open() {
         motors[GRAB].setPower(-0.8);
+        servo.setPosition(0);
     }
-    public void lift() {
-        move(ELEV, 1000, 1);
-    }
+    public void lift(int dist) {move(ELEV, dist, 1);}
+    public void lift() {move(ELEV, 1000, 1);}
+    public void lower(int dist) {move(ELEV, -dist, -1);}
     public void lower() {
         move(ELEV, -1000, -1);
     }
