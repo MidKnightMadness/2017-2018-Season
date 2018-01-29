@@ -21,8 +21,8 @@ public class GlyphAssemblyController {
     private static final int LOWER = 1;
     private static final int CLOSED = 0;
     private static final int OPEN = 1;
-    private static final int HEIGHT_TO_GRAB_SECOND_GLYPH = 1;
-    private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 1;
+    private static final int HEIGHT_TO_GRAB_SECOND_GLYPH = 100;
+    private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 400;
 
     private Telemetry telemetry;
     //The DcMotor controlling the elevator vertically
@@ -105,6 +105,7 @@ public class GlyphAssemblyController {
                 }};
 
         telemetry.addData("Elevator", elevPos());
+        elev.setTargetPosition((elevatorTargetPos)- elev.getCurrentPosition());
         if (up) {
             elevatorTargetPos = 6600;
             manual = true;

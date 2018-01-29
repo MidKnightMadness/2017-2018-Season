@@ -67,7 +67,7 @@ public class RedRecoveryAutonomous extends LinearOpMode {
         glyphMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         glyphStartPosition = glyphMotor.getCurrentPosition();
 
-        glyphServo = hardwareMap.servo.get(CrossCommunicator.Glyph.GRAB);
+        glyphServo = hardwareMap.servo.get(CrossCommunicator.Glyph.GRAB_UPPER);
 
         driveUpMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.UP);
         driveUpMotor.resetDeviceConfigurationForOpMode();

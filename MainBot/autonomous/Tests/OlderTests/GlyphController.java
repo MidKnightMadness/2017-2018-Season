@@ -21,7 +21,7 @@ public class GlyphController {
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         pos = motor.getCurrentPosition();
 
-        servo = hardwareMap.servo.get(CrossCommunicator.Glyph.GRAB);
+        servo = hardwareMap.servo.get(CrossCommunicator.Glyph.GRAB_UPPER);
         servo.setPosition(1);
     }
 
