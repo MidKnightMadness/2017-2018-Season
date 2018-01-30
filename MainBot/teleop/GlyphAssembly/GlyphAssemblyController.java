@@ -21,9 +21,10 @@ public class GlyphAssemblyController {
     private static final int LOWER = 1;
     private static final int CLOSED = 0;
     private static final int OPEN = 1;
-    private static final int HEIGHT_TO_GRAB_SECOND_GLYPH = 100;
-    private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 400;
+    private static final int HEIGHT_TO_GRAB_SECOND_GLYPH = 2100;
+    private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 5000;
 
+    private Servo vsd;
     private Telemetry telemetry;
     //The DcMotor controlling the elevator vertically
     private DcMotor elev;
@@ -42,7 +43,7 @@ public class GlyphAssemblyController {
     //The future percentage to close the grabber and upperServo
     private double futurePercentageClosed[] = {-1, -1};
     //The time at which the future values will come into effect
-    private int timeToUpdate;
+    private double timeToUpdate;
 
     //The last known state of the up and down d-pad
     private boolean uPressed = false;
@@ -54,7 +55,7 @@ public class GlyphAssemblyController {
     //Boolean value representing if the main grabber is fully closed on an object
     private boolean isFullyClosed[] = {false, false};
     //The last difference in movement of the grabber: used in determining if the grabber is fully closed
-    private int lastdiff[] = {0, 0};
+    private int lastpos[] = {0, 0};
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
@@ -65,7 +66,7 @@ public class GlyphAssemblyController {
         //Initialize the elevator motor: reset encoder, RUN_USING_ENCODER, and brake on zero power
         elev = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.ELEV);
         elev.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        elev.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        elev.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         elev.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         grabber[0] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.GRAB_UPPER);
         grabber[0].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -75,8 +76,12 @@ public class GlyphAssemblyController {
         grabber[1].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         elevatorTargetPos = -1;
         futureElevTargetPos = -1;
-        timeToUpdate = 0;
+        timeToUpdate = -1;
         //curLvl = 0;
+
+        //Delete later... for testing purposes
+        vsd = hardwareMap.servo.get(CrossCommunicator.Glyph.VSD);
+        vsd.setPosition(0);
     }
 
     public void start() {
@@ -97,17 +102,16 @@ public class GlyphAssemblyController {
         boolean override = gamepad1.x || gamepad2.x;
         boolean grab[][] = {
                 {
-                        gamepad2.left_bumper, //upper closed
+                        gamepad2.left_bumper, //upper closed (
                         gamepad2.right_bumper //upper open
                 }, {
-                        gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0, //lower closed
+                        gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0, //lower closed (1, 0)
                         gamepad1.right_trigger > 0 || gamepad2.right_trigger > 0 //lower open
                 }};
 
         telemetry.addData("Elevator", elevPos());
-        elev.setTargetPosition((elevatorTargetPos)- elev.getCurrentPosition());
         if (up) {
-            elevatorTargetPos = 6600;
+            elevatorTargetPos = 5000;
             manual = true;
         } else if (down) {
             elevatorTargetPos = 0;
@@ -122,7 +126,7 @@ public class GlyphAssemblyController {
             elev.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }*/
 
-        if (time.milliseconds() > timeToUpdate) {
+        if (time.seconds() > timeToUpdate && timeToUpdate != -1) {
             if (futurePercentageClosed[0] != -1) {
                 percentageClosed[0] = futurePercentageClosed[0];
                 futurePercentageClosed[0] = -1;
@@ -135,6 +139,7 @@ public class GlyphAssemblyController {
                 elevatorTargetPos = futureElevTargetPos;
                 futureElevTargetPos = -1;
             }
+            timeToUpdate = -1;
         }
 
         for (int i = 0; i < 2; i++) {
@@ -152,49 +157,59 @@ public class GlyphAssemblyController {
                 }
             }
 
-            if (Math.abs(lastdiff[i] - (percentageClosed[i] * 800 - grabber[i].getCurrentPosition())) < 10) {
-                isFullyClosed[i] = true;
-            } else {
-                isFullyClosed[i] = false;
-            }
-            lastdiff[i] = Math.abs((int) (percentageClosed[i] * 800 - grabber[i].getCurrentPosition()));
+            isFullyClosed[i] = (Math.abs(lastpos[i] - grabber[i].getCurrentPosition()) < 5);
+            lastpos[i] = grabber[i].getCurrentPosition();
         }
-
-        if (yIncreased) {
-            if (yState == 0 || yState == 1) {
-                grab(yState);
-            } else {
-                releaseBoth();
+        if (justChanged) {
+            if (yIncreased) {
+                if (yState == 0 || yState == 1) {
+                    grab(yState);
+                } else {
+                    releaseBoth();
+                }
+            } else if (yDecreased) {
+                if (yState == 2) {
+                    release(0);
+                } else if (yState == 0) {
+                    release(1);
+                } else {
+                    releaseBoth();
+                }
             }
             justChanged = false;
-        } else if (yDecreased) {
-            if (yState == 2) {
-                release(0);
-            } else if (yState == 0){
-                release(1);
-            } else {
-                releaseBoth();
-            }
         }
 
-        telemetry.addData("Grabber", percentageClosed);
+        telemetry.addData("UP", up);
+        telemetry.addData("DOWN", down);
+        telemetry.addData("open_Lower", grab[LOWER][OPEN]);
+        telemetry.addData("close_Lower", grab[LOWER][CLOSED]);
+        telemetry.addData("open_Upper", grab[UPPER][OPEN]);
+        telemetry.addData("close_Upper", grab[UPPER][CLOSED]);
+        telemetry.addData("Percentage Closed Upper", percentageClosed[UPPER]);
+        telemetry.addData("Percentage Closed Lower", percentageClosed[LOWER]);
+
         telemetry.addData("Buttons", gamepad1.right_bumper || gamepad1.left_bumper);
         telemetry.addData("Elev", elevPos());
         telemetry.addData("Elevator Target", elevatorTargetPos);
         telemetry.addData("Future Target", futureElevTargetPos);
-        telemetry.addData("Time Remaining", time.milliseconds() - timeToUpdate);
+        telemetry.addData("Time To Update", timeToUpdate);
+        telemetry.addData("Current Time", time.seconds());
 
-        elev.setTargetPosition((elevatorTargetPos)- elev.getCurrentPosition());
-        grabber[UPPER].setPower(Math.min(Math.max(((percentageClosed[UPPER] *800)- grabber[UPPER].getCurrentPosition())/300d,
-                isFullyClosed[UPPER] ? -0.03 : -0.5),
-                isFullyClosed[UPPER] ? 0.03 : 0.5));
-        grabber[LOWER].setPower(Math.min(Math.max(((percentageClosed[LOWER] *800)- grabber[LOWER].getCurrentPosition())/300d,
-                isFullyClosed[LOWER] ? -0.03 : -0.5),
-                isFullyClosed[LOWER] ? 0.03 : 0.5));
+        elev.setTargetPosition(elevatorTargetPos);
+        elev.setPower(1);
+        //elev.setPower(Math.min(Math.max(elevatorTargetPos - elev.getCurrentPosition()/10d, -1), 1));
+        grabber[UPPER].setPower(Math.min(Math.max((-(percentageClosed[UPPER] * 800) - grabber[UPPER].getCurrentPosition())/300d,
+                isFullyClosed[UPPER] ? -0.15 : -0.5),
+                isFullyClosed[UPPER] ? 0.15 : 0.5));
+        grabber[LOWER].setPower(Math.min(Math.max(((percentageClosed[LOWER] * 800)- grabber[LOWER].getCurrentPosition())/300d,
+                isFullyClosed[LOWER] ? -0.15 : -0.5),
+                isFullyClosed[LOWER] ? 0.15 : 0.5));
+
+        //grabber[UPPER].setPower(gamepad2.right_stick_y/5);
 
         telemetry.addData("Speed Upper Grabber: ", grabber[0].getPower());
         telemetry.addData("Speed Lower Grabber: ", grabber[1].getPower());
-        telemetry.addData("Position Elevator: ", ((elevatorTargetPos)- elev.getCurrentPosition()));
+        telemetry.addData("Position Elevator: ", elevPos());
         telemetry.addData("Fully Closed Upper", isFullyClosed[0]);
         telemetry.addData("Fully Closed Lower", isFullyClosed[1]);
     }
@@ -204,18 +219,20 @@ public class GlyphAssemblyController {
     }
 
     public void grab(int arm) {
+        vsd.setPosition((arm + 1) / 2d);
         manual = false;
         percentageClosed[arm] = 1;
-        timeToUpdate = (int)time.milliseconds() + 1000;
+        timeToUpdate = time.seconds() + 1d;
         futureElevTargetPos = arm == UPPER ? HEIGHT_TO_GRAB_SECOND_GLYPH : HEIGHT_AFTER_GRABBING_SECOND_GLYPH;
         futurePercentageClosed[0] = -1;
         futurePercentageClosed[1] = -1;
     }
 
     public void release(int arm) {
+        vsd.setPosition(0);
         manual = false;
         percentageClosed[arm] = 0.3;
-        timeToUpdate = (int) time.milliseconds() + 1500;
+        timeToUpdate = time.seconds() + 1.5d;
         futureElevTargetPos = arm == LOWER ? HEIGHT_TO_GRAB_SECOND_GLYPH : 0;
         futurePercentageClosed[arm] = 0;
         futurePercentageClosed[arm == 0 ? 1 : 0] = -1;

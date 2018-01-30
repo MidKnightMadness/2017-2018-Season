@@ -22,6 +22,7 @@ public class CrossCommunicator {
         public static final String ELEV = "glyph elevator";
         public static final String GRAB_UPPER = "grab_upper";
         public static final String GRAB_LOWER = "grab_lower";
+        public static final String VSD = "vsd";
     }
 
     public static class State {
