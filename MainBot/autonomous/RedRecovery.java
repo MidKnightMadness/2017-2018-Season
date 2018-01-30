@@ -23,18 +23,18 @@ public class RedRecovery extends LinearOpMode {
     private int[][] targets = new int[][]{
            //L, C, R
             //shift
-            {-150, 0, 0},
+            {-100, 0, 0},
             //knock
             {250, 0, -250},
             //toCrypto
-            {2550, 1850, 2750},
+            {2500, 1800, 2700},
             //rotCrypto
             {ENC_90*3/2, ENC_90*3/2, ENC_90/2},
             //push (1 = LR, 0 = UD)
             {1, 1, 0},
             {-500, -500, -500},
             {-1100, -1100, -1100},
-            {1200, 1200, 1200},
+            {1000, 1000, 1000},
             //rotate
             {ENC_90*3/2, ENC_90*3/2, ENC_90*5/2}
     };
@@ -73,8 +73,8 @@ public class RedRecovery extends LinearOpMode {
         a.moveBot(targets[0][0]);
         waitFor(UP);
 
-        if (v.leftJewel != null) {
-            state = (v.leftJewel == TEAM_COLOR ? 0 : 2);
+        if (v.rightJewel != null) {
+            state = (v.rightJewel == TEAM_COLOR ? 0 : 2);
 
             a.lowerJArm();
             wait(1d);

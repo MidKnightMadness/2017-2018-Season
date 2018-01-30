@@ -16,7 +16,7 @@ public class RedNonRecovery extends LinearOpMode {
     private AutonomousController a = new AutonomousController();
     private VisualController v = new VisualController();
 
-    private static int ENC_90 = 1575;
+    private static int ENC_90 = 1595;
 
     private double waitUntil = 0;
     private int state = 0;
@@ -25,11 +25,11 @@ public class RedNonRecovery extends LinearOpMode {
     private int[][] targets = new int[][]{
            //L, C, R
             //shift
-            {-150, 0, 0},
+            {-100, 0, 0},
             //knock
             {250, 0, -250},
             //toCrypto
-            {1700, 1700, 1700},
+            {1650, 1650, 1650},
             //rotate
             {ENC_90, ENC_90, ENC_90},
             //toCrypto
@@ -80,8 +80,8 @@ public class RedNonRecovery extends LinearOpMode {
         a.moveBot(targets[0][0]);
         waitFor(UP);
 
-        if (v.leftJewel != null) {
-            state = (v.leftJewel == TEAM_COLOR ? 0 : 2);
+        if (v.rightJewel != null) {
+            state = (v.rightJewel == TEAM_COLOR ? 0 : 2);
 
             a.lowerJArm();
             wait(1d);

@@ -221,8 +221,8 @@ public class DriveAssemblyController {
                 telemetry.addData("Offset", (theta - tempTarget + 3780) % 360 - 180);
 
 
-                if (Math.abs((theta - tempTarget + 3780) % 360 - 180) > 3) {
-                    adjustedR = Math.min(Math.max(((theta - tempTarget + 3780) % 360 - 180) / 10.0d, -1), 1);
+                if (Math.abs((theta - tempTarget + 3780) % 360 - 180) > 5) {
+                    adjustedR = Math.min(Math.max(((theta - tempTarget + 3780) % 360 - 180) / 30.0d, -1), 1);
                 } else {
                     adjustedR = 0;
                 }

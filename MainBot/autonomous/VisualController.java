@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.vuforia.CameraDevice;
 import com.vuforia.Image;
 import com.vuforia.Matrix34F;
 import com.vuforia.PIXEL_FORMAT;
@@ -24,13 +23,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * Created by gregory.ling on 10/15/17.
  */
 
 public class VisualController {
-
     // whether or not to save the cropped image
     private boolean SAVE_CROPPED = true;
 
@@ -39,7 +38,7 @@ public class VisualController {
         BLUE
     }
 
-    public JewelColor leftJewel;
+    public JewelColor rightJewel;
     public RelicRecoveryVuMark pictograph;
 
     private Telemetry telemetry;
@@ -135,6 +134,15 @@ public class VisualController {
                             telemetry.update();
                             Bitmap outBmp;
                             if (SAVE_CROPPED) {
+                                try {
+                                    File file = new File("/storage/self/primary/Pictures/images/", "Output_S" + Math.random() + ".png");
+                                    FileOutputStream outStream = new FileOutputStream(file);
+                                    srcBmp.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+                                    outStream.close();
+                                } catch (Exception e) {
+                                    //telemetry.addLine(e.toString());
+                                    //telemetry.update();
+                                }
                                 Bitmap medBmp = Bitmap.createBitmap(srcBmp, (int) x, (int) y, (int) width, (int) height);
                                 try {
                                     File file = new File("/storage/self/primary/Pictures/images/", "Output_M" + Math.random() + ".png");
@@ -231,7 +239,7 @@ public class VisualController {
 
                             if (left != right) {
                                 //telemetry.addLine("Yay");
-                                leftJewel = left;
+                                rightJewel = left;
                             } else {
                                 continue;
                             }
@@ -283,7 +291,16 @@ public class VisualController {
                         srcBmp.copyPixelsFromBuffer(vuforiaImage.getPixels());
                         telemetry.update();
                         Bitmap outBmp;
-                        if (SAVE_CROPPED) {
+                        //if (SAVE_CROPPED) {
+                            try {
+                                File file = new File("/storage/self/primary/Pictures/images/", "Output_S" + Math.random() + ".png");
+                                FileOutputStream outStream = new FileOutputStream(file);
+                                srcBmp.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+                                outStream.close();
+                            } catch (Exception e) {
+                                //telemetry.addLine(e.toString());
+                                //telemetry.update();
+                            }
                             Bitmap medBmp = Bitmap.createBitmap(srcBmp, 50, 0, 650, 190);
                             try {
                                 File file = new File("/storage/self/primary/Pictures/images/", "Output_M" + Math.random() + ".png");
@@ -308,9 +325,9 @@ public class VisualController {
                                 telemetry.addLine(e.toString());
                                 telemetry.update();
                             }
-                        } else {
-                            outBmp = Bitmap.createScaledBitmap(Bitmap.createBitmap(srcBmp, 50, 0, 580, 190), 2, 4, false);
-                        }
+                        //} else {
+                        //    outBmp = Bitmap.createScaledBitmap(Bitmap.createBitmap(srcBmp, 50, 0, 580, 190), 2, 4, false);
+                        //}
 
 
                             /*//Check color
@@ -330,35 +347,39 @@ public class VisualController {
                         // BEGIN EDIT:
 
                         int maxRed = 0;
-                        int maxRedColumn = 0;
+                        int maxRedColumn = -1;
                         int maxBlue = 0;
-                        int maxBlueColumn = 0;
+                        int maxBlueColumn = -1;
                         int columns[][] = new int[4][2];
                         for (int k = 0; k < 4; k++) {
                             for (int j = 0; j < 4; j++) {
                                 columns[k][0] += Color.red(outBmp.getPixel(k, j));
                                 columns[k][1] += Color.blue(outBmp.getPixel(k, j));
-                                if (columns[k][0] > maxRed) {
-                                    maxRed = columns[k][0];
-                                    maxRedColumn = k;
-                                }
-                                if (columns[k][1] > maxBlue) {
-                                    maxBlue = columns[k][1];
-                                    maxBlueColumn = k;
-                                }
+                            }
+
+                            boolean isMaxRed = false;
+                            if (columns[k][0] > maxRed && columns[k][0] - columns[k][1] > 50) {
+                                maxRed = columns[k][0];
+                                maxRedColumn = k;
+                            }
+                            if (columns[k][1] > maxBlue && columns[k][1] - columns[k][0] > 50) {
+                                maxBlue = columns[k][1];
+                                maxBlueColumn = k;
                             }
                             telemetry.addLine(columns[k][0] + ", " + columns[k][1]);
                         }
-                        telemetry.update();
-                        if (maxRed > 50 && maxBlue > 50 && Math.abs(maxRed - maxBlue) > 50) {
+                        if (maxRed > 50 && maxBlue > 50 && maxRedColumn != maxBlueColumn) {
                             if (maxRedColumn > maxBlueColumn) {
-                                leftJewel = JewelColor.BLUE;
+                                rightJewel = JewelColor.BLUE;
                             } else {
-                                leftJewel = JewelColor.RED;
+                                rightJewel = JewelColor.RED;
                             }
                         } else {
-                            leftJewel = null;
+                            rightJewel = null;
+                            telemetry.addLine(String.format(Locale.ENGLISH, "%d, %d", maxRed, maxBlue));
                         }
+                        telemetry.addLine(rightJewel == JewelColor.BLUE ? "BLUE" : rightJewel == JewelColor.RED ? "RED" : "UNKNOWN");
+                        telemetry.update();
                         break;
                     }
 

@@ -25,19 +25,18 @@ public class BlueRecovery extends LinearOpMode {
     private int[][] targets = new int[][]{
            //L, C, R
             //shift
-            {-150, 0, 0},
+            {-100, 0, 0},
             //knock
             {250, 0, -250},
             //toCrypto
-            {-2450, -2000, -2450},
+            {-2500, -1950, -2400},
             //rotCrypto
             {ENC_90*3/2, ENC_90/2, ENC_90/2},
             //push (1 = LR, 0 = UD)
             {1, 0, 0},
             {-400, -400, -400},
             {-1100, -1100, -1100},
-            {1200, 1200, 1200},
-            //rotate
+            {900, 900, 900},
             {ENC_90*3/2, ENC_90*5/2, ENC_90*5/2}
     };
 
@@ -75,8 +74,8 @@ public class BlueRecovery extends LinearOpMode {
         a.moveBot(targets[0][0]);
         waitFor(UP);
 
-        if (v.leftJewel != null) {
-            state = (v.leftJewel == TEAM_COLOR ? 0 : 2);
+        if (v.rightJewel != null) {
+            state = (v.rightJewel == TEAM_COLOR ? 0 : 2);
 
             a.lowerJArm();
             wait(1d);
