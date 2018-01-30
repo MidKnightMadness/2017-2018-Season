@@ -399,7 +399,7 @@ public class VisualController {
         return null;
     }
 
-    public void saveTeamColor(int team) {
+    public void saveTeamColor(int team) throws InterruptedException {
         try {
             File file = new File("/storage/self/primary/", "LastTeamColor.txt");
             FileOutputStream outStream = new FileOutputStream(file);

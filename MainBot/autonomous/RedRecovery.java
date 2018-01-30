@@ -135,13 +135,13 @@ public class RedRecovery extends LinearOpMode {
         waitFor(UP);
     }
 
-    private void waitFor(int motor) {
+    private void waitFor(int motor) throws InterruptedException {
         while (a.motors[motor].isBusy())
             idle();
         a.reset();
     }
 
-    private void wait(double s) {
+    private void wait(double s) throws InterruptedException {
         waitUntil = time + s;
         while (time < waitUntil)
             idle();
