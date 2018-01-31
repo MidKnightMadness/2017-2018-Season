@@ -152,13 +152,6 @@ public class DriveAssemblyController {
             resetHeading();
         }
 
-        if ((gamepad1.b || gamepad2.b )&& !bPressed) {
-            toggleTankMode();
-            bPressed = true;
-        } else if (!(gamepad1.b|| gamepad2.b)){
-            bPressed = false;
-        }
-
         if ((gamepad1.back || gamepad2.back )&& !backPressed) {
             yDecreased = true;
             yIncreased = false;

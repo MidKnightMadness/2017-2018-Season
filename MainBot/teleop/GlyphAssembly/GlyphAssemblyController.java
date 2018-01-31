@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop.GlyphAssembly;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -23,6 +24,9 @@ public class GlyphAssemblyController {
     private static final int OPEN = 1;
     private static final int HEIGHT_TO_GRAB_SECOND_GLYPH = 2100;
     private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 5000;
+
+    private boolean bPressed;
+    private boolean resettingArms;
 
     private Servo vsd;
     private Telemetry telemetry;
@@ -71,6 +75,7 @@ public class GlyphAssemblyController {
         grabber[0] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.GRAB_UPPER);
         grabber[0].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         grabber[0].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        grabber[0].setDirection(DcMotorSimple.Direction.REVERSE);
         grabber[1] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.GRAB_LOWER);
         grabber[1].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         grabber[1].setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -109,6 +114,17 @@ public class GlyphAssemblyController {
                         gamepad1.right_trigger > 0 || gamepad2.right_trigger > 0 //lower open
                 }};
 
+        if ((gamepad1.b || gamepad2.b )&& !bPressed) {
+            bPressed = true;
+            resettingArms = true;
+            percentageClosed[0] = 0;
+            percentageClosed[1] = 0;
+            grabber[UPPER].setPower(0.5);
+            grabber[LOWER].setPower(0.5);
+        } else if (!(gamepad1.b|| gamepad2.b)){
+            bPressed = false;
+        }
+
         telemetry.addData("Elevator", elevPos());
         if (up) {
             elevatorTargetPos = 5000;
@@ -141,24 +157,45 @@ public class GlyphAssemblyController {
             }
             timeToUpdate = -1;
         }
-
-        for (int i = 0; i < 2; i++) {
-            if (grab[i][CLOSED]) {
-                if (percentageClosed[i] > 0.9) {
-                    percentageClosed[i] = 1;
-                } else {
-                    percentageClosed[i] += 0.1;
+        if (!resettingArms) {
+            for (int i = 0; i < 2; i++) {
+                if (grab[i][CLOSED]) {
+                    if (percentageClosed[i] > 0.9) {
+                        percentageClosed[i] = 1;
+                    } else {
+                        percentageClosed[i] += 0.1;
+                    }
+                } else if (grab[i][OPEN]) {
+                    if (percentageClosed[i] < 0.1) {
+                        percentageClosed[i] = 0;
+                    } else {
+                        percentageClosed[i] -= 0.1;
+                    }
                 }
-            } else if (grab[i][OPEN]) {
-                if (percentageClosed[i] < 0.1) {
-                    percentageClosed[i] = 0;
-                } else {
-                    percentageClosed[i] -= 0.1;
+
+                isFullyClosed[i] = (Math.abs(lastpos[i] - grabber[i].getCurrentPosition()) < 5);
+                lastpos[i] = grabber[i].getCurrentPosition();
+            }
+        } else {
+            if (!bPressed) {
+                if (grabber[UPPER].getMode() != DcMotor.RunMode.RUN_TO_POSITION) {
+                    grabber[UPPER].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    grabber[UPPER].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    grabber[UPPER].setTargetPosition(100);
+                    grabber[UPPER].setPower(0.5);
+                    grabber[LOWER].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    grabber[LOWER].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    grabber[LOWER].setTargetPosition(100);
+                    grabber[LOWER].setPower(0.5);
+                } else if (!grabber[UPPER].isBusy() && !grabber[LOWER].isBusy()) {
+                    grabber[UPPER].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    grabber[UPPER].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    grabber[LOWER].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    grabber[LOWER].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+                    resettingArms = false;
                 }
             }
-
-            isFullyClosed[i] = (Math.abs(lastpos[i] - grabber[i].getCurrentPosition()) < 5);
-            lastpos[i] = grabber[i].getCurrentPosition();
         }
         if (justChanged) {
             if (yIncreased) {
@@ -198,13 +235,14 @@ public class GlyphAssemblyController {
         elev.setTargetPosition(elevatorTargetPos);
         elev.setPower(1);
         //elev.setPower(Math.min(Math.max(elevatorTargetPos - elev.getCurrentPosition()/10d, -1), 1));
-        grabber[UPPER].setPower(Math.min(Math.max((-(percentageClosed[UPPER] * 800) - grabber[UPPER].getCurrentPosition())/300d,
-                isFullyClosed[UPPER] ? -0.15 : -0.5),
-                isFullyClosed[UPPER] ? 0.15 : 0.5));
-        grabber[LOWER].setPower(Math.min(Math.max(((percentageClosed[LOWER] * 800)- grabber[LOWER].getCurrentPosition())/300d,
-                isFullyClosed[LOWER] ? -0.15 : -0.5),
-                isFullyClosed[LOWER] ? 0.15 : 0.5));
-
+        if (!resettingArms) {
+            grabber[UPPER].setPower(Math.min(Math.max(((percentageClosed[UPPER] * 800) - grabber[UPPER].getCurrentPosition()) / 300d,
+                    isFullyClosed[UPPER] ? -0.15 : -0.5),
+                    isFullyClosed[UPPER] ? 0.15 : 0.5));
+            grabber[LOWER].setPower(Math.min(Math.max(((percentageClosed[LOWER] * 800) - grabber[LOWER].getCurrentPosition()) / 300d,
+                    isFullyClosed[LOWER] ? -0.15 : -0.5),
+                    isFullyClosed[LOWER] ? 0.15 : 0.5));
+        }
         //grabber[UPPER].setPower(gamepad2.right_stick_y/5);
 
         telemetry.addData("Speed Upper Grabber: ", grabber[0].getPower());
