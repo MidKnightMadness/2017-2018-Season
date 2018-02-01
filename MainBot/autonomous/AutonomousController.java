@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.MainBot.autonomous;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -58,10 +59,11 @@ public class AutonomousController {
         motors[RIGHT].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motors[RIGHT].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        motors[GRAB] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.GRAB_LOWER);
+        motors[GRAB] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.GRAB_UPPER);
         motors[GRAB].resetDeviceConfigurationForOpMode();
         motors[GRAB].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motors[GRAB].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motors[GRAB].setDirection(DcMotorSimple.Direction.REVERSE);
 
         reset();
     }

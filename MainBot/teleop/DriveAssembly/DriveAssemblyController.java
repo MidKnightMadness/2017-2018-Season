@@ -164,6 +164,7 @@ public class DriveAssemblyController {
         } else if (!(gamepad1.back|| gamepad2.back)){
             backPressed = false;
         }
+        telemetry.addData("Back", backPressed);
 
         if ((gamepad1.y || gamepad2.y )&& !yPressed) {
             yIncreased = true;

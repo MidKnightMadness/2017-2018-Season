@@ -22,8 +22,8 @@ public class GlyphAssemblyController {
     private static final int LOWER = 1;
     private static final int CLOSED = 0;
     private static final int OPEN = 1;
-    private static final int HEIGHT_TO_GRAB_SECOND_GLYPH = 2100;
-    private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 5000;
+    private static final int HEIGHT_TO_GRAB_SECOND_GLYPH = 2200;
+    private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 5100;
 
     private boolean bPressed;
     private boolean resettingArms;
@@ -119,8 +119,8 @@ public class GlyphAssemblyController {
             resettingArms = true;
             percentageClosed[0] = 0;
             percentageClosed[1] = 0;
-            grabber[UPPER].setPower(0.5);
-            grabber[LOWER].setPower(0.5);
+            grabber[UPPER].setPower(-0.5);
+            grabber[LOWER].setPower(-0.5);
         } else if (!(gamepad1.b|| gamepad2.b)){
             bPressed = false;
         }
