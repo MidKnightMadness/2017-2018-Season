@@ -29,11 +29,11 @@ public class RedNonRecovery extends LinearOpMode {
             //knock
             {250, 0, -250},
             //toCrypto
-            {1650, 1650, 1650},
+            {1700, 1700, 1700},
             //rotate
             {ENC_90, ENC_90, ENC_90},
             //toCrypto
-            {1900, 1500, 1000},
+            {2000, 1550, 1100},
             //rotCrypto
             {ENC_90/2, ENC_90/2, ENC_90/2},
             //push (1 = LR, 0 = UD)

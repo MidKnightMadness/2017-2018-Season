@@ -25,11 +25,11 @@ public class BlueRecovery extends LinearOpMode {
     private int[][] targets = new int[][]{
            //L, C, R
             //shift
-            {-100, 0, 0},
+            {-150, 0, 0},
             //knock
             {250, 0, -250},
             //toCrypto
-            {-2500, -1950, -2400},
+            {-2550, -1900, -2400},
             //rotCrypto
             {ENC_90*3/2, ENC_90/2, ENC_90/2},
             //push (1 = LR, 0 = UD)

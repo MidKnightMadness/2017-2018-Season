@@ -152,16 +152,18 @@ public class DriveAssemblyController {
             resetHeading();
         }
 
-        if ((gamepad1.back || gamepad2.back )&& !backPressed) {
+        if ((gamepad1.x || gamepad2.x )&& !backPressed) {
             yDecreased = true;
             yIncreased = false;
             yDecrease();
+            justChanged = true;
             if (yState == 0) {
+                isTimeToRotate = false;
                 resettingRotation = true;
                 timeToRotate = time.seconds() + 1d;
             }
             backPressed = true;
-        } else if (!(gamepad1.back|| gamepad2.back)){
+        } else if (!(gamepad1.x|| gamepad2.x)){
             backPressed = false;
         }
         telemetry.addData("Back", backPressed);

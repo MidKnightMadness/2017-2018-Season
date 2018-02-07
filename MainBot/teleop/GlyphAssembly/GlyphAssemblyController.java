@@ -23,7 +23,7 @@ public class GlyphAssemblyController {
     private static final int CLOSED = 0;
     private static final int OPEN = 1;
     private static final int HEIGHT_TO_GRAB_SECOND_GLYPH = 2200;
-    private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 5100;
+    private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 5200;
 
     private boolean bPressed;
     private boolean resettingArms;
@@ -86,10 +86,11 @@ public class GlyphAssemblyController {
 
         //Delete later... for testing purposes
         vsd = hardwareMap.servo.get(CrossCommunicator.Glyph.VSD);
-        vsd.setPosition(0);
     }
 
     public void start() {
+
+        vsd.setPosition(0);
         //init grabber if necessary
 
         grabber[0].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -104,8 +105,8 @@ public class GlyphAssemblyController {
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
         boolean up = gamepad1.right_bumper  || gamepad2.left_stick_y < -0.1;
         boolean down = gamepad1.left_bumper || gamepad2.left_stick_y > 0.1;
-        boolean override = gamepad1.x || gamepad2.x;
-        boolean grab[][] = {
+        boolean override = gamepad2.x;
+        /*boolean grab[][] = {
                 {
                         gamepad2.left_bumper, //upper closed (
                         gamepad2.right_bumper //upper open
@@ -113,6 +114,15 @@ public class GlyphAssemblyController {
                         gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0, //lower closed (1, 0)
                         gamepad1.right_trigger > 0 || gamepad2.right_trigger > 0 //lower open
                 }};
+        */ // OLD
+        boolean grab[][] = {
+                {
+                        gamepad2.left_bumper, //upper closed (
+                        gamepad2.right_bumper //upper open
+                }, {
+                gamepad1.right_trigger > 0 || gamepad2.left_trigger > 0, //lower closed (1, 0)
+                gamepad1.left_trigger > 0 || gamepad2.right_trigger > 0 //lower open
+        }};
 
         if ((gamepad1.b || gamepad2.b )&& !bPressed) {
             bPressed = true;
@@ -127,7 +137,7 @@ public class GlyphAssemblyController {
 
         telemetry.addData("Elevator", elevPos());
         if (up) {
-            elevatorTargetPos = 5000;
+            elevatorTargetPos = HEIGHT_AFTER_GRABBING_SECOND_GLYPH;
             manual = true;
         } else if (down) {
             elevatorTargetPos = 0;
@@ -137,9 +147,11 @@ public class GlyphAssemblyController {
             manual = false;
         }
 
+
         /*if (override) {
+
             elev.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            elev.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            elev.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }*/
 
         if (time.seconds() > timeToUpdate && timeToUpdate != -1) {
@@ -157,6 +169,7 @@ public class GlyphAssemblyController {
             }
             timeToUpdate = -1;
         }
+
         if (!resettingArms) {
             for (int i = 0; i < 2; i++) {
                 if (grab[i][CLOSED]) {
@@ -181,7 +194,7 @@ public class GlyphAssemblyController {
                 if (grabber[UPPER].getMode() != DcMotor.RunMode.RUN_TO_POSITION) {
                     grabber[UPPER].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     grabber[UPPER].setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    grabber[UPPER].setTargetPosition(100);
+                    grabber[UPPER].setTargetPosition(200);
                     grabber[UPPER].setPower(0.5);
                     grabber[LOWER].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     grabber[LOWER].setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -224,6 +237,9 @@ public class GlyphAssemblyController {
         telemetry.addData("close_Upper", grab[UPPER][CLOSED]);
         telemetry.addData("Percentage Closed Upper", percentageClosed[UPPER]);
         telemetry.addData("Percentage Closed Lower", percentageClosed[LOWER]);
+        telemetry.addData("YDecreased", yDecreased);
+        telemetry.addData("YState", yState);
+        telemetry.addData("Just Changed", justChanged);
 
         telemetry.addData("Buttons", gamepad1.right_bumper || gamepad1.left_bumper);
         telemetry.addData("Elev", elevPos());
@@ -280,6 +296,7 @@ public class GlyphAssemblyController {
         release(LOWER);
         release(UPPER);
         futurePercentageClosed[LOWER] = 0;
+        timeToUpdate = time.seconds() + 3d;
     }
 
     public void stop() {
