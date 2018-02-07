@@ -13,58 +13,58 @@ public class EncoderTesting extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         //Init here
-        DcMotor motorUp;
-        DcMotor motorDown;
-        DcMotor motorLeft;
-        DcMotor motorRight;
+        DcMotor motorFL;
+        DcMotor motorBR;
+        DcMotor motorBL;
+        DcMotor motorFR;
 
         telemetry.addLine("Status: Initialized and ready!");
         telemetry.update();
-        motorUp = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_LEFT);
-        motorUp.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorDown = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_RIGHT);
-        motorDown.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorLeft = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_LEFT);
-        motorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorRight = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_RIGHT);
-        motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFL = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_LEFT);
+        motorFL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorBR = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_RIGHT);
+        motorBR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorBL = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_LEFT);
+        motorBL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorFR = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_RIGHT);
+        motorFR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         waitForStart();
-        motorUp.setPower(1);
+        motorFL.setPower(1);
         while (time < 5) {
-            telemetry.addData("Motor Up", motorUp.getCurrentPosition());
+            telemetry.addData("Motor FrontLeft", motorFL.getCurrentPosition());
             telemetry.update();
             idle();
         }
-        motorUp.setPower(0);
-        motorLeft.setPower(1);
+        motorFL.setPower(0);
+        motorBL.setPower(1);
         while (time < 10) {
-            telemetry.addData("Motor Left", motorLeft.getCurrentPosition());
+            telemetry.addData("Motor BackLeft", motorBL.getCurrentPosition());
             telemetry.update();
             idle();
         }
-        motorLeft.setPower(0);
-        motorDown.setPower(1);
+        motorBL.setPower(0);
+        motorBR.setPower(1);
         while (time < 15) {
-            telemetry.addData("Motor Down", motorDown.getCurrentPosition());
+            telemetry.addData("Motor BackRight", motorBR.getCurrentPosition());
             telemetry.update();
             idle();
         }
-        motorDown.setPower(0);
-        motorRight.setPower(1);
+        motorBR.setPower(0);
+        motorFR.setPower(1);
         while (time < 20 ) {
-            telemetry.addData("Motor Right", motorRight.getCurrentPosition());
+            telemetry.addData("Motor FrontRight", motorFR.getCurrentPosition());
             telemetry.update();
             idle();
         }
-        motorRight.setPower(0);
+        motorFR.setPower(0);
 
 
 
 
         /*while (time < 20) {
-            telemetry.addData("Up Motor (0)", motorUp.getCurrentPosition());
-            telemetry.addData("Left Motor (1)", motorDown.getCurrentPosition());
+            telemetry.addData("Up Motor (0)", motorFL.getCurrentPosition());
+            telemetry.addData("Left Motor (1)", motorBR.getCurrentPosition());
             telemetry.addData("Down Motor (2)", motorLeft.getCurrentPosition());
             telemetry.addData("Right Motor (3)", motorRight.getCurrentPosition());
             telemetry.update();
