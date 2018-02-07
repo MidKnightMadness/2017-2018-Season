@@ -13,10 +13,10 @@ public class AutonomousController {
 
     public static int ELEV = 0;
     public static int JEWEL = 1;
-    public static int UP = 2;
-    public static int DOWN = 3;
-    public static int LEFT = 4;
-    public static int RIGHT = 5;
+    public static int FRONT_LEFT = 2;
+    public static int BACK_RIGHT = 3;
+    public static int BACK_LEFT = 4;
+    public static int FRONT_RIGHT = 5;
     public static int GRAB = 6;
 
     private VisualController v;
@@ -39,25 +39,25 @@ public class AutonomousController {
         motors[JEWEL].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motors[JEWEL].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        motors[UP] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_LEFT);
-        motors[UP].resetDeviceConfigurationForOpMode();
-        motors[UP].setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motors[UP].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motors[FRONT_LEFT] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_LEFT);
+        motors[FRONT_LEFT].resetDeviceConfigurationForOpMode();
+        motors[FRONT_LEFT].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motors[FRONT_LEFT].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        motors[DOWN] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_RIGHT);
-        motors[DOWN].resetDeviceConfigurationForOpMode();
-        motors[DOWN].setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motors[DOWN].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motors[BACK_RIGHT] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_RIGHT);
+        motors[BACK_RIGHT].resetDeviceConfigurationForOpMode();
+        motors[BACK_RIGHT].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motors[BACK_RIGHT].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        motors[LEFT] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_LEFT);
-        motors[LEFT].resetDeviceConfigurationForOpMode();
-        motors[LEFT].setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motors[LEFT].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motors[BACK_LEFT] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_LEFT);
+        motors[BACK_LEFT].resetDeviceConfigurationForOpMode();
+        motors[BACK_LEFT].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motors[BACK_LEFT].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        motors[RIGHT] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_RIGHT);
-        motors[RIGHT].resetDeviceConfigurationForOpMode();
-        motors[RIGHT].setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motors[RIGHT].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motors[FRONT_RIGHT] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_RIGHT);
+        motors[FRONT_RIGHT].resetDeviceConfigurationForOpMode();
+        motors[FRONT_RIGHT].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motors[FRONT_RIGHT].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         motors[GRAB] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.GRAB_UPPER);
         motors[GRAB].resetDeviceConfigurationForOpMode();
@@ -93,35 +93,35 @@ public class AutonomousController {
     public void moveBot(int distance, double speed) {
         if (Math.signum(distance) != Math.signum(speed))
             speed *= -1;
-        move(UP, distance, speed);
-        move(LEFT, distance, speed);
-        move(DOWN, -distance, -speed);
-        move(RIGHT, -distance, -speed);
+        move(FRONT_LEFT, distance, speed);
+        move(BACK_LEFT, distance, speed);
+        move(BACK_RIGHT, -distance, -speed);
+        move(FRONT_RIGHT, -distance, -speed);
     }
 
     public void rotateBot(int distance, double speed) {
         if (Math.signum(distance) != Math.signum(speed))
             speed *= -1;
-        move(UP, distance, speed);
-        move(LEFT, distance, speed);
-        move(DOWN, distance, speed);
-        move(RIGHT, distance, speed);
+        move(FRONT_LEFT, distance, speed);
+        move(BACK_LEFT, distance, speed);
+        move(BACK_RIGHT, distance, speed);
+        move(FRONT_RIGHT, distance, speed);
     }
 
     public void moveBotDiUD(int distance) {
         double speed = DRIVE_SPEED;
         if (Math.signum(distance) != Math.signum(speed))
             speed *= -1;
-        move(UP, distance, speed);
-        move(DOWN, -distance, -speed);
+        move(FRONT_LEFT, distance, speed);
+        move(BACK_RIGHT, -distance, -speed);
     }
 
     public void moveBotDiLR(int distance) {
         double speed = DRIVE_SPEED;
         if (Math.signum(distance) != Math.signum(speed))
             speed *= -1;
-        move(LEFT, distance, speed);
-        move(RIGHT, -distance, -speed);
+        move(BACK_LEFT, distance, speed);
+        move(FRONT_RIGHT, -distance, -speed);
     }
 
     public void rotateBot(int distance) {
@@ -146,36 +146,36 @@ public class AutonomousController {
         v.look();
         int i;
         if (v.pictograph == null) {
-            move(UP, 50, 0.1);
-            move(LEFT, -50, -0.1);
-            move(DOWN, 50, 0.1);
-            move(RIGHT, -50, -0.1);
-            while(motors[UP].isBusy()) {
+            move(FRONT_LEFT, 50, 0.1);
+            move(BACK_LEFT, -50, -0.1);
+            move(BACK_RIGHT, 50, 0.1);
+            move(FRONT_RIGHT, -50, -0.1);
+            while(motors[FRONT_LEFT].isBusy()) {
                 v.look();
                 if (v.pictograph != null) {
                     break;
                 }
             }
-            move(UP, 0, 0);
-            move(LEFT, 0, 0);
-            move(DOWN, 0, 0);
-            move(RIGHT, 0, 0);
+            move(FRONT_LEFT, 0, 0);
+            move(BACK_LEFT, 0, 0);
+            move(BACK_RIGHT, 0, 0);
+            move(FRONT_RIGHT, 0, 0);
             if (v.pictograph == null) {
-                move(UP, -50, -0.1);
-                move(LEFT, 50, 0.1);
-                move(DOWN, -50, -0.1);
-                move(RIGHT, 50, 0.1);
-                while(motors[UP].isBusy()) {
+                move(FRONT_LEFT, -50, -0.1);
+                move(BACK_LEFT, 50, 0.1);
+                move(BACK_RIGHT, -50, -0.1);
+                move(FRONT_RIGHT, 50, 0.1);
+                while(motors[FRONT_LEFT].isBusy()) {
                     v.look();
                     if (v.pictograph != null) {
                         break;
                     }
                 }
             }
-            move(UP, 0, 0);
-            move(LEFT, 0, 0);
-            move(DOWN, 0, 0);
-            move(RIGHT, 0, 0);
+            move(FRONT_LEFT, 0, 0);
+            move(BACK_LEFT, 0, 0);
+            move(BACK_RIGHT, 0, 0);
+            move(FRONT_RIGHT, 0, 0);
         }
         if (v.pictograph == null) {
             v.blindLook();

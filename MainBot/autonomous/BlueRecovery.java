@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.ELEV;
-import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.LEFT;
-import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.UP;
+import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.BACK_LEFT;
+import static org.firstinspires.ftc.teamcode.MainBot.autonomous.AutonomousController.FRONT_LEFT;
 
 @Autonomous(name = "Blue Recovery", group = "MainBot")
 public class BlueRecovery extends LinearOpMode {
@@ -72,7 +72,7 @@ public class BlueRecovery extends LinearOpMode {
         a.look();
 
         a.moveBot(targets[0][0]);
-        waitFor(UP);
+        waitFor(FRONT_LEFT);
 
         if (v.rightJewel != null) {
             state = (v.rightJewel == TEAM_COLOR ? 0 : 2);
@@ -81,29 +81,29 @@ public class BlueRecovery extends LinearOpMode {
             wait(1d);
 
             a.rotateBot(targets[1][state], 0.7);
-            waitFor(UP);
+            waitFor(FRONT_LEFT);
 
             a.raiseJArm();
             wait(1d);
 
             a.rotateBot(-targets[1][state], 0.7);
-            waitFor(UP);
+            waitFor(FRONT_LEFT);
         }
 
         state = (v.pictograph == RelicRecoveryVuMark.LEFT ? 0 : (v.pictograph == RelicRecoveryVuMark.CENTER ? 1 : 2));
 
         a.moveBot(targets[2][state]);
-        waitFor(UP);
+        waitFor(FRONT_LEFT);
 
         a.rotateBot(targets[3][state], 0.7);
-        waitFor(UP);
+        waitFor(FRONT_LEFT);
 
         if (targets[4][state] == 0) {
             a.moveBotDiUD(targets[5][state]);
-            waitFor(UP);
+            waitFor(FRONT_LEFT);
         } else {
             a.moveBotDiLR(targets[5][state]);
-            waitFor(LEFT);
+            waitFor(BACK_LEFT);
         }
 
 
@@ -116,24 +116,24 @@ public class BlueRecovery extends LinearOpMode {
 
         if (targets[4][state] == 0) {
             a.moveBotDiUD(targets[6][state]);
-            waitFor(UP);
+            waitFor(FRONT_LEFT);
         } else {
             a.moveBotDiLR(targets[6][state]);
-            waitFor(LEFT);
+            waitFor(BACK_LEFT);
         }
 
         if (targets[4][state] == 0) {
             a.moveBotDiUD(targets[7][state]);
-            waitFor(UP);
+            waitFor(FRONT_LEFT);
         } else {
             a.moveBotDiLR(targets[7][state]);
-            waitFor(LEFT);
+            waitFor(BACK_LEFT);
         }
 
         a.grabStop();
 
         a.rotateBot(targets[8][state]);
-        waitFor(UP);
+        waitFor(FRONT_LEFT);
     }
 
     private void waitFor(int motor) throws InterruptedException {

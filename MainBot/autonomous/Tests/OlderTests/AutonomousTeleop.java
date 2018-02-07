@@ -42,7 +42,7 @@ public class AutonomousTeleop extends LinearOpMode {
             telemetry.addData("StartMove: ", amount);
             telemetry.addData("StartMove: ", gamepad1.left_stick_x);
             telemetry.update();
-            waitFor(UP);
+            waitFor(FRONT_LEFT);
         }
 
         while (gamepad1.x)
@@ -57,7 +57,7 @@ public class AutonomousTeleop extends LinearOpMode {
             }
             telemetry.addData("FRONT_LEFT: ", amount);
             telemetry.update();
-            waitFor(UP);
+            waitFor(FRONT_LEFT);
         }
 
         p = amount;
@@ -72,7 +72,7 @@ public class AutonomousTeleop extends LinearOpMode {
         a.reset();
 
         a.rotateBot(-p);
-        waitFor(UP);
+        waitFor(FRONT_LEFT);
         a.reset();
 
         a.raiseJArm();
@@ -86,7 +86,7 @@ public class AutonomousTeleop extends LinearOpMode {
             }
             telemetry.addData("FRONT_LEFT: ", amount);
             telemetry.update();
-            waitFor(UP);
+            waitFor(FRONT_LEFT);
         }
 
         while (gamepad1.x)
@@ -101,7 +101,7 @@ public class AutonomousTeleop extends LinearOpMode {
             }
             telemetry.addData("FRONT_LEFT: ", amount);
             telemetry.update();
-            waitFor(UP);
+            waitFor(FRONT_LEFT);
         }
 
         while (gamepad1.x)
@@ -120,20 +120,20 @@ public class AutonomousTeleop extends LinearOpMode {
                 }
                 telemetry.addData("FRONT_LEFT: ", amount);
                 telemetry.update();
-                waitFor(UP);
+                waitFor(FRONT_LEFT);
             }
-            p = a.getPos(UP);
+            p = a.getPos(FRONT_LEFT);
         } else {
             while (!gamepad1.x && opModeIsActive()) {
                 if (Math.abs(gamepad1.left_stick_y) > 0.2) {
                 amount += (int) Math.signum(gamepad1.left_stick_y) * 50;
                     a.moveBotDiLR((int) Math.signum(gamepad1.left_stick_y) * 50);
                 }
-                telemetry.addData("FRONT_LEFT: ", a.getPos(LEFT));
+                telemetry.addData("FRONT_LEFT: ", a.getPos(BACK_LEFT));
                 telemetry.update();
-                waitFor(LEFT);
+                waitFor(BACK_LEFT);
             }
-            p = a.getPos(LEFT);
+            p = a.getPos(BACK_LEFT);
         }
 
         while (gamepad1.x)
@@ -149,10 +149,10 @@ public class AutonomousTeleop extends LinearOpMode {
 
         if (s) {
             a.moveBotDiUD(p);
-            waitFor(UP);
+            waitFor(FRONT_LEFT);
         } else {
             a.moveBotDiLR(p);
-            waitFor(LEFT);
+            waitFor(BACK_LEFT);
         }
         a.reset();
 
@@ -163,7 +163,7 @@ public class AutonomousTeleop extends LinearOpMode {
             }
             telemetry.addData("FRONT_LEFT: ", amount);
             telemetry.update();
-            waitFor(UP);
+            waitFor(FRONT_LEFT);
         }
 
         while (gamepad1.x)
