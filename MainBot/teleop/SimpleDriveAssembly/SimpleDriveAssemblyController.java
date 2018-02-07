@@ -20,20 +20,20 @@ public class SimpleDriveAssemblyController {
 
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         //fl
-        fl = hardwareMap.dcMotor.get(CrossCommunicator.Drive.UP);
+        fl = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_LEFT);
         fl.resetDeviceConfigurationForOpMode();
         fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //br
-        br = hardwareMap.dcMotor.get(CrossCommunicator.Drive.DOWN);
+        br = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_RIGHT);
         br.resetDeviceConfigurationForOpMode();
         br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        bl = hardwareMap.dcMotor.get(CrossCommunicator.Drive.LEFT);
+        bl = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_LEFT);
         bl.resetDeviceConfigurationForOpMode();
         bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        fr = hardwareMap.dcMotor.get(CrossCommunicator.Drive.RIGHT);
+        fr = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_RIGHT);
         fr.resetDeviceConfigurationForOpMode();
         fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }

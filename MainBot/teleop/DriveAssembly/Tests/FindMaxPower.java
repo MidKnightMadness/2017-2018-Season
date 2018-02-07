@@ -17,7 +17,7 @@ public class FindMaxPower extends LinearOpMode {
         DcMotor motorUp;
         double speeds[] = new double[22];
 
-        motorUp = hardwareMap.dcMotor.get(CrossCommunicator.Drive.UP);
+        motorUp = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_LEFT);
         motorUp.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorUp.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 

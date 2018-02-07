@@ -55,7 +55,7 @@ public class AutonomousTeleop extends LinearOpMode {
                 amount += (int)Math.signum(gamepad1.left_stick_x)*50;
                 a.rotateBot((int)Math.signum(gamepad1.left_stick_x)*50);
             }
-            telemetry.addData("UP: ", amount);
+            telemetry.addData("FRONT_LEFT: ", amount);
             telemetry.update();
             waitFor(UP);
         }
@@ -84,7 +84,7 @@ public class AutonomousTeleop extends LinearOpMode {
                 amount += (int)Math.signum(gamepad1.left_stick_x)*50;
                 a.moveBot((int)Math.signum(gamepad1.left_stick_x)*50);
             }
-            telemetry.addData("UP: ", amount);
+            telemetry.addData("FRONT_LEFT: ", amount);
             telemetry.update();
             waitFor(UP);
         }
@@ -99,7 +99,7 @@ public class AutonomousTeleop extends LinearOpMode {
                 amount += (int)Math.signum(gamepad1.left_stick_x)*50;
                 a.rotateBot((int)Math.signum(gamepad1.left_stick_x)*50);
             }
-            telemetry.addData("UP: ", amount);
+            telemetry.addData("FRONT_LEFT: ", amount);
             telemetry.update();
             waitFor(UP);
         }
@@ -118,7 +118,7 @@ public class AutonomousTeleop extends LinearOpMode {
                 amount += (int) Math.signum(gamepad1.left_stick_x) * 50;
                     a.moveBotDiUD((int) Math.signum(gamepad1.left_stick_x) * 50);
                 }
-                telemetry.addData("UP: ", amount);
+                telemetry.addData("FRONT_LEFT: ", amount);
                 telemetry.update();
                 waitFor(UP);
             }
@@ -129,7 +129,7 @@ public class AutonomousTeleop extends LinearOpMode {
                 amount += (int) Math.signum(gamepad1.left_stick_y) * 50;
                     a.moveBotDiLR((int) Math.signum(gamepad1.left_stick_y) * 50);
                 }
-                telemetry.addData("UP: ", a.getPos(LEFT));
+                telemetry.addData("FRONT_LEFT: ", a.getPos(LEFT));
                 telemetry.update();
                 waitFor(LEFT);
             }
@@ -161,7 +161,7 @@ public class AutonomousTeleop extends LinearOpMode {
                 amount += (int)Math.signum(gamepad1.left_stick_x)*50;
                 a.rotateBot((int)Math.signum(gamepad1.left_stick_x)*50);
             }
-            telemetry.addData("UP: ", amount);
+            telemetry.addData("FRONT_LEFT: ", amount);
             telemetry.update();
             waitFor(UP);
         }

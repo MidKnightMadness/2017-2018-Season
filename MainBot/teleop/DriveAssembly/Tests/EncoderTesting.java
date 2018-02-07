@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop.DriveAssembly.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -21,13 +20,13 @@ public class EncoderTesting extends LinearOpMode {
 
         telemetry.addLine("Status: Initialized and ready!");
         telemetry.update();
-        motorUp = hardwareMap.dcMotor.get(CrossCommunicator.Drive.UP);
+        motorUp = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_LEFT);
         motorUp.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorDown = hardwareMap.dcMotor.get(CrossCommunicator.Drive.DOWN);
+        motorDown = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_RIGHT);
         motorDown.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorLeft = hardwareMap.dcMotor.get(CrossCommunicator.Drive.LEFT);
+        motorLeft = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_LEFT);
         motorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorRight = hardwareMap.dcMotor.get(CrossCommunicator.Drive.RIGHT);
+        motorRight = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_RIGHT);
         motorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         waitForStart();

@@ -39,22 +39,22 @@ public class AutonomousController {
         motors[JEWEL].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motors[JEWEL].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        motors[UP] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.UP);
+        motors[UP] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_LEFT);
         motors[UP].resetDeviceConfigurationForOpMode();
         motors[UP].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motors[UP].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        motors[DOWN] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.DOWN);
+        motors[DOWN] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_RIGHT);
         motors[DOWN].resetDeviceConfigurationForOpMode();
         motors[DOWN].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motors[DOWN].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        motors[LEFT] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.LEFT);
+        motors[LEFT] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_LEFT);
         motors[LEFT].resetDeviceConfigurationForOpMode();
         motors[LEFT].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motors[LEFT].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        motors[RIGHT] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.RIGHT);
+        motors[RIGHT] = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_RIGHT);
         motors[RIGHT].resetDeviceConfigurationForOpMode();
         motors[RIGHT].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motors[RIGHT].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

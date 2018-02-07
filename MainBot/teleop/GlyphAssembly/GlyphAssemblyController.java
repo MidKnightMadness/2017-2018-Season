@@ -229,8 +229,8 @@ public class GlyphAssemblyController {
             justChanged = false;
         }
 
-        telemetry.addData("UP", up);
-        telemetry.addData("DOWN", down);
+        telemetry.addData("FRONT_LEFT", up);
+        telemetry.addData("BACK_RIGHT", down);
         telemetry.addData("open_Lower", grab[LOWER][OPEN]);
         telemetry.addData("close_Lower", grab[LOWER][CLOSED]);
         telemetry.addData("open_Upper", grab[UPPER][OPEN]);

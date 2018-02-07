@@ -74,22 +74,22 @@ public class BlueRecovery extends LinearOpMode {
         jewelMotor.resetDeviceConfigurationForOpMode();
         jewelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        driveUpMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.UP);
+        driveUpMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_LEFT);
         driveUpMotor.resetDeviceConfigurationForOpMode();
         driveUpMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveUpMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        driveDownMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.DOWN);
+        driveDownMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_RIGHT);
         driveDownMotor.resetDeviceConfigurationForOpMode();
         driveDownMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveDownMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        driveLeftMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.LEFT);
+        driveLeftMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_LEFT);
         driveLeftMotor.resetDeviceConfigurationForOpMode();
         driveLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        driveRightMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.RIGHT);
+        driveRightMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_RIGHT);
         driveRightMotor.resetDeviceConfigurationForOpMode();
         driveRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

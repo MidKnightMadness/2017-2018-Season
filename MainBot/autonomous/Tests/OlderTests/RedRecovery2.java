@@ -122,7 +122,7 @@ public class RedRecovery2 extends LinearOpMode {
             idle();
         }
         speedRotateBot(0.3, (DRIVE_ROTATE90_DISTANCE * 3) - DRIVE_ROTATE_DISTANCE);
-        /*if (visualC.pictograph == RelicRecoveryVuMark.RIGHT) {
+        /*if (visualC.pictograph == RelicRecoveryVuMark.FRONT_RIGHT) {
             DRIVE_MOVE_DISTANCE = 3300;
             moveBot();
             speedRotateBot(0.3, DRIVE_ROTATE90_DISTANCE / 2);
@@ -140,7 +140,7 @@ public class RedRecovery2 extends LinearOpMode {
             glyphC.resetArm();
         }
          else {
-            if (visualC.pictograph == RelicRecoveryVuMark.LEFT) {
+            if (visualC.pictograph == RelicRecoveryVuMark.BACK_LEFT) {
                 DRIVE_MOVE_DISTANCE = 3950 - 1400;
             }
             else {
@@ -179,22 +179,22 @@ public class RedRecovery2 extends LinearOpMode {
         jewelMotor.resetDeviceConfigurationForOpMode();
         jewelMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        driveUpMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.UP);
+        driveUpMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_LEFT);
         driveUpMotor.resetDeviceConfigurationForOpMode();
         driveUpMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveUpMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        driveDownMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.DOWN);
+        driveDownMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_RIGHT);
         driveDownMotor.resetDeviceConfigurationForOpMode();
         driveDownMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveDownMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        driveLeftMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.LEFT);
+        driveLeftMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_LEFT);
         driveLeftMotor.resetDeviceConfigurationForOpMode();
         driveLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        driveRightMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.RIGHT);
+        driveRightMotor = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_RIGHT);
         driveRightMotor.resetDeviceConfigurationForOpMode();
         driveRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         driveRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

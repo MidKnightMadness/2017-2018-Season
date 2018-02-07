@@ -8,10 +8,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class CrossCommunicator {
     public static class Drive {                            // FL––G––FR
-        public static final String UP = "front left";      // |U+   -R|
-        public static final String DOWN = "back right";    // J       |
-        public static final String LEFT = "back left";     // |L+   -D|
-        public static final String RIGHT = "front right";  // BL-----BR
+        public static final String FRONT_LEFT = "front left";      // |U+   -R|
+        public static final String BACK_RIGHT = "back right";    // J       |
+        public static final String BACK_LEFT = "back left";     // |L+   -D|
+        public static final String FRONT_RIGHT = "front right";  // BL-----BR
     }
 
     public static class Jewel {

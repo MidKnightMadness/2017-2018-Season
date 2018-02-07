@@ -51,10 +51,10 @@ public class DriveAssemblyOldController {
 
 
         if (MOTORS) {
-            motorUp = hardwareMap.dcMotor.get(CrossCommunicator.Drive.UP);
-            motorDown = hardwareMap.dcMotor.get(CrossCommunicator.Drive.DOWN);
-            motorLeft = hardwareMap.dcMotor.get(CrossCommunicator.Drive.LEFT);
-            motorRight = hardwareMap.dcMotor.get(CrossCommunicator.Drive.RIGHT);
+            motorUp = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_LEFT);
+            motorDown = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_RIGHT);
+            motorLeft = hardwareMap.dcMotor.get(CrossCommunicator.Drive.BACK_LEFT);
+            motorRight = hardwareMap.dcMotor.get(CrossCommunicator.Drive.FRONT_RIGHT);
 
             motorUp.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motorDown.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
