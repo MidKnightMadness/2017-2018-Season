@@ -10,6 +10,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+
 import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.justChanged;
 import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.time;
 import static org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator.State.yDecreased;
@@ -24,6 +28,9 @@ public class GlyphAssemblyController {
     private static final int OPEN = 1;
     private static final int HEIGHT_TO_GRAB_SECOND_GLYPH = 2200;
     private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 5200;
+    private static final double K_DISTANCE = 0.0005;
+    private static final double K_VELOCITY = 0.0001;
+    private static final int DISTANCE_FROM_HARD_STOP[] = {100, 100};
 
     private boolean bPressed;
     private boolean resettingArms;
@@ -61,6 +68,20 @@ public class GlyphAssemblyController {
     //The last difference in movement of the grabber: used in determining if the grabber is fully closed
     private int lastpos[] = {0, 0};
 
+
+    ElapsedTime elapsedTime = new ElapsedTime();
+    FileOutputStream fileOutputStream;
+    OutputStreamWriter outputStreamWriter;
+    int lastPosition[] = {0, 0};
+    double lastTime[] = {0, 0};
+    double velocity[] = {0, 0};
+    double thisTime[] = {0, 0};
+    double thisEnc[] = {0, 0};
+    double velocityArray[][] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+    int i = 0;
+
+
+
     public void init(Telemetry telemetry, HardwareMap hardwareMap) {
         this.telemetry = telemetry;
 
@@ -76,16 +97,29 @@ public class GlyphAssemblyController {
         grabber[0].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         grabber[0].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         grabber[0].setDirection(DcMotorSimple.Direction.REVERSE);
+        grabber[0].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         grabber[1] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.GRAB_LOWER);
         grabber[1].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         grabber[1].setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        grabber[1].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elevatorTargetPos = -1;
         futureElevTargetPos = -1;
         timeToUpdate = -1;
-        //curLvl = 0;
 
-        //Delete later... for testing purposes
         vsd = hardwareMap.servo.get(CrossCommunicator.Glyph.VSD);
+
+        try {
+            int j = 0;
+            while (new File("/storage/self/primary/Data/", j + "Data.txt").exists()) {
+                j++;
+            }
+            File file = new File("/storage/self/primary/Data/", j + "Data.txt");
+            fileOutputStream = new FileOutputStream(file);
+            outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+        } catch (Exception e) {
+            telemetry.addData("Error", e);
+            telemetry.update();
+        }
     }
 
     public void start() {
@@ -95,7 +129,14 @@ public class GlyphAssemblyController {
 
         grabber[0].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         grabber[1].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        resettingArms = true;
+        percentageClosed[0] = 0;
+        percentageClosed[1] = 0;
+        grabber[UPPER].setPower(-0.5);
+        grabber[LOWER].setPower(-0.5);
 
+
+        elapsedTime.reset();
     }
 
     private int elevPos() {
@@ -103,26 +144,19 @@ public class GlyphAssemblyController {
     }
 
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
+        updateVelocity();
         boolean up = gamepad1.right_bumper  || gamepad2.left_stick_y < -0.1;
         boolean down = gamepad1.left_bumper || gamepad2.left_stick_y > 0.1;
         boolean override = gamepad2.x;
-        /*boolean grab[][] = {
+        boolean grab[][] = {
                 {
                         gamepad2.left_bumper, //upper closed (
                         gamepad2.right_bumper //upper open
                 }, {
                         gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0, //lower closed (1, 0)
                         gamepad1.right_trigger > 0 || gamepad2.right_trigger > 0 //lower open
-                }};
-        */ // OLD
-        boolean grab[][] = {
-                {
-                        gamepad2.left_bumper, //upper closed (
-                        gamepad2.right_bumper //upper open
-                }, {
-                gamepad1.right_trigger > 0 || gamepad2.left_trigger > 0, //lower closed (1, 0)
-                gamepad1.left_trigger > 0 || gamepad2.right_trigger > 0 //lower open
-        }};
+                }
+        };
 
         if ((gamepad1.b || gamepad2.b )&& !bPressed) {
             bPressed = true;
@@ -190,24 +224,12 @@ public class GlyphAssemblyController {
                 lastpos[i] = grabber[i].getCurrentPosition();
             }
         } else {
-            if (!bPressed) {
-                if (grabber[UPPER].getMode() != DcMotor.RunMode.RUN_TO_POSITION) {
-                    grabber[UPPER].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    grabber[UPPER].setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    grabber[UPPER].setTargetPosition(200);
-                    grabber[UPPER].setPower(0.5);
-                    grabber[LOWER].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    grabber[LOWER].setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    grabber[LOWER].setTargetPosition(100);
-                    grabber[LOWER].setPower(0.5);
-                } else if (!grabber[UPPER].isBusy() && !grabber[LOWER].isBusy()) {
-                    grabber[UPPER].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    grabber[UPPER].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    grabber[LOWER].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    grabber[LOWER].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-                    resettingArms = false;
-                }
+            if (!bPressed && time.seconds() > 2) {
+                grabber[UPPER].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                grabber[UPPER].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                grabber[LOWER].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                grabber[LOWER].setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                resettingArms = false;
             }
         }
         if (justChanged) {
@@ -252,14 +274,13 @@ public class GlyphAssemblyController {
         elev.setPower(1);
         //elev.setPower(Math.min(Math.max(elevatorTargetPos - elev.getCurrentPosition()/10d, -1), 1));
         if (!resettingArms) {
-            grabber[UPPER].setPower(Math.min(Math.max(((percentageClosed[UPPER] * 800) - grabber[UPPER].getCurrentPosition()) / 300d,
-                    isFullyClosed[UPPER] ? -0.15 : -0.5),
-                    isFullyClosed[UPPER] ? 0.15 : 0.5));
-            grabber[LOWER].setPower(Math.min(Math.max(((percentageClosed[LOWER] * 800) - grabber[LOWER].getCurrentPosition()) / 300d,
-                    isFullyClosed[LOWER] ? -0.15 : -0.5),
-                    isFullyClosed[LOWER] ? 0.15 : 0.5));
+            grabber[UPPER].setPower(Math.min(Math.max(
+                    K_DISTANCE * ((DISTANCE_FROM_HARD_STOP[UPPER] + percentageClosed[UPPER] * 800) - grabber[UPPER].getCurrentPosition()) - (K_VELOCITY * velocity[UPPER])
+                    , -0.5), 0.5));
+            grabber[LOWER].setPower(Math.min(Math.max(
+                    K_DISTANCE * ((DISTANCE_FROM_HARD_STOP[LOWER] + percentageClosed[LOWER] * 800) - grabber[LOWER].getCurrentPosition()) - (K_VELOCITY * velocity[LOWER])
+                    , -0.5), 0.5));
         }
-        //grabber[UPPER].setPower(gamepad2.right_stick_y/5);
 
         telemetry.addData("Speed Upper Grabber: ", grabber[0].getPower());
         telemetry.addData("Speed Lower Grabber: ", grabber[1].getPower());
@@ -300,6 +321,47 @@ public class GlyphAssemblyController {
     }
 
     public void stop() {
+        try {
+            outputStreamWriter.flush();
+            outputStreamWriter.close();
+            fileOutputStream.flush();
+            fileOutputStream.close();
+        } catch (Exception e) {
 
+        }
+    }
+
+
+
+
+    private void updateVelocity() {
+        for (int mi = 0; mi < 2; mi++) {
+            i = i + 1 < 40 ? i + 1 : 0;
+            thisEnc[mi] = lastPosition[mi] - grabber[mi].getCurrentPosition();
+            lastPosition[mi] = grabber[mi].getCurrentPosition();
+            thisTime[mi] = lastTime[mi] - elapsedTime.seconds();
+            lastTime[mi] = elapsedTime.seconds();
+
+            velocityArray[mi][i] = thisEnc[mi] / thisTime[mi];
+            velocity[mi] = 0;
+            for (int j = 0; j < 40; j++) {
+                velocity[mi] += velocityArray[mi][j];
+            }
+            velocity[mi] /= 40;
+
+
+            telemetry.addData("Velocity (enc/sec)", velocity[mi]);
+            telemetry.addData("Time This Run", thisTime[mi]);
+            telemetry.addData("Enc This Run", thisEnc[mi]);
+        }
+        telemetry.update();
+
+        if (i % 1 == 0) {
+            try {
+                outputStreamWriter.append(velocity[0] + ", " + velocity[1] + "\n");
+            } catch (Exception e) {
+
+            }
+        }
     }
 }
