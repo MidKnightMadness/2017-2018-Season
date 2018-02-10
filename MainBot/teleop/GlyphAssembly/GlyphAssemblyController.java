@@ -28,7 +28,7 @@ public class GlyphAssemblyController {
     private static final int OPEN = 1;
     private static final int HEIGHT_TO_GRAB_SECOND_GLYPH = 2200;
     private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 5200;
-    private static final double K_DISTANCE = 0.0005;
+    private static final double K_DISTANCE = 0.0000;
     private static final double K_VELOCITY = 0.0001;
     private static final int DISTANCE_FROM_HARD_STOP[] = {100, 100};
 
@@ -277,11 +277,13 @@ public class GlyphAssemblyController {
             grabber[UPPER].setPower(Math.min(Math.max(
                     K_DISTANCE * ((DISTANCE_FROM_HARD_STOP[UPPER] + percentageClosed[UPPER] * 800) - grabber[UPPER].getCurrentPosition()) - (K_VELOCITY * velocity[UPPER])
                     , -0.5), 0.5));
+            telemetry.addData("Upper Power Unrestricted", K_DISTANCE * ((DISTANCE_FROM_HARD_STOP[UPPER] + percentageClosed[UPPER] * 800) - grabber[UPPER].getCurrentPosition()) - (K_VELOCITY * velocity[UPPER]));
             grabber[LOWER].setPower(Math.min(Math.max(
                     K_DISTANCE * ((DISTANCE_FROM_HARD_STOP[LOWER] + percentageClosed[LOWER] * 800) - grabber[LOWER].getCurrentPosition()) - (K_VELOCITY * velocity[LOWER])
                     , -0.5), 0.5));
         }
-
+        telemetry.addData("Current Upper Grabber Position", grabber[UPPER].getCurrentPosition());
+        telemetry.addData("Distance Upper", ((DISTANCE_FROM_HARD_STOP[UPPER] + percentageClosed[UPPER] * 800) - grabber[UPPER].getCurrentPosition()));
         telemetry.addData("Speed Upper Grabber: ", grabber[0].getPower());
         telemetry.addData("Speed Lower Grabber: ", grabber[1].getPower());
         telemetry.addData("Position Elevator: ", elevPos());
@@ -335,30 +337,29 @@ public class GlyphAssemblyController {
 
 
     private void updateVelocity() {
+        //i = i + 1 < 10 ? i + 1 : 0;
         for (int mi = 0; mi < 2; mi++) {
-            i = i + 1 < 40 ? i + 1 : 0;
+
             thisEnc[mi] = lastPosition[mi] - grabber[mi].getCurrentPosition();
             lastPosition[mi] = grabber[mi].getCurrentPosition();
             thisTime[mi] = lastTime[mi] - elapsedTime.seconds();
             lastTime[mi] = elapsedTime.seconds();
 
             velocityArray[mi][i] = thisEnc[mi] / thisTime[mi];
-            velocity[mi] = 0;
-            for (int j = 0; j < 40; j++) {
+            /*velocity[mi] = 0;
+            for (int j = 0; j < 10; j++) {
                 velocity[mi] += velocityArray[mi][j];
-            }
-            velocity[mi] /= 40;
-
+            }*/
+            velocity[mi] = 0.85 * velocity[mi] + 0.15 *(thisEnc[mi] / thisTime[mi]);
 
             telemetry.addData("Velocity (enc/sec)", velocity[mi]);
             telemetry.addData("Time This Run", thisTime[mi]);
             telemetry.addData("Enc This Run", thisEnc[mi]);
         }
-        telemetry.update();
 
         if (i % 1 == 0) {
             try {
-                outputStreamWriter.append(velocity[0] + ", " + velocity[1] + "\n");
+                //outputStreamWriter.append(velocity[0] + ", " + velocity[1] + "\n");
             } catch (Exception e) {
 
             }

@@ -59,6 +59,16 @@ public class VelocityTest extends OpMode {
     @Override
     public void loop() {
         i = i + 1 < 20 ? i + 1 : 0;
+        if (lastTime - elapsedTime.seconds() < 0.1) {
+            telemetry.addData("Velocity (enc/sec)", velocity);
+            telemetry.addData("Time This Run", thisTime);
+            telemetry.addData("Enc This Run", thisEnc);
+            telemetry.addData("lastTime", lastTime);
+            telemetry.addData("Current Time", elapsedTime.seconds());
+            telemetry.addData("Last Time - elapsedTime", lastTime - elapsedTime.seconds());
+            telemetry.update();
+            return;
+        }
         thisEnc = lastPosition - motor.getCurrentPosition();
         lastPosition = motor.getCurrentPosition();
         thisTime = lastTime - elapsedTime.seconds();
@@ -76,9 +86,9 @@ public class VelocityTest extends OpMode {
         telemetry.addData("Velocity (enc/sec)", velocity);
         telemetry.addData("Time This Run", thisTime);
         telemetry.addData("Enc This Run", thisEnc);
-        telemetry.addData("Speed", Math.min(Math.max(power
-                , -0.5), 0.5));
-        telemetry.addData("Unrestricted Speed", power);
+        //telemetry.addData("Speed", Math.min(Math.max(power
+                //, -0.5), 0.5));
+        //telemetry.addData("Unrestricted Speed", power);
         telemetry.update();
         try {
             //outputStreamWriter.append(velocity + "\n");
