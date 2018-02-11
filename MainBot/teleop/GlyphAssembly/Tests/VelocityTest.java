@@ -58,8 +58,7 @@ public class VelocityTest extends OpMode {
 
     @Override
     public void loop() {
-        i = i + 1 < 20 ? i + 1 : 0;
-        if (lastTime - elapsedTime.seconds() < 0.1) {
+        if (lastTime - elapsedTime.seconds() > -0.15) {
             telemetry.addData("Velocity (enc/sec)", velocity);
             telemetry.addData("Time This Run", thisTime);
             telemetry.addData("Enc This Run", thisEnc);
@@ -67,43 +66,44 @@ public class VelocityTest extends OpMode {
             telemetry.addData("Current Time", elapsedTime.seconds());
             telemetry.addData("Last Time - elapsedTime", lastTime - elapsedTime.seconds());
             telemetry.update();
-            return;
-        }
-        thisEnc = lastPosition - motor.getCurrentPosition();
-        lastPosition = motor.getCurrentPosition();
-        thisTime = lastTime - elapsedTime.seconds();
-        lastTime = elapsedTime.seconds();
-
-
-        velocityArray[i] = thisEnc / thisTime;
-        velocity = 0;
-        for (int j = 0; j < 20; j++) {
-            velocity += velocityArray[j];
-        }
-        velocity /= 20;
-        //velocity = 0.95 * velocity + 0.05 * (thisEnc / thisTime);
-        double power = 0.0005 * (target - motor.getCurrentPosition()) - 0.0001 * velocity;
-        telemetry.addData("Velocity (enc/sec)", velocity);
-        telemetry.addData("Time This Run", thisTime);
-        telemetry.addData("Enc This Run", thisEnc);
-        //telemetry.addData("Speed", Math.min(Math.max(power
-                //, -0.5), 0.5));
-        //telemetry.addData("Unrestricted Speed", power);
-        telemetry.update();
-        try {
-            //outputStreamWriter.append(velocity + "\n");
-        } catch (Exception e) {
-
-        }
-        if (gamepad1.a) {
-            target = 1000;
         } else {
-            target = 0;
-        }
+            //i = i + 1 < 10 ? i + 1 : 0;
+            thisEnc = lastPosition - motor.getCurrentPosition();
+            lastPosition = motor.getCurrentPosition();
+            thisTime = lastTime - elapsedTime.seconds();
+            lastTime = elapsedTime.seconds();
 
-        motor.setPower(Math.min(Math.max(
-                power
-                , -0.5), 0.5));
+
+            velocityArray[i] = thisEnc / thisTime;
+            //velocity = 0;
+            /*for (int j = 0; j < 10; j++) {
+                velocity += velocityArray[j];
+            }
+            velocity /= 10;*/
+            velocity = 0.2 * velocity + 0.8 * (thisEnc / thisTime);
+            double power = 0.0000 * (target - motor.getCurrentPosition()) - 0.0001 * velocity;
+            telemetry.addData("Velocity (enc/sec)", velocity);
+            telemetry.addData("Time This Run", thisTime);
+            telemetry.addData("Enc This Run", thisEnc);
+            //telemetry.addData("Speed", Math.min(Math.max(power
+            //, -0.5), 0.5));
+            //telemetry.addData("Unrestricted Speed", power);
+            telemetry.update();
+            try {
+                //outputStreamWriter.append(velocity + "\n");
+            } catch (Exception e) {
+
+            }
+            if (gamepad1.a) {
+                target = 1000;
+            } else {
+                target = 0;
+            }
+
+            motor.setPower(Math.min(Math.max(
+                    power
+                    , -0.5), 0.5));
+        }
     }
 
     @Override

@@ -28,9 +28,9 @@ public class GlyphAssemblyController {
     private static final int OPEN = 1;
     private static final int HEIGHT_TO_GRAB_SECOND_GLYPH = 2200;
     private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 5200;
-    private static final double K_DISTANCE = 0.0000;
-    private static final double K_VELOCITY = 0.0001;
-    private static final int DISTANCE_FROM_HARD_STOP[] = {100, 100};
+    private static final double K_DISTANCE = 0.001;
+    private static final double K_VELOCITY = 0.0002;
+    private static final int DISTANCE_FROM_HARD_STOP[] = {120, 120};
 
     private boolean bPressed;
     private boolean resettingArms;
@@ -77,7 +77,7 @@ public class GlyphAssemblyController {
     double velocity[] = {0, 0};
     double thisTime[] = {0, 0};
     double thisEnc[] = {0, 0};
-    double velocityArray[][] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+    //double velocityArray[][] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
     int i = 0;
 
 
@@ -150,8 +150,8 @@ public class GlyphAssemblyController {
         boolean override = gamepad2.x;
         boolean grab[][] = {
                 {
-                        gamepad2.left_bumper, //upper closed (
-                        gamepad2.right_bumper //upper open
+                        gamepad2.left_bumper || gamepad1.dpad_left, //upper closed
+                        gamepad2.right_bumper || gamepad1.dpad_right //upper open
                 }, {
                         gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0, //lower closed (1, 0)
                         gamepad1.right_trigger > 0 || gamepad2.right_trigger > 0 //lower open
@@ -210,13 +210,13 @@ public class GlyphAssemblyController {
                     if (percentageClosed[i] > 0.9) {
                         percentageClosed[i] = 1;
                     } else {
-                        percentageClosed[i] += 0.1;
+                        percentageClosed[i] += 0.15;
                     }
                 } else if (grab[i][OPEN]) {
                     if (percentageClosed[i] < 0.1) {
                         percentageClosed[i] = 0;
                     } else {
-                        percentageClosed[i] -= 0.1;
+                        percentageClosed[i] -= 0.15;
                     }
                 }
 
@@ -345,12 +345,12 @@ public class GlyphAssemblyController {
             thisTime[mi] = lastTime[mi] - elapsedTime.seconds();
             lastTime[mi] = elapsedTime.seconds();
 
-            velocityArray[mi][i] = thisEnc[mi] / thisTime[mi];
+            //velocityArray[mi][i] = thisEnc[mi] / thisTime[mi];
             /*velocity[mi] = 0;
             for (int j = 0; j < 10; j++) {
                 velocity[mi] += velocityArray[mi][j];
             }*/
-            velocity[mi] = 0.85 * velocity[mi] + 0.15 *(thisEnc[mi] / thisTime[mi]);
+            velocity[mi] = 0.2 * velocity[mi] + 0.8 * (thisEnc[mi] / thisTime[mi]);
 
             telemetry.addData("Velocity (enc/sec)", velocity[mi]);
             telemetry.addData("Time This Run", thisTime[mi]);
