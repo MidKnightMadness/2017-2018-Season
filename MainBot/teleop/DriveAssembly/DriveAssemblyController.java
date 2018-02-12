@@ -148,123 +148,131 @@ public class DriveAssemblyController {
     public void loop(Gamepad gamepad1, Gamepad gamepad2) {
         target = targets[corner][turnDir];
 
-        if ((gamepad1.a || gamepad2.a)) {
-            resetHeading();
-        }
+        if (gamepad1.dpad_down) {
+            motorUp.setPower(.7);
+            motorDown.setPower(-.7);
+            motorLeft.setPower(.7);
+            motorRight.setPower(-.7);
+        } else {
 
-        if ((gamepad1.x || gamepad2.x )&& !backPressed) {
-            yDecreased = true;
-            yIncreased = false;
-            yDecrease();
-            justChanged = true;
-            if (yState == 0) {
+            if ((gamepad1.a || gamepad2.a)) {
+                resetHeading();
+            }
+
+            if ((gamepad1.x || gamepad2.x) && !backPressed) {
+                yDecreased = true;
+                yIncreased = false;
+                yDecrease();
+                justChanged = true;
+                if (yState == 0) {
+                    isTimeToRotate = false;
+                    resettingRotation = true;
+                    timeToRotate = time.seconds() + 1d;
+                }
+                backPressed = true;
+            } else if (!(gamepad1.x || gamepad2.x)) {
+                backPressed = false;
+            }
+            telemetry.addData("Back", backPressed);
+
+            if ((gamepad1.y || gamepad2.y) && !yPressed) {
+                yIncreased = true;
+                yDecreased = false;
+                yIncrease();
                 isTimeToRotate = false;
-                resettingRotation = true;
-                timeToRotate = time.seconds() + 1d;
+                if (yState == 1) {
+                    timeToRotate = time.seconds() + 1d;
+                    lastKnownRotation = theta;
+                }
+                justChanged = true;
+                yPressed = true;
+            } else if (!(gamepad1.y || gamepad2.y)) {
+                yPressed = false;
             }
-            backPressed = true;
-        } else if (!(gamepad1.x|| gamepad2.x)){
-            backPressed = false;
-        }
-        telemetry.addData("Back", backPressed);
 
-        if ((gamepad1.y || gamepad2.y )&& !yPressed) {
-            yIncreased = true;
-            yDecreased = false;
-            yIncrease();
-            isTimeToRotate = false;
-            if (yState == 1) {
-                timeToRotate = time.seconds() + 1d;
-                lastKnownRotation = theta;
+            if ((gamepad1.dpad_left || gamepad2.dpad_left)) {
+                turnDir = 0;
+            } else if ((gamepad1.dpad_right || gamepad2.dpad_right)) {
+                turnDir = 1;
             }
-            justChanged = true;
-            yPressed = true;
-        } else if (!(gamepad1.y|| gamepad2.y)){
-            yPressed = false;
-        }
 
-        if ((gamepad1.dpad_left|| gamepad2.dpad_left)) {
-            turnDir = 0;
-        } else if ((gamepad1.dpad_right|| gamepad2.dpad_right)) {
-            turnDir = 1;
-        }
-
-        if (time.seconds() > timeToRotate && timeToRotate != -1) {
-            timeToRotate = -1;
-            isTimeToRotate = true;
-        }
-
-        {
-            theta = getIMURotation() - startPos;
-            adjustedX = gamepad1.left_stick_x;
-            adjustedY = gamepad1.left_stick_y;
-            adjustedR = gamepad1.right_stick_x;
-
-            if (Math.abs(adjustedR) > 0.1 && isTimeToRotate) {
+            if (time.seconds() > timeToRotate && timeToRotate != -1) {
                 timeToRotate = -1;
-                isTimeToRotate = false;
-                resettingRotation = false;
+                isTimeToRotate = true;
             }
 
-            //Adding base rotation angle so the numbers are the rotation of the glyph arm instead of the IMU.
-            if (isTimeToRotate) {
-                double tempTarget;
-                if (resettingRotation) {
-                    tempTarget = lastKnownRotation;
-                } else {
-                    tempTarget = (target + BASE_ROTATION_ANGLE);
+            {
+                theta = getIMURotation() - startPos;
+                adjustedX = gamepad1.left_stick_x;
+                adjustedY = gamepad1.left_stick_y;
+                adjustedR = gamepad1.right_stick_x;
+
+                if (Math.abs(adjustedR) > 0.1 && isTimeToRotate) {
+                    timeToRotate = -1;
+                    isTimeToRotate = false;
+                    resettingRotation = false;
                 }
-                telemetry.addData("Offset", (theta - tempTarget + 3780) % 360 - 180);
+
+                //Adding base rotation angle so the numbers are the rotation of the glyph arm instead of the IMU.
+                if (isTimeToRotate) {
+                    double tempTarget;
+                    if (resettingRotation) {
+                        tempTarget = lastKnownRotation;
+                    } else {
+                        tempTarget = (target + BASE_ROTATION_ANGLE);
+                    }
+                    telemetry.addData("Offset", (theta - tempTarget + 3780) % 360 - 180);
 
 
-                if (Math.abs((theta - tempTarget + 3780) % 360 - 180) > 5) {
-                    adjustedR = Math.min(Math.max(((theta - tempTarget + 3780) % 360 - 180) / 30.0d, -1), 1);
-                } else {
-                    adjustedR = 0;
+                    if (Math.abs((theta - tempTarget + 3780) % 360 - 180) > 5) {
+                        adjustedR = Math.min(Math.max(((theta - tempTarget + 3780) % 360 - 180) / 30.0d, -1), 1);
+                    } else {
+                        adjustedR = 0;
+                    }
                 }
+
+                double translateScale = Math.pow(Math.hypot(adjustedX, adjustedY), 5) * (1 - Math.min(Math.pow(Math.abs(adjustedR), 2), 0.6)) * (slow ? 0.5 : 1);
+                double targetDirection = aTan(gamepad1.left_stick_x, -gamepad1.left_stick_y);
+                double rotateScale = Math.pow(Math.abs(adjustedR), 5) * Math.signum(-adjustedR) * (1 - Math.abs(translateScale)) * (slow ? 0.5 : 1);
+
+                telemetry.addData("AdjustedR", adjustedR);
+                telemetry.addData("Needs To Move", Math.abs((theta - target + 3780) % 360 - 180) > 1);
+                telemetry.addData("Theta", theta);
+                telemetry.addData("Target", target);
+                telemetry.addData("Homeward", isTimeToRotate);
+                telemetry.addData("Corner", corner);
+
+                telemetry.addData("Rotate Scale", rotateScale);
+
+                tempMotors[0] = Math.cos((theta + targetDirection) * (Math.PI / 180d));
+                tempMotors[1] = -Math.cos((theta + targetDirection) * (Math.PI / 180d));
+                tempMotors[2] = Math.sin((theta + targetDirection) * (Math.PI / 180d));
+                tempMotors[3] = -Math.sin((theta + targetDirection) * (Math.PI / 180d));
+
+                double scale = Math.max(Math.max(Math.abs(tempMotors[0]), Math.abs(tempMotors[1])), Math.max(Math.abs(tempMotors[2]), Math.abs(tempMotors[3])));
+                if (scale == 0) {
+                    scale = 0;
+                } else {
+                    scale = translateScale / (scale);
+                }
+
+                tempMotors[0] *= scale;
+                tempMotors[1] *= scale;
+                tempMotors[2] *= scale;
+                tempMotors[3] *= scale;
+
+                tempMotors[0] += rotateScale;
+                tempMotors[1] += rotateScale;
+                tempMotors[2] += rotateScale;
+                tempMotors[3] += rotateScale;
+
+                targPow(motorUp, 0, tempMotors[0]);
+                targPow(motorDown, 1, tempMotors[1]);
+                targPow(motorLeft, 2, tempMotors[2]);
+                targPow(motorRight, 3, tempMotors[3]);
+
+                telemetry.update();
             }
-
-            double translateScale = Math.pow(Math.hypot(adjustedX, adjustedY), 5) * (1 - Math.min(Math.pow(Math.abs(adjustedR), 2), 0.6)) * (slow ? 0.5 : 1);
-            double targetDirection = aTan(gamepad1.left_stick_x, -gamepad1.left_stick_y);
-            double rotateScale = Math.pow(Math.abs(adjustedR), 5) * Math.signum(-adjustedR) * (1 - Math.abs(translateScale)) * (slow ? 0.5 : 1);
-
-            telemetry.addData("AdjustedR", adjustedR);
-            telemetry.addData("Needs To Move", Math.abs((theta - target + 3780) % 360 - 180) > 1);
-            telemetry.addData("Theta", theta);
-            telemetry.addData("Target", target);
-            telemetry.addData("Homeward", isTimeToRotate);
-            telemetry.addData("Corner", corner);
-
-            telemetry.addData("Rotate Scale", rotateScale);
-
-            tempMotors[0] = Math.cos((theta + targetDirection) * (Math.PI / 180d));
-            tempMotors[1] = -Math.cos((theta + targetDirection) * (Math.PI / 180d));
-            tempMotors[2] = Math.sin((theta + targetDirection) * (Math.PI / 180d));
-            tempMotors[3] = -Math.sin((theta + targetDirection) * (Math.PI / 180d));
-
-            double scale = Math.max(Math.max(Math.abs(tempMotors[0]), Math.abs(tempMotors[1])), Math.max(Math.abs(tempMotors[2]), Math.abs(tempMotors[3])));
-            if (scale == 0) {
-                scale = 0;
-            } else {
-                scale = translateScale / (scale);
-            }
-
-            tempMotors[0] *= scale;
-            tempMotors[1] *= scale;
-            tempMotors[2] *= scale;
-            tempMotors[3] *= scale;
-
-            tempMotors[0] += rotateScale;
-            tempMotors[1] += rotateScale;
-            tempMotors[2] += rotateScale;
-            tempMotors[3] += rotateScale;
-
-            targPow(motorUp, 0, tempMotors[0]);
-            targPow(motorDown, 1, tempMotors[1]);
-            targPow(motorLeft, 2, tempMotors[2]);
-            targPow(motorRight, 3, tempMotors[3]);
-
-            telemetry.update();
         }
     }
 

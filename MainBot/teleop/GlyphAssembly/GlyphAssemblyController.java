@@ -30,7 +30,7 @@ public class GlyphAssemblyController {
     private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 5200;
     private static final double K_DISTANCE = 0.001;
     private static final double K_VELOCITY = 0.0002;
-    private static final int DISTANCE_FROM_HARD_STOP[] = {120, 120};
+    private static final int DISTANCE_FROM_HARD_STOP[] = {240, 240};
 
     private boolean bPressed;
     private boolean resettingArms;
@@ -153,8 +153,8 @@ public class GlyphAssemblyController {
                         gamepad2.left_bumper || gamepad1.dpad_left, //upper closed
                         gamepad2.right_bumper || gamepad1.dpad_right //upper open
                 }, {
-                        gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0, //lower closed (1, 0)
-                        gamepad1.right_trigger > 0 || gamepad2.right_trigger > 0 //lower open
+                        gamepad1.right_trigger > 0 || gamepad2.right_trigger > 0, //lower closed (1, 0)
+                        gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0 //lower open
                 }
         };
 
