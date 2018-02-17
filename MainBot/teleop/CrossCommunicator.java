@@ -28,9 +28,9 @@ public class CrossCommunicator {
     public static class State {
         public static boolean justChanged = false;
         public static ElapsedTime time = new ElapsedTime();
-        public static int yState = 2;
-        public static void yIncrease() {yState = yState + 1 > 2? 0 : yState + 1;}
-        public static void yDecrease() {yState = yState - 1 < 0? 2 : yState - 1;}
+        public static int yState = 3;
+        public static void yIncrease() {yState = yState + 1 > 3? 0 : yState + 1;}
+        public static void yDecrease() {yState = yState - 1 < 0? 3 : yState - 1;}
         public static boolean yIncreased = false;
         public static boolean yDecreased = false;
     }

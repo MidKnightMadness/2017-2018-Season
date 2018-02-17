@@ -42,11 +42,11 @@ public class DriveAssemblyController {
             //RedRecovery
             {180 - 30, 180 + 30},
             //RedNonRecovery
-            {125, 125},
+            {180 + 60, 180 - 60},
             //BlueRecovery
-            {20, 70},
+            {180 - 30, 180 + 30},
             //BlueNonRecovery
-            {-20, -70}
+            {180 + 60, 180 - 60}
     };
 
     //The last initialized position of the IMU
@@ -129,6 +129,7 @@ public class DriveAssemblyController {
         resetHeading();
 
         vsd = hardwareMap.servo.get("vsd");
+        readTeamColor();
     }
 
     public void start() {vsd.setPosition(1);}

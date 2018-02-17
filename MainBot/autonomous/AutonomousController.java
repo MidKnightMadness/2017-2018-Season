@@ -81,13 +81,13 @@ public class AutonomousController {
         motors[GRAB].setPower(0);
     }
     public void open() {
-        motors[GRAB].setPower(-0.8);
+        motors[GRAB].setPower(-0.5);
     }
     public void lift() {
-        move(ELEV, 1000, 1);
+        move(ELEV, 1300, 1);
     }
     public void lower() {
-        move(ELEV, -1000, -1);
+        move(ELEV, -1300, -1);
     }
 
     public void moveBot(int distance, double speed) {

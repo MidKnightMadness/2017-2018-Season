@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.MainBot.teleop.GlyphAssembly.Tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
+@Disabled
 @TeleOp(name = "Velocity Test", group = "Tests")
 public class VelocityTest extends OpMode {
 
@@ -65,6 +67,8 @@ public class VelocityTest extends OpMode {
             telemetry.addData("lastTime", lastTime);
             telemetry.addData("Current Time", elapsedTime.seconds());
             telemetry.addData("Last Time - elapsedTime", lastTime - elapsedTime.seconds());
+            telemetry.addData("Power", motor.getPower());
+
             telemetry.update();
         } else {
             //i = i + 1 < 10 ? i + 1 : 0;
@@ -74,17 +78,19 @@ public class VelocityTest extends OpMode {
             lastTime = elapsedTime.seconds();
 
 
+
             velocityArray[i] = thisEnc / thisTime;
             //velocity = 0;
             /*for (int j = 0; j < 10; j++) {
                 velocity += velocityArray[j];
             }
             velocity /= 10;*/
-            velocity = 0.2 * velocity + 0.8 * (thisEnc / thisTime);
-            double power = 0.0000 * (target - motor.getCurrentPosition()) - 0.0001 * velocity;
+            velocity = 0.6 * velocity + 0.4 * (thisEnc / thisTime);
+            double power = 0.0005 * (target - motor.getCurrentPosition()) - 0.0002 * velocity;
             telemetry.addData("Velocity (enc/sec)", velocity);
             telemetry.addData("Time This Run", thisTime);
             telemetry.addData("Enc This Run", thisEnc);
+            telemetry.addData("Power", motor.getPower());
             //telemetry.addData("Speed", Math.min(Math.max(power
             //, -0.5), 0.5));
             //telemetry.addData("Unrestricted Speed", power);

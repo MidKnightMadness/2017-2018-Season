@@ -27,10 +27,11 @@ public class GlyphAssemblyController {
     private static final int CLOSED = 0;
     private static final int OPEN = 1;
     private static final int HEIGHT_TO_GRAB_SECOND_GLYPH = 2200;
-    private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 5200;
-    private static final double K_DISTANCE = 0.001;
+    private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 5400;
+    private static final double K_DISTANCE = 0.0005;
     private static final double K_VELOCITY = 0.0002;
-    private static final int DISTANCE_FROM_HARD_STOP[] = {240, 240};
+    private static final double K_TOTAL[] = {2, 1.5};
+    private static final int DISTANCE_FROM_HARD_STOP[] = {140, 100};
 
     private boolean bPressed;
     private boolean resettingArms;
@@ -150,11 +151,11 @@ public class GlyphAssemblyController {
         boolean override = gamepad2.x;
         boolean grab[][] = {
                 {
-                        gamepad2.left_bumper || gamepad1.dpad_left, //upper closed
-                        gamepad2.right_bumper || gamepad1.dpad_right //upper open
+                        gamepad2.left_bumper,
+                        gamepad2.right_bumper
                 }, {
-                        gamepad1.right_trigger > 0 || gamepad2.right_trigger > 0, //lower closed (1, 0)
-                        gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0 //lower open
+                        gamepad1.right_trigger > 0 || gamepad2.left_trigger > 0, //lower closed (1, 0)
+                        gamepad1.left_trigger > 0 || gamepad2.right_trigger > 0 //lower open
                 }
         };
 
@@ -236,16 +237,19 @@ public class GlyphAssemblyController {
             if (yIncreased) {
                 if (yState == 0 || yState == 1) {
                     grab(yState);
-                } else {
+                } else if (yState == 2){
                     releaseBoth();
+                } else {
+                    finishReleaseBoth();
                 }
             } else if (yDecreased) {
                 if (yState == 2) {
                     release(0);
                 } else if (yState == 0) {
                     release(1);
-                } else {
+                } else if (yState == 3){
                     releaseBoth();
+                    finishReleaseBoth();
                 }
             }
             justChanged = false;
@@ -275,12 +279,12 @@ public class GlyphAssemblyController {
         //elev.setPower(Math.min(Math.max(elevatorTargetPos - elev.getCurrentPosition()/10d, -1), 1));
         if (!resettingArms) {
             grabber[UPPER].setPower(Math.min(Math.max(
-                    K_DISTANCE * ((DISTANCE_FROM_HARD_STOP[UPPER] + percentageClosed[UPPER] * 800) - grabber[UPPER].getCurrentPosition()) - (K_VELOCITY * velocity[UPPER])
-                    , -0.5), 0.5));
-            telemetry.addData("Upper Power Unrestricted", K_DISTANCE * ((DISTANCE_FROM_HARD_STOP[UPPER] + percentageClosed[UPPER] * 800) - grabber[UPPER].getCurrentPosition()) - (K_VELOCITY * velocity[UPPER]));
+                    K_TOTAL[UPPER] * (K_DISTANCE * ((DISTANCE_FROM_HARD_STOP[UPPER] + percentageClosed[UPPER] * 800) - grabber[UPPER].getCurrentPosition()) - (K_VELOCITY * velocity[UPPER]))
+                    , -0.6), 0.6));
+            telemetry.addData("Upper Power Unrestricted", K_TOTAL[UPPER] * (K_DISTANCE * ((DISTANCE_FROM_HARD_STOP[UPPER] + percentageClosed[UPPER] * 800) - grabber[UPPER].getCurrentPosition()) - (K_VELOCITY * velocity[UPPER])));
             grabber[LOWER].setPower(Math.min(Math.max(
-                    K_DISTANCE * ((DISTANCE_FROM_HARD_STOP[LOWER] + percentageClosed[LOWER] * 800) - grabber[LOWER].getCurrentPosition()) - (K_VELOCITY * velocity[LOWER])
-                    , -0.5), 0.5));
+                    K_TOTAL[LOWER] * (K_DISTANCE * ((DISTANCE_FROM_HARD_STOP[LOWER] + percentageClosed[LOWER] * 800) - grabber[LOWER].getCurrentPosition()) - (K_VELOCITY * velocity[LOWER]))
+                    , -0.6), 0.6));
         }
         telemetry.addData("Current Upper Grabber Position", grabber[UPPER].getCurrentPosition());
         telemetry.addData("Distance Upper", ((DISTANCE_FROM_HARD_STOP[UPPER] + percentageClosed[UPPER] * 800) - grabber[UPPER].getCurrentPosition()));
@@ -308,18 +312,25 @@ public class GlyphAssemblyController {
     public void release(int arm) {
         vsd.setPosition(0);
         manual = false;
-        percentageClosed[arm] = 0.3;
+        percentageClosed[arm] = 0.2;
         timeToUpdate = time.seconds() + 1.5d;
         futureElevTargetPos = arm == LOWER ? HEIGHT_TO_GRAB_SECOND_GLYPH : 0;
         futurePercentageClosed[arm] = 0;
         futurePercentageClosed[arm == 0 ? 1 : 0] = -1;
     }
 
+    public void finishReleaseBoth() {
+        percentageClosed[0] = 0;
+        percentageClosed[1] = 0;
+        elevatorTargetPos = 0;
+    }
+
     public void releaseBoth() {
         release(LOWER);
         release(UPPER);
-        futurePercentageClosed[LOWER] = 0;
-        timeToUpdate = time.seconds() + 3d;
+        futurePercentageClosed[0] = -1;
+        futurePercentageClosed[1] = -1;
+        futureElevTargetPos = -1;
     }
 
     public void stop() {
@@ -350,19 +361,11 @@ public class GlyphAssemblyController {
             for (int j = 0; j < 10; j++) {
                 velocity[mi] += velocityArray[mi][j];
             }*/
-            velocity[mi] = 0.2 * velocity[mi] + 0.8 * (thisEnc[mi] / thisTime[mi]);
+            velocity[mi] = 0.7 * velocity[mi] + 0.3 * (thisEnc[mi] / thisTime[mi]);
 
             telemetry.addData("Velocity (enc/sec)", velocity[mi]);
             telemetry.addData("Time This Run", thisTime[mi]);
             telemetry.addData("Enc This Run", thisEnc[mi]);
-        }
-
-        if (i % 1 == 0) {
-            try {
-                //outputStreamWriter.append(velocity[0] + ", " + velocity[1] + "\n");
-            } catch (Exception e) {
-
-            }
         }
     }
 }

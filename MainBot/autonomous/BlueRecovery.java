@@ -25,7 +25,7 @@ public class BlueRecovery extends LinearOpMode {
     private int[][] targets = new int[][]{
            //L, C, R
             //shift
-            {-150, 0, 0},
+            {-100, 0, 0},
             //knock
             {250, 0, -250},
             //toCrypto
