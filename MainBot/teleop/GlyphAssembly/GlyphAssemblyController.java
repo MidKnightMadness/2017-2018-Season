@@ -27,7 +27,7 @@ public class GlyphAssemblyController {
     private static final int CLOSED = 0;
     private static final int OPEN = 1;
     private static final int HEIGHT_TO_GRAB_SECOND_GLYPH = 2200;
-    private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 5400;
+    private static final int HEIGHT_AFTER_GRABBING_SECOND_GLYPH = 5600;
     private static final double K_DISTANCE = 0.0005;
     private static final double K_VELOCITY = 0.0002;
     private static final double K_TOTAL[] = {2, 1.5};
@@ -243,11 +243,11 @@ public class GlyphAssemblyController {
                     finishReleaseBoth();
                 }
             } else if (yDecreased) {
-                if (yState == 2) {
+                if (yState == 3) {
                     release(0);
                 } else if (yState == 0) {
                     release(1);
-                } else if (yState == 3){
+                } else if (yState == 2){
                     releaseBoth();
                     finishReleaseBoth();
                 }

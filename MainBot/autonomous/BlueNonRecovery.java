@@ -33,14 +33,14 @@ public class BlueNonRecovery extends LinearOpMode {
             //rotate
             {ENC_90, ENC_90, ENC_90},
             //toCrypto
-            {900, 1400, 2050},
+            {1000, 1500, 2050},
             //rotCrypto
             {-ENC_90/2, -ENC_90/2, -ENC_90/2},
             //push (1 = LR, 0 = UD)
             {1, 1, 1},
             {-500, -500, -500},
             {-1300, -1300, -1300},
-            {700, 700, 700},
+            {800, 800, 800},
             //rotate
             {-ENC_90*3/2, -ENC_90*3/2, -ENC_90*3/2},
             {0, 0, 700}
