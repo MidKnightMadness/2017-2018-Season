@@ -1,34 +1,36 @@
-package org.firstinspires.ftc.teamcode.MainBot.teleop;
-
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-/**
- * Created by gregory.ling on 9/27/17.
- */
+package org.firstinspires.ftc.teamcode.OldMainBot.teleop;
 
 public class CrossCommunicator {
-    public static class Drive {                      // FL––G––FR
-        public static final String UP = "front left";      // |U     R|
-        public static final String DOWN = "back right";    // J       |
-        public static final String LEFT = "back left";     // |L     D|
-        public static final String RIGHT = "front right";  // BL-----BR
+    public static double mainBotThrottleFactor = 1.0;
+
+    public static class Drive {
+        public static final String MOTOR_FRONT_LEFT = "front_left";
+        public static final String MOTOR_FRONT_RIGHT = "front_right";
+        public static final String MOTOR_BACK_LEFT = "back_left";
+        public static final String MOTOR_BACK_RIGHT = "back_right";
     }
 
-    public static class Jewel {
-        public static final String MOTOR = "jewel arm";
+    public static class Elevator {
+        public static final String MOTOR = "elevator";
+        public static final String SERVO = "elevator_retainer";
+
+        public static void setIsExtended(boolean val) {
+            mainBotThrottleFactor = val ? 0.25 : 1.0;
+        }
     }
 
-    public static class Glyph {
-        public static final String ELEV = "glyph elevator";
-        public static final String GRAB = "grabber";
-        public static final String UPPER_SERVO = "finger";
+    public static class Feeder {
+        public static final String SERVO = "ball_holder";
     }
 
-    public static class State {
-        public static boolean homeward = false;
-        public static boolean justChanged = false;
-        public static int curCol = 0;
-        public static ElapsedTime time = new ElapsedTime();
+    public static class Intake {
+        public static final String MOTOR = "intake";
     }
 
+    public static class Pinball {
+        public static final String MOTOR = "pinball_motor";
+        public static final String SERVO_FLAG = "semaphore";
+        public static final String SERVO_CLAMP = "pinball_servo";
+        public static final String SENSOR_TOUCH = "pinball_touch";
+    }
 }
