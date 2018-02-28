@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OldMainBot.teleop.IntakeAssembly;
+package org.firstinspires.ftc.teamcode.MainBot.teleop.IntakeAssembly;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;

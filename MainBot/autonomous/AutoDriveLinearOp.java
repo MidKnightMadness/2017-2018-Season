@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.OldMainBot.autonomous;
+package org.firstinspires.ftc.teamcode.MainBot.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.OldMainBot.teleop.CrossCommunicator;
+import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
 @Disabled
 @Autonomous(name = "Delay Move")

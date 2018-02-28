@@ -1,14 +1,14 @@
-package org.firstinspires.ftc.teamcode.OldMainBot.teleop.OldMainBot;
+package org.firstinspires.ftc.teamcode.MainBot.teleop.OldMainBot;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.OldMainBot.teleop.DriveAssembly.DriveController;
-import org.firstinspires.ftc.teamcode.OldMainBot.teleop.ElevatorAssembly.ElevatorController;
-import org.firstinspires.ftc.teamcode.OldMainBot.teleop.FeederAssembly.FeederController;
-import org.firstinspires.ftc.teamcode.OldMainBot.teleop.IntakeAssembly.IntakeController;
-import org.firstinspires.ftc.teamcode.OldMainBot.teleop.PinballAssembly.PinballController;
+import org.firstinspires.ftc.teamcode.MainBot.teleop.DriveAssembly.DriveController;
+import org.firstinspires.ftc.teamcode.MainBot.teleop.ElevatorAssembly.ElevatorController;
+import org.firstinspires.ftc.teamcode.MainBot.teleop.FeederAssembly.FeederController;
+import org.firstinspires.ftc.teamcode.MainBot.teleop.IntakeAssembly.IntakeController;
+import org.firstinspires.ftc.teamcode.MainBot.teleop.PinballAssembly.PinballController;
 
 public class OldMainBotController {
 

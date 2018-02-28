@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.OldMainBot.teleop.FeederAssembly;
+package org.firstinspires.ftc.teamcode.MainBot.teleop.FeederAssembly;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.OldMainBot.teleop.CrossCommunicator;
+import org.firstinspires.ftc.teamcode.MainBot.teleop.CrossCommunicator;
 
 public class FeederController {
 
