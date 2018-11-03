@@ -97,12 +97,12 @@ public class GlyphAssemblyController {
         grabber[0] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.GRAB_UPPER);
         grabber[0].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         grabber[0].setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        grabber[0].setDirection(DcMotorSimple.Direction.REVERSE);
         grabber[0].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         grabber[1] = hardwareMap.dcMotor.get(CrossCommunicator.Glyph.GRAB_LOWER);
         grabber[1].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         grabber[1].setMode(DcMotor.RunMode.RUN_TO_POSITION);
         grabber[1].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        grabber[1].setDirection(DcMotorSimple.Direction.REVERSE);
         elevatorTargetPos = -1;
         futureElevTargetPos = -1;
         timeToUpdate = -1;
